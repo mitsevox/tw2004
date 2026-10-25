@@ -1,6 +1,6 @@
 // ball.h (our name): the ball and the ground it lies on. The Ball struct and Ball.c's physics,
 // the surface types, the current hole's terrain data (its pins and tees) and the terrain queries
-// (GoTerrainCollision, 0x8004AFA0..) that other files call. Players are in golfer.h, which
+// (GoTerrainCollision.c) that other files call. Players are in golfer.h, which
 // includes this file.
 
 #ifndef BALL_H
@@ -118,10 +118,10 @@ typedef struct TGD_TerrainInfo {
                                 //       (Ter_GetAmbientLight)
     TGD_Cell* pGrid;            // 0x34  nGridWidth x nGridLength cells, row by row
     TGD_FoggingData* pFog;      // 0x38  four optional blocks, NULL when absent. The hole's fog
-                                //       (light sets 0 to 2; fn_800A27FC uses it without a test)
+                                //       (light sets 0 to 2), read without a NULL test
     struct CourseGlowBlock* pGlow;  // 0x3C  what the glows get (Ter_CourseLoadCallback)
     u8*    pUnread;             // 0x40  made a pointer (Ter_InitTGD), never read
-    TGD_FoggingData* pRainFog;  // 0x44  the fog of light set 2 when rain starts (fn_800A27FC)
+    TGD_FoggingData* pRainFog;  // 0x44  the fog of light set 2 when rain starts
     TGD_ObjectInstanceInfo* pObjects;   // 0x48  the course objects
     TGD_PolygonReference* pPolyRefs;   // 0x4C  the strips, listed cell by cell (TGD_Cell.uRefs)
     u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices)
@@ -267,6 +267,7 @@ typedef struct TerBox {
     f32  vMin[4];               // 0x00
     f32  vMax[4];               // 0x10
 } TerBox;
+LAYOUT_ASSERT(TerBox, 0x20);
 
 #define NUM_CUP_POSITIONS 4     // one set of cup geometry per pin position (TGD_TerrainInfo.pin)
 
@@ -280,8 +281,8 @@ extern u8        gTerObjectMarks[MAX_OBJECTS];        // objects near the curren
 extern f32       gBallDropSpot[4][4];  // per player: the last spot where the ball could be dropped
 extern f32       gBallPreferredLieSpot[4][4];  // per player: the last such spot with a preferred lie
 extern u8        gTerUse3DCupGeometry;        // the cup is real geometry
-extern s32       gTerNumFreeDropNetworks;        // free-drop networks loaded
-extern s32       gTerNumOOBNetworks;        // out-of-bounds networks loaded
+extern s32       gTerNumFreeDropNetworks;        // free-drop outlines loaded
+extern s32       gTerNumOOBNetworks;        // in-bounds outlines loaded
 
 // UNetwork.c: the hole's networks and the outline tests.
 typedef void (*LoadNetworkCallbackPtr)(TNetwork* pNetwork);   // a loader: gets each network of its type
@@ -339,8 +340,9 @@ u8   Ter_PointInOOBNetwork(f32* location);     // inside the in-bounds outlines 
 // The segment crosses an in-bounds outline (at intersect).
 u8   Ter_CollisionWithOOBNetwork(f32* start, f32* end, f32* intersect);
 // Something spoils the spot for a ball: an object near it, or (as asked) its lie or slope.
-u8   Ter_CheckObjectAndHazardObstruction(f32* position, f32 obstructionDistance, u8 bOnlyCheckNonFadingObjects,
-                                         u8 bCheckLie, f32 hazardDistance, u8 bCheckHeight, f32 fMaxSlope);
+u8   Ter_CheckObjectAndHazardObstruction(f32* position, f32 obstructionDistance,
+                                         u8 bOnlyCheckNonFadingObjects, u8 bCheckLie, f32 hazardDistance,
+                                         u8 bCheckHeight, f32 fMaxSlope);
 // Where to drop the player's ball; 0 when that is where the shot started, or (bRevertToTee) near the tee.
 u8   Ter_SearchForDropLocation(int PlayerID, u8 bUsePreferredLies, u8 bRevertToTee, f32* dropPosition);
 // Whether a ball could be dropped at a point (and with a preferred lie); returns the ground's height.

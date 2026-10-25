@@ -1,12 +1,6 @@
-// GoTerrainCollision.c (TW06's goterraincollision.c; TW07 splits it into GoTerrainCollision.c,
-// GoTerrainCollision_Headgate.c and GoTerrainUtils.c): the course's ground as collision data
-// (TGD_TerrainInfo): the free-drop and out-of-bounds networks, the drop
-// checks, the ambient light, heights, normals and surfaces under a point, and the ball's collision
-// tests against the ground, the pin and the course objects. The ground is triangle strips found
-// through a grid; each triangle's surface is a row of gSurfaceTypes. It ends with small helpers
-// (vector differences and negations, the barycentric and point-in-triangle tests, a mesh's flag
-// byte). The file starts at 0x8004AFA0 (the code from there on shares one constant pool) and ends
-// where MaterialTypes.c begins.
+// GoTerrainCollision.c: the course's ground as collision data (TGD_TerrainInfo): the hole's
+// in-bounds and free-drop outlines, where a ball may be dropped, the light, height and surface under
+// a point, and the ball's collision with the ground, the pin and the course objects.
 
 #include "golfer.h"
 #include "game.h"
@@ -36,17 +30,6 @@ static void Ter_OOBNetworkLoadCallback(TNetwork* netPtr);
 static void LLMath_Subtract3(const f32* src1, const f32* src2, f32* dest);
 static void LLMath_Negate3(const f32* src, f32* dest);
 static void LLMath_Negate(const f32* src, f32* dest);
-
-static inline f32 Ter_Floor(f32 x) {
-    return Math_Floor(x);
-}
-
-// The grid cell a coordinate falls in along one axis, given as cells from the grid's corner (the
-// cell may be outside the grid).
-static inline int Ter_GridCell(f32 fCells) {
-    return (int)Ter_Floor(fCells);
-}
-
 static void Ter_ComputeHighestPointInEveryTriangle(TGD_TerrainInfo* pTerrainData);
 static f32 Ter_CalcLowestPlayableWorldHeight(TGD_TerrainInfo* pTerrainData);
 static f32 Ter_GetLowestGroundTriangle(TGD_TerrainInfo* pTerrainData, f32* location, TGD_Cell** pCellResult,
@@ -74,8 +57,18 @@ static u8 Ter_CheckForObjectCollisionOneGrid(TGD_TerrainInfo* pTerrainData, int 
 static u8 Ter_LineSphereIntersection(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 static int TerCollision_GetMeshFlags(UObjMesh* pMesh, int i);
 
+static inline f32 Ter_Floor(f32 x) {
+    return Math_Floor(x);
+}
+
+// The grid cell a coordinate falls in along one axis, given as cells from the grid's corner (the
+// cell may be outside the grid).
+static inline int Ter_GridCell(f32 fCells) {
+    return (int)Ter_Floor(fCells);
+}
+
 // fake match: never called, puts 1.0f first in the constant pool
-static f32 GoTerrainCollision_StrippedFn(f32 x) {
+static f32 Ter_OrderConstants(f32 x) {
     return x + 1.0f;
 }
 
@@ -146,7 +139,7 @@ void Ter_InitTGD(TGD_TerrainInfo* pTerrainData) {
     int j;
     int nBit;
     int nPinSet;
-    f32 (*pVert)[3];
+    f32 (*pVertexData)[3];
 
     TER_RELOCATE(pTerrainData, pVerts);
     TER_RELOCATE(pTerrainData, pTriFlags);
@@ -181,27 +174,27 @@ void Ter_InitTGD(TGD_TerrainInfo* pTerrainData) {
         for (k = 0; k < NUM_CUP_POSITIONS; k++) {
             if (nBit == (pTerrainData->pPolyRefs[i].uFlags & POLYREF_PIN_POSITIONS)) {
                 gTerUse3DCupGeometry = 1;
-                pVert = &pTerrainData->pVerts[TER_FIRST_VERTEX(&pTerrainData->pPolyRefs[i])];
+                pVertexData = &pTerrainData->pVerts[TER_FIRST_VERTEX(&pTerrainData->pPolyRefs[i])];
                 for (j = 0; j < pTerrainData->pPolyRefs[i].nTris + 2; j++) {
-                    if (pVert[0][0] < gTerCupGeometryBounds[k].vMin[0]) {
-                        gTerCupGeometryBounds[k].vMin[0] = pVert[0][0];
+                    if (pVertexData[0][0] < gTerCupGeometryBounds[k].vMin[0]) {
+                        gTerCupGeometryBounds[k].vMin[0] = pVertexData[0][0];
                     }
-                    if (pVert[0][1] < gTerCupGeometryBounds[k].vMin[1]) {
-                        gTerCupGeometryBounds[k].vMin[1] = pVert[0][1];
+                    if (pVertexData[0][1] < gTerCupGeometryBounds[k].vMin[1]) {
+                        gTerCupGeometryBounds[k].vMin[1] = pVertexData[0][1];
                     }
-                    if (pVert[0][2] < gTerCupGeometryBounds[k].vMin[2]) {
-                        gTerCupGeometryBounds[k].vMin[2] = pVert[0][2];
+                    if (pVertexData[0][2] < gTerCupGeometryBounds[k].vMin[2]) {
+                        gTerCupGeometryBounds[k].vMin[2] = pVertexData[0][2];
                     }
-                    if (pVert[0][0] > gTerCupGeometryBounds[k].vMax[0]) {
-                        gTerCupGeometryBounds[k].vMax[0] = pVert[0][0];
+                    if (pVertexData[0][0] > gTerCupGeometryBounds[k].vMax[0]) {
+                        gTerCupGeometryBounds[k].vMax[0] = pVertexData[0][0];
                     }
-                    if (pVert[0][1] > gTerCupGeometryBounds[k].vMax[1]) {
-                        gTerCupGeometryBounds[k].vMax[1] = pVert[0][1];
+                    if (pVertexData[0][1] > gTerCupGeometryBounds[k].vMax[1]) {
+                        gTerCupGeometryBounds[k].vMax[1] = pVertexData[0][1];
                     }
-                    if (pVert[0][2] > gTerCupGeometryBounds[k].vMax[2]) {
-                        gTerCupGeometryBounds[k].vMax[2] = pVert[0][2];
+                    if (pVertexData[0][2] > gTerCupGeometryBounds[k].vMax[2]) {
+                        gTerCupGeometryBounds[k].vMax[2] = pVertexData[0][2];
                     }
-                    pVert++;
+                    pVertexData++;
                 }
             }
             nBit <<= 1;
@@ -342,7 +335,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* position, f32 obstructionDistance, u
     int j;
     TGD_Cell* pCell;
     f32 aHeight[TER_NUM_CHECK_POINTS];
-    TGD_PolygonReference* apRef[TER_NUM_CHECK_POINTS];
+    TGD_PolygonReference* apPolyRef[TER_NUM_CHECK_POINTS];
     f32 vPos[4];
     u8 abFreeDrop[TER_NUM_CHECK_POINTS];
     f32 fA;
@@ -376,11 +369,11 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* position, f32 obstructionDistance, u
     u8 bObstructed;
     int nSideX;
     int nSideZ;
-    TGD_PolygonReference* pRef;
+    TGD_PolygonReference* pPolyRef;
     u16* pObjRef;
-    f32 (*pVert)[3];
-    u8* pFlags;
-    u8 uFlags;
+    f32 (*pVertexData)[3];
+    u8* pDrawKickData;
+    u8 uiDrawKick;
     UObjMesh* pModel;
 
     bObstructed = 0;
@@ -390,7 +383,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* position, f32 obstructionDistance, u
     for (i = 0; i < TER_NUM_CHECK_POINTS; i++) {
         aHeight[i] = -50000.0f;
         abFreeDrop[i] = 0;
-        apRef[i] = NULL;
+        apPolyRef[i] = NULL;
     }
     fMinX = position[0] - (obstructionDistance <= hazardDistance ? hazardDistance : obstructionDistance);
     fMaxX = position[0] + (obstructionDistance <= hazardDistance ? hazardDistance : obstructionDistance);
@@ -426,28 +419,29 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* position, f32 obstructionDistance, u
                     }
                     pObjRef++;
                 }
-                pRef = &pTerrainData->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+                pPolyRef = &pTerrainData->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
                 for (nRef = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; nRef >= 0; nRef--) {
-                    if (pRef->nObject != 0) {
-                        pRef++;
+                    if (pPolyRef->nObject != 0) {
+                        pPolyRef++;
                     } else {
-                        pVert = &pTerrainData->pVerts[TER_FIRST_VERTEX(pRef)];
-                        pFlags = pTerrainData->pTriFlags + TER_FIRST_VERTEX(pRef);
-                        for (j = pRef->nTris - 1; j >= 0; j--) {
-                            uFlags = pFlags[2];
+                        pVertexData = &pTerrainData->pVerts[TER_FIRST_VERTEX(pPolyRef)];
+                        pDrawKickData = pTerrainData->pTriFlags + TER_FIRST_VERTEX(pPolyRef);
+                        for (j = pPolyRef->nTris - 1; j >= 0; j--) {
+                            uiDrawKick = pDrawKickData[2];
                             if (bFirst) {
                                 abFreeDrop[0] = Ter_PointInFreeDropNetwork(position);
                             }
-                            if ((uFlags & TER_TRI_KICK_MASK)
-                                && (fTop > pVert[TER_TRI_LOWEST_CORNER(uFlags)][1]
-                                    || aHeight[0] < pVert[TER_TRI_HIGHEST_CORNER(uFlags)][1])
-                                && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], position[0],
-                                                           position[2])) {
-                                Ter_GetBarycentricCoords(pVert, position, &fA, &fB, &fC);
-                                fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
+                            if ((uiDrawKick & TER_TRI_KICK_MASK)
+                                && (fTop > pVertexData[TER_TRI_LOWEST_CORNER(uiDrawKick)][1]
+                                    || aHeight[0] < pVertexData[TER_TRI_HIGHEST_CORNER(uiDrawKick)][1])
+                                && Ter_PointInTriangleXZpY(pVertexData[0], pVertexData[1], pVertexData[2],
+                                                           position[0], position[2])) {
+                                Ter_GetBarycentricCoords(pVertexData, position, &fA, &fB, &fC);
+                                fHeight = fA * pVertexData[0][1] + fB * pVertexData[1][1]
+                                          + fC * pVertexData[2][1];
                                 if (fHeight > aHeight[0] && fHeight <= fTop) {
                                     aHeight[0] = fHeight;
-                                    apRef[0] = pRef;
+                                    apPolyRef[0] = pPolyRef;
                                 }
                             }
                             k = 1;
@@ -458,16 +452,18 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* position, f32 obstructionDistance, u
                                     if (bFirst) {
                                         abFreeDrop[k] = Ter_PointInFreeDropNetwork(vPos);
                                     }
-                                    if ((uFlags & TER_TRI_KICK_MASK)
-                                        && (fTop > pVert[TER_TRI_LOWEST_CORNER(uFlags)][1]
-                                            || aHeight[k] < pVert[TER_TRI_HIGHEST_CORNER(uFlags)][1])
-                                        && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], vPos[0],
-                                                vPos[2])) {
-                                        Ter_GetBarycentricCoords(pVert, vPos, &fA2, &fB2, &fC2);
-                                        fHeight = fA2 * pVert[0][1] + fB2 * pVert[1][1] + fC2 * pVert[2][1];
+                                    if ((uiDrawKick & TER_TRI_KICK_MASK)
+                                        && (fTop > pVertexData[TER_TRI_LOWEST_CORNER(uiDrawKick)][1]
+                                            || aHeight[k]
+                                                   < pVertexData[TER_TRI_HIGHEST_CORNER(uiDrawKick)][1])
+                                        && Ter_PointInTriangleXZpY(pVertexData[0], pVertexData[1],
+                                                                   pVertexData[2], vPos[0], vPos[2])) {
+                                        Ter_GetBarycentricCoords(pVertexData, vPos, &fA2, &fB2, &fC2);
+                                        fHeight = fA2 * pVertexData[0][1] + fB2 * pVertexData[1][1]
+                                                  + fC2 * pVertexData[2][1];
                                         if (fHeight > aHeight[k] && fHeight <= fTop) {
                                             aHeight[k] = fHeight;
-                                            apRef[k] = pRef;
+                                            apPolyRef[k] = pPolyRef;
                                         }
                                     }
                                     vPos[2] += 2.0f * hazardDistance;
@@ -476,39 +472,40 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* position, f32 obstructionDistance, u
                                 vPos[0] += 2.0f * hazardDistance;
                             }
                             bFirst = 0;
-                            pVert++;
-                            pFlags++;
+                            pVertexData++;
+                            pDrawKickData++;
                         }
-                        pRef++;
+                        pPolyRef++;
                     }
                 }
             }
         }
     }
-    if (apRef[0] != NULL) {
-        if (gSurfaceTypes[apRef[0]->nSurface].nClass == SURFCLASS_GREEN_e
-            || gSurfaceTypes[apRef[0]->nSurface].nClass == SURFCLASS_FAIRWAY_e
-            || gSurfaceTypes[apRef[0]->nSurface].nClass == SURFCLASS_SAND_e) {
+    if (apPolyRef[0] != NULL) {
+        if (gSurfaceTypes[apPolyRef[0]->nSurface].nClass == SURFCLASS_GREEN_e
+            || gSurfaceTypes[apPolyRef[0]->nSurface].nClass == SURFCLASS_FAIRWAY_e
+            || gSurfaceTypes[apPolyRef[0]->nSurface].nClass == SURFCLASS_SAND_e) {
             bObstructed = 0;
         }
     }
     if (bObstructed) return 1;
     if (bCheckLie) {
-        if ((apRef[0] != NULL && !(gSurfaceTypes[apRef[0]->nSurface].uFlags & MATERIAL_BALL_CAN_LIE))
+        if ((apPolyRef[0] != NULL && !(gSurfaceTypes[apPolyRef[0]->nSurface].uFlags & MATERIAL_BALL_CAN_LIE))
             || abFreeDrop[0]) {
             return 1;
         }
         for (k = 1; k < TER_NUM_CHECK_POINTS; k++) {
-            if (abFreeDrop[k] || apRef[k] == NULL
-                || (apRef[k] != NULL && !(gSurfaceTypes[apRef[k]->nSurface].uFlags & MATERIAL_BALL_CAN_LIE)
-                    && gSurfaceTypes[apRef[k]->nSurface].nClass != SURFCLASS_CARTPATH_e)) {
+            if (abFreeDrop[k] || apPolyRef[k] == NULL
+                || (apPolyRef[k] != NULL
+                    && !(gSurfaceTypes[apPolyRef[k]->nSurface].uFlags & MATERIAL_BALL_CAN_LIE)
+                    && gSurfaceTypes[apPolyRef[k]->nSurface].nClass != SURFCLASS_CARTPATH_e)) {
                 return 1;
             }
         }
     }
     if (bCheckHeight) {
         for (k = 1; k < TER_NUM_CHECK_POINTS; k++) {
-            if (apRef[k] != NULL && fabsf(aHeight[k] - aHeight[0]) > hazardDistance * fMaxSlope) return 1;
+            if (apPolyRef[k] != NULL && fabsf(aHeight[k] - aHeight[0]) > hazardDistance * fMaxSlope) return 1;
         }
     }
     return 0;
@@ -521,9 +518,10 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* position, f32 obstructionDistance, u
 // shot's start than the pin is. When the spot is over 3 yards from the ball, or (without
 // bUsePreferredLies) on ground of another surface class than the ball's, rings 1 to 4 yards
 // around the ball are searched, 8 points a ring (only the first of them from SURFCLASS_WATER_e),
-// for a drop (a preferred one with bUsePreferredLies) on the ball's surface class, else the
-// nearest. Returns 0 when the spot is where the shot started (x, z), or, with bRevertToTee and the
-// shot played from the tee (vBall at vTeePos), when it is within 50 yards of the tee.
+// for a drop (a preferred one with bUsePreferredLies) on the ball's surface class, else a nearer
+// spot (see docs/game/ea-bugs.md). Returns 0 when the spot is where the shot started (x, z), or,
+// with bRevertToTee and the shot played from the tee (vBall at vTeePos), when it is within 50
+// yards of the tee.
 u8 Ter_SearchForDropLocation(int PlayerID, u8 bUsePreferredLies, u8 bRevertToTee, f32* dropPosition) {
     f32 angle;
     f32 testPosition[4];
@@ -2452,9 +2450,8 @@ u8 Ter_PointInTriangleXZpY(f32* t0, f32* t1, f32* t2, f32 x, f32 z) {
     return 1;
 }
 
-// The mesh's flag byte i, the same as UObject.c's Object_GetMeshFlags and GoTerrain.c's
-// Ter_GetMeshFlags, compiled into this file too: Ter_CheckObjectAndHazardObstruction tests
-// UOBJMESH_F0_NO_FADE in byte 0 of a course object's model.
+// The mesh's flag byte i. Ter_CheckObjectAndHazardObstruction tests UOBJMESH_F0_NO_FADE in byte 0
+// of a course object's model.
 static int TerCollision_GetMeshFlags(UObjMesh* pMesh, int i) {
     return pMesh->pInfo->aFlags[i];
 }
