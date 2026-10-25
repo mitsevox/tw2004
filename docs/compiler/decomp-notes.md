@@ -720,7 +720,7 @@ The fixes that come up most often. Each points to its full entry below.
   parameter fed `(s16)(s8)f()` gives `extsb; clrlwi 16`.
 - **[verified] `static const` locals for constant struct arguments** load just before each call where
   initialised locals load at entry; pass a global struct field by value directly, not through a local
-  (streammanagerhole RenderState_Apply).
+  (Code80015470.c RenderState_Apply).
 - **[verified] EA's vector-scale helpers take the scale first** (TW07 `LLMath_Scale3(float, const float*,
   float*)`): Vec3_Scale / LLMath_Scale fixed in 149 calls; Physics_BallFlying became exact.
 - **[verified] The late `void*` parameter copy also fixes argument-setup order** (hlaudtrackstm

@@ -61,12 +61,13 @@ void EASBio_InitOnce(void) {
     EASBio_SetCurrentRewardMessage(EASBio_eReward_None);
 }
 
-// The 'EASI' stream object is the Bio icon.
-void fn_80124A40(void) {
+// Has the stream loader hand the 'EASI' object, the Bio icon, to this file's handler.
+void EASBio_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('EASI', fn_80124B10);
 }
 
-void fn_80124A70(void) {
+// Stops the stream loader handing 'EASI' objects to this file's handler.
+void EASBio_UnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('EASI');
 }
 

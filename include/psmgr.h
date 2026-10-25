@@ -23,8 +23,8 @@ extern char lbl_801F1640[20][9];            // the names listed by the 'sfxd' ob
 
 void fn_800A2934(void);
 void fn_800A2958(void);
-void fn_800A295C(void);         // register the 'sfxd' stream handler (fn_800A29B4)
-void fn_800A298C(void);         // and unregister it
+void PsMgr_RegisterStreamClients(void);     // register the 'sfxd' stream handler (fn_800A29B4)
+void PsMgr_UnregisterStreamClients(void);   // and unregister it
 // Start the effect of kind nKind; pArg points at its strength (NULL: 0.9). n3 is not used.
 s32  fn_800A2A80(s32 nKind, f32* pArg, s32 n3);
 void fn_800A2B34(s32 nKind);    // stop it

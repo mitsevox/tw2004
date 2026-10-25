@@ -121,6 +121,10 @@ void* UI_GetFileData(char* szUnused);          // the UI file's data
 UILoaded* UI_GetTextureBanks(char* szUnused);      // the texture banks
 UINamedList* UI_GetPictureList(char* szUnused);   // the 'GRPS'/'MPCS' data
 u32* UI_GetFonts(char* szUnused);           // the 'FONS' data
+// uiLoadFile.c: its stream handlers, registered while the front end's, the round's and the start-up
+// files stream.
+void UI_RegisterStreamClients(void);
+void UI_UnregisterStreamClients(void);
 
 // One font in the 'FONS' object (uiLoadFile.c UI_StreamLoadFonts): the font's data starts at 0x20; once
 // it is loaded into a font slot, its first word holds the slot.

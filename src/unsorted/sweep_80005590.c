@@ -2,11 +2,11 @@
 
 #include "engine.h"
 #include "core/goaram.h"
+#include "ustream.h"
 
 void UStream_FreeBuffers();
 void fn_800055D4();
 void fn_8000724C();
-void StreamManager_CloseOnce();
 void AudMem_CloseOnce();
 
 void fn_80005590(void);

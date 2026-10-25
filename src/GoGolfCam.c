@@ -2619,7 +2619,7 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
     if (szName != NULL) {
         pShot = DynamicCam_ChooseScriptByName(szName);
         if (pShot == NULL && gpCrAPState->pShown != NULL && gpCrAPState->pShown->pChar != NULL
-            && gpCrAPState->pShown->pChar->nSlot == 1) {
+            && gpCrAPState->pShown->pChar->nSlot == ANIM_SLOT_FEMALE) {
             c = szName[0];
             szName[0] = 'f';
             pShot = DynamicCam_ChooseScriptByName(szName);

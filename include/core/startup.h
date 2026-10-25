@@ -254,5 +254,7 @@ void HwVoice_OnVoiceFreed(void);
 s16  HwVoice_GetVolume(u16 nVoice);
 u32  AudAram_AllocStreamBuffer(void);                // an ARAM stream buffer
 void AudAram_FreeStreamBuffer(u32 uAddr);            // give an ARAM buffer back
+void startup_RegisterStreamClients(void);
+void startup_UnregisterStreamClients(void);
 
 #endif

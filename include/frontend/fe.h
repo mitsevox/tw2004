@@ -126,6 +126,18 @@ LAYOUT_ASSERT(UILoadingScreen, 0x38);
 
 extern UILoadingScreen gUILoadingScreen;
 
+// What UI_DrawLoadingScreenAndProgressBar is asked to do.
+typedef enum UI_LoadScreen_state {
+    UI_LOADSCREEN_STEP = 0,     // one step while the stream loads
+    UI_LOADSCREEN_DONE = 1      // the stream has loaded: show the tiles still to come and stop
+} UI_LoadScreen_state;
+
+// uiProcessPolygon.c: the loading screen the stream manager shows while a list of files streams.
+void UI_LoadLoadingBarTexture(void);
+void UI_InitLoadingBar(void);
+void UI_DrawLoadingScreenAndProgressBar(UI_LoadScreen_state state);
+void UI_FreeLoadingPicture(void);
+
 // A corner of a quad uiProcessPolygon.c UIPoly_UnpackVertex turns into draw arrays (uiArc.c builds
 // them too). Our name.
 typedef struct FEVertex {
@@ -259,6 +271,9 @@ extern s32 gStartUnlockedGolfers[16];  // the golfers unlocked from the start (G
 
 #define FE_NUM_BIOS 29
 extern FEBio* gpFEBios;           // a copy of the 'BIO ' stream object's data (FE_CharBios_LoadBIOfromStream)
+void FE_CharBios_RegisterStreamClients(void);       // FE_Manager.c
+void FE_CharBios_UnRegisterStreamClients(void);     // FE_Manager.c
+void FE_Manager_RegisterStreamClients(void);        // FE_Manager.c
 
 // The profile backups (FEState.p658) can be moved out to ARAM (FE_MoveBackupsToARAM) and back
 // (FE_RestoreBackupsFromARAM).
@@ -290,6 +305,8 @@ typedef struct FEGolferMachine {
     u8  bPaused;                // 0xB
 } FEGolferMachine;
 LAYOUT_ASSERT(FEGolferMachine, 0xC);
+
+void FE_lite_vRegisterStreamClients(void);
 
 // ---- the Create-A-Player database (FE_CrAPDB.c) ----------------------------------------------
 
@@ -405,6 +422,8 @@ extern char lbl_801932C8[CRAP_NUM_PARTS][32];
 int  sGetLinkedAssetID(int nAsset);
 CrAPAsset* sGetLinkedAsset(CrAPAsset* pAsset);                 // the same, by asset
 u8   FE_CrAP_GetTriggerAnims(void);                            // the database's b14
+void FE_CrAP_RegisterStreamClients(void);
+void FE_CrAP_UnRegisterStreamClients(void);
 // Set the database's nGender (which assets are offered)
 void FE_CrAP_SetCurrentGender(s8 n);
 s8   FE_CrAP_GetAssetGender(int nAsset);                       // an asset's nGender

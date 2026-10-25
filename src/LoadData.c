@@ -50,11 +50,11 @@ void fn_8000B984(void) {
     lbl_80281C08 = Mem_AllocFunc(TXF2_KEPT_SIZE, 16, 1);
 }
 
-void fn_8000B9E4(void) {
+void FEtm_vRegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback(TAG('t', 'x', 'f', '2'), fn_8000BCA0);
 }
 
-void fn_8000BA14(void) {
+void FEtm_vUnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback(TAG('t', 'x', 'f', '2'));
 }
 
@@ -176,7 +176,7 @@ int fn_8000BDF8(char* pName, TexBank** ppBank, TexEntry** ppTex) {
 }
 
 void fn_8000BEC8(void) {
-    gpStreamManagerLists->aParams[2].nNumFiles = 0;
+    STREAM_LIST(STREAM_FILE_LOADSCREEN).nNumFiles = 0;
 }
 
 int Game_GetMode(void) {

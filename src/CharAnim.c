@@ -483,11 +483,11 @@ void CharacterState_UpdateSKAState(Character* pChar) {
     case 1:
         nGroup = 1;
         if (gPlayers[pChar->nPlayer].ball.nLie == 0 && gSession.options.a24[6] == 0 &&
-            gSession.options.nWind >= 1 && pChar->nSlot == 0) {
+            gSession.options.nWind >= 1 && pChar->nSlot == ANIM_SLOT_MALE) {
             nGroup = 16;
         } else if (gPlayers[pChar->nPlayer].ball.nLie == 0 && gPlayers[pChar->nPlayer].nClub >= 0 &&
                    gPlayers[pChar->nPlayer].nClub <= 5 && Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 10
-                           && pChar->nSlot == 0) {
+                           && pChar->nSlot == ANIM_SLOT_MALE) {
             nGroup = 16;
         }
         CharacterState_AddSKABlendData(pChar, 1, nGroup, SKABlender_BlendLinear, 1, 2, -10000.0f, -30000.0f,

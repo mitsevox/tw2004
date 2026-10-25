@@ -266,17 +266,17 @@ void Ter_vCloseModule(void) {
     }
 }
 
-// Registers the terrain's chunk loaders (streammanagerhole.c): 'ter ' the hole's ground and objects
+// Registers the terrain's chunk loaders (StreamManager.c): 'ter ' the hole's ground and objects
 // (Ter_HoleDataLoadCallback), 'tgd ' the course data (Ter_CourseLoadCallback), 'tLOD' the LOD
 // distances (Ter_LODLoadCallback).
-void Ter_RegisterStreamClients(void) {
+void Ter_vRegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('ter ', Ter_HoleDataLoadCallback);
     Stream_RegisterLoadChunkCallback('tgd ', Ter_CourseLoadCallback);
     Stream_RegisterLoadChunkCallback('tLOD', Ter_LODLoadCallback);
 }
 
 // Unregisters the 'ter ' and 'tgd ' chunk loaders; 'tLOD' stays registered.
-void Ter_UnRegisterStreamClients(void) {
+void Ter_vUnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('ter ');
     Stream_UnregisterLoadChunkCallback('tgd ');
 }

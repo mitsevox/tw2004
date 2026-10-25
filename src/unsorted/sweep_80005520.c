@@ -2,12 +2,12 @@
 
 #include "engine.h"
 #include "core/goaram.h"
+#include "ustream.h"
 
 void Session_Init();
 void UStream_AllocBuffers();
 void fn_80005580();
 void fn_800071BC();
-void StreamManager_InitOnce();
 void fn_8002F1D4();
 void Gaud_InitOnce();
 void AudMem_InitOnce();

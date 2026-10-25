@@ -20,7 +20,7 @@ and MetroTRK are built from public decomps in `extern/` (the `progress_category=
 | A shot, start to finish | `gomainloop.c` calls `STATEMAIN_Update` (`statemain.c`) each frame, which runs `GOLFERSTATE_Update` (`StateGolfer.c`): each player's golfer state (`stateFunc.c`, `STATEFUNC_*`). `STATEFUNC_Swing*` drives `Swing.c`, which launches the ball with `Physics_ShotImpact` (`Ball.c`); `GM_BallHit` and `GM_Update` (`GameMode.c`) keep the round's turns and strokes |
 | A round's rules | `GameRound.c` `GM_SetModeType` fills `gpGame`'s callbacks (`GameState`, `include/golfer.h`) with defaults, then calls the game mode's own setup (`GameMode*.c`) |
 | The menus | `uiProcessInterface.c` runs the UI; the screens run on EA's UI Studio library (`UISApi.c` is the game's side, `UISStack.c` `UISStackProcess` the script interpreter); menu messages land in `FE_MessageTable.c`, a round's in `GameUICommands.c` |
-| Loading anything from disc | `UStream.c` (the chunked `.hog`/`.gcb` streamer; `docs/game/formats/ctrl-container.md`), handlers registered per chunk type, file lists in `streammanagerhole.c` |
+| Loading anything from disc | `UStream.c` (the chunked `.hog`/`.gcb` streamer; `docs/game/formats/ctrl-container.md`), handlers registered per chunk type, file lists in `StreamManager.c` |
 | Shared headers | `include/engine.h` (services), `include/game.h` (round, modes), `include/golfer.h` (players, golfers, `GameState`), `include/character.h`, `include/camera.h` |
 
 `gSession.nGameType` (the outer loop in `GoEntry.c`): 0 boot decision, 1 start-up screens,
@@ -119,7 +119,7 @@ early in link order (0x80005628-0x80013720), between the LL rendering files.
 | URes.c | EA | the resource list: the stream objects kept once delivered, found by type and id |
 | LoadData.c | ours | stream handlers: `'txf2'` texture banks, the `'load'` object, the loading-screen file; `Game_GetMode` |
 | UStream.c | EA | the streaming asset loader (CTRL/SHOC/SONO chunk files `.hog`/`.gcb`), async DVD reads into 18 buffers |
-| streammanagerhole.c | T6 | the stream file lists (front end, start-up, in game, characters, hole) and their handler lists |
+| StreamManager.c | T6 | the stream manager: a file list per kind of stream (round, front end, loading screen, menu golfer, global data, start-up, hole), the chunk handlers each kind registers, and streaming a list behind the loading screen |
 | LLInput_Gc.c | ours (after TW06 `llinput_xbox.c`) | the four controllers: buttons, sticks, triggers, rumble |
 | UByteSwap.c | T7 | copies little-endian disc data while swapping byte order |
 | LLTime.c | T7 | the clock and its stopwatch counters (`TI_*`) the main loop times frames with |
