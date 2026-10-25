@@ -9,6 +9,7 @@
 #include "core/memcard.h"
 #include "core/gbacable.h"
 #include "core/goaram.h"
+#include "core/audcontainers.h"
 #include "game/frontend.h"
 #include "frontend/fe.h"
 #include "llpict.h"
@@ -191,8 +192,6 @@ void fn_800B28D4(Character* pChar, int a, int b);
 void fn_800B2FB0(Character* pChar, int a, int b);
 void ComicCam_InitComicCam(void);
 void ComicCam_CloseComicCam(void);
-void AudMem_InitModule(void);
-void AudMem_CloseModule(void);
 void UI_EATraxDraw(void);
 void fn_800BA940(void);
 void fn_800BAA4C(void);
