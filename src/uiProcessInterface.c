@@ -64,7 +64,6 @@ void FO_vSetCurrentAddMode(s32 nMode);
 void fn_80012C54_SetWordWrap(s32 v);
 void UFont_ResetContext(void);
 void UI_SetTextLineSpacing(f32 fSpacing);
-TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 void UI_ReportUISError(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg);
 void UI_ScreenDrawDebug(u16 uGroup, u16 uScreen, s32 n);
 void UI_BlankProcess1(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr);
@@ -743,10 +742,11 @@ void UI_SetTextLineSpacing(f32 fSpacing) {
 }
 
 // The texture in pBank whose name hashes to uHash. A name not in the bank gives index 0x80000000,
-// which fn_800107E4's 32-bit multiply by the entry size wraps to the bank's first texture.
+// which TX_spGetTextureGroupTextureFromIndex's 32-bit multiply by the entry size wraps to the
+// bank's first texture.
 // port: on 64 bits that index points far outside the bank.
 TexEntry* UI_FindTexture(TexBank* pBank, u64 uHash) {
     int nTex = TX_uiFindTextureIndexFromID(pBank, uHash);
 
-    return fn_800107E4(pBank, nTex);
+    return TX_spGetTextureGroupTextureFromIndex(pBank, nTex);
 }

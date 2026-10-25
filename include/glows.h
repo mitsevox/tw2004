@@ -24,7 +24,7 @@ LAYOUT_ASSERT(GlowTable, 0x70);
 
 extern GlowTable lbl_801D99D0;
 
-// The glows queued for drawing (lbl_80281F80): fn_8009B260 adds one,
+// The glows queued for drawing (gpCurrentGlowList): fn_8009B260 adds one,
 // ColGlow_RenderAllGlowInCurrentList draws them all.
 #define NUM_GLOW_QUEUE 160
 
@@ -48,12 +48,15 @@ typedef struct GlowQueue {
     s32  nCount;                    // 0x1E00
     u8   unk1E04[0x1E10 - 0x1E04];  // no code found reads these
 } GlowQueue;
-// 0x1E10 bytes: ColGlow_SetCurrentList picks a queue by n * 0x1E10 from lbl_801D9A68 (one queue, 0x1E10
-// bytes; lbl_801DB878 follows it).
+// 0x1E10 bytes: ColGlow_SetCurrentList steps through gaGlowLists by 0x1E10 a list.
 LAYOUT_ASSERT(GlowQueue, 0x1E10);
 
-extern GlowQueue lbl_801D9A68[1];
-extern GlowQueue* lbl_80281F80;
+#define NUM_GLOW_LISTS 1
+
+// The glow lists, and the one glows are queued on and drawn from: NULL from ColGlow_InitModule
+// until GLW_vInitModule picks list 0 (ColGlow_SetCurrentList).
+extern GlowQueue gaGlowLists[NUM_GLOW_LISTS];
+extern GlowQueue* gpCurrentGlowList;
 
 // What ColGlow_RenderAllGlowInCurrentList hands the glow mesh (our name): Skin.c's
 // SD_FillShaderObject passes it on, fn_80098884 copies it and fn_8009884C draws the queue with it.
@@ -179,5 +182,28 @@ extern BallGlowState* lbl_80281518;
 // Queues a glow at pPos (Code8009AA28.c); nothing when the queue is full.
 void fn_8009B260(f32* pPos, u32 uColorA, u32 uColorB, u8 n25, u8 n24, u8 n26, f32 f18, f32 f1C,
                  f32 f20);
+
+// Code8009AA28.c: the sun flare's set-up, shut-down and per-view update.
+void SF_vInitModule(s32 nViews);
+void SF_vCloseModule(void);
+void SF_vUpdateSunFlare(s32 nView);
+
+// GoShaderObject_Glows_Gc.c: the glow list's shader object.
+void ColGlow_InitModule(void);
+void ColGlow_CloseModule(void);
+void ColGlow_RenderAllGlowInCurrentList(void);
+
+// Code8009B340.c: the fading glow nodes.
+void FadeGlow_UpdateAll(f32 fTime);
+void FadeGlow_RenderAll(void);
+void FadeGlow_InitModule(void);
+void FadeGlow_CloseModule(void);
+
+// GlowMgr.c: the glows' module hooks for gomainloop.c.
+void GLW_vInitModule(int iNumberOfViewports);
+void GLW_vCloseModule(void);
+void GLW_vUpdateGlows(int iViewportID);
+void GLW_vRenderGlows(int iViewportID);
+void ColGlow_ResetCurrentList(void);    // empties the current glow list
 
 #endif

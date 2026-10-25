@@ -239,7 +239,7 @@ void FE_CrAPBall_SetLogo(char* szBall) {
     }
     SKA_PackName(&uLogo, szBall);
     SKA_PackName(&uSlot, gszCrAPBallLogoTex);
-    fn_800102DC(uSlot, &pSlotBank, &pSlot);
+    TG_iFindTextureGroupAndTexture(uSlot, &pSlotBank, &pSlot);
     if (pSlotBank == NULL || pSlot == NULL) {
         return;
     }

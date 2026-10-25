@@ -13,7 +13,7 @@ typedef struct GreenGrid {
     f32* apVert[2];             // 0x050  vertex positions, three floats each
     f32* apUV[2];               // 0x058  texture coordinates, two floats each
     u8*  apColor[2];            // 0x060  vertex colours, four bytes each
-    s16* apIndex[2];            // 0x068  the line strip's vertex indexes
+    u16* apIndex[2];            // 0x068  the line strip's vertex indexes
     s32  nVerts;                // 0x070  vertices built so far (GR_BuildGridRenderData)
     s32  nIndices;              // 0x074  indexes built so far
     f32* apHeight[2];           // 0x078  ground height per grid point, nCols x anRows[view]

@@ -98,3 +98,17 @@ void fn_8006FF08(u8* p0) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+s32 fn_80070168(s32, s32);
+void fn_8006FF2C(void* arg0);
+
+void fn_8006FF2C(void* arg0) {
+    if ((u8) (*(u8*)((u8*)(arg0) + 0xC)) != 0) {
+        GXSetArray(9, (void*)*(*(s32**)((u8*)(arg0) + 0x24)), 0xC);
+    }
+    fn_80070168((*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 4)));
+}
+
+// ---- end of sweep code ----

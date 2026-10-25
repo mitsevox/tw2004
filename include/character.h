@@ -594,8 +594,8 @@ typedef struct Character {
                                 //        (Character_Sleep; also while its textures are given
                                 //        back), 0x80 its club or shot kind changed
                                 //        (Character_InitNewClubAndShotType; state 5 clears it),
-                                //        0x100 the animation runs 5 times as fast, 0x2000 cleared
-                                //        by fn_800955F0's skin reload (set nowhere), 0x400 a flag
+                                //        0x100 the animation runs 5 times as fast,
+                                //        CHARACTER_CLEARED_ON_SKIN_LOAD, 0x400 a flag
                                 //        of its CHR object, 0x1000 cleared each frame
                                 //        (Character_PreRenderAll), 0x4000 the club hangs from the
                                 //        root (Character_UpdateClubAttachment), 0x8000 the putt
@@ -776,6 +776,10 @@ typedef struct Character {
     struct SkinChoices* pChoices;   // 0x17B8  its look (Character_SetClubsAndClothes dresses it from this); Character_EndLoadTexturesCallbackIG
                                     //         puts its logos on the model (sApplyUserLogos)
 } Character;
+
+// Character.uCharFlags bits.
+#define CHARACTER_CLEARED_ON_SKIN_LOAD  0x2000  // cleared when CharacterSkin_LoadOnlyPlayer gives the
+                                                // body skin its render data; nothing sets it
 
 // The players' characters (gViewSlots, 0x80187124): Player_SetGolfer takes the player's from here.
 typedef struct ViewSlot {
@@ -1235,6 +1239,18 @@ MalBank* MtaLib_GetBank(int nBank);
 void*    MtaLib_GetRandom(MalBank* pBank, int nGroup, int n);
 
 void Character_PreHoleInit(void);
+
+// char_skin.c: which golfers' body skins have their render data, in a single view; and the skin's
+// steps in the characters' set-up, frame, hole exit and shutdown, which are empty.
+void  CharacterSkin_PostExitHole(void);
+void  CharacterSkin_Update(void);
+void  CharacterSkin_PreHoleInit(void);
+void  CharacterSkin_PostInit(void);
+void  CharacterSkin_Init(void);
+void  CharacterSkin_Close(void);
+void  CharacterSkin_FreeAll(void);
+void  CharacterSkin_LoadOnlyPlayer(int nPlayer);
+
 // AnimStream.c
 void AnimStream_WaitForRead(void);
 

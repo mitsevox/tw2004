@@ -14,6 +14,7 @@
 #include "frontend/fe.h"
 #include "llpict.h"
 #include "ustream.h"
+#include "glows.h"
 
 void*       lbl_80281E60;
 FB_SFrameBuffer* lbl_80281E5C;
@@ -159,7 +160,6 @@ void fn_80093AD4(void);
 void fn_80093D14(void);
 void BS_vInit(void);
 void BS_vClose(void);
-void fn_80095550(void);
 void fn_80098A98(void);
 void fn_80098B5C(void);
 void fn_80099344(f32 fFrameTime);
@@ -167,10 +167,6 @@ void fn_80099BA0(void);
 void fn_8009A16C(void);
 u8   fn_8009A180(void);
 void DEMO_Restore(void);
-void GLW_vInitModule(int n);
-void GLW_vCloseModule(void);
-void GLW_vUpdateGlows(int nView);
-void GLW_vRenderGlows(int nView);
 void fn_8009B134(void);
 void GR_vClose(void);
 void GR_UpdateGreenGrid(int nView);
@@ -1040,7 +1036,7 @@ void fn_8006D8E8(void) {
         fn_800080D0();
         Gaud_Cycle();
         if (gSession.nGameType != GAMESTATE_STARTUP) {
-            fn_80095550();
+            CharacterSkin_Update();
         }
         if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
             CharacterTex_TextureLoader();

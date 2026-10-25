@@ -808,11 +808,11 @@ u8 SW_vStateCancelSwing(int nPlayer) {
 void SW_vUIInit(int nPlayer) {
     u64 uHash;
     uHash = FEtm_PackName("clubback");
-    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubBack);
+    TG_iFindTextureGroupAndTexture(uHash, &gpSwing->pBank, &gpSwing->pClubBack);
     uHash = FEtm_PackName("clubdown");
-    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubDown);
+    TG_iFindTextureGroupAndTexture(uHash, &gpSwing->pBank, &gpSwing->pClubDown);
     uHash = FEtm_PackName("tball");
-    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pTBall);
+    TG_iFindTextureGroupAndTexture(uHash, &gpSwing->pBank, &gpSwing->pTBall);
 }
 
 // Empty a player's club trail history (nNumInBlurQueue = 0).
@@ -1000,18 +1000,18 @@ void SW_vUIRender2D(int nPlayer) {
 // length, blended and without depth writes. A CPU's trail is drawn only in lessons 8 and 9 of the
 // lessons mode (11).
 void SW_vUIRender3D(int nPlayer) {
-    s16           idx[26];
-    TrailMeshDesc mesh;
-    f32           vGrip[4];
-    TrailDraw     draw;
+    u16             idx[26];
+    DynRenderFill   mesh;
+    f32             vGrip[4];
+    DynRenderDrawIn draw;
     Character*      pObj;
-    u8            nBlue;
-    s8            nRed;
-    u8            nGreen;
-    SwingData*    pSw;
-    int           nView;
-    int           nGrip;
-    int           i;
+    u8              nBlue;
+    s8              nRed;
+    u8              nGreen;
+    SwingData*      pSw;
+    int             nView;
+    int             nGrip;
+    int             i;
 
     pSw   = &gPlayers[nPlayer].swing;
     pObj  = gPlayers[nPlayer].pChar;
@@ -1072,16 +1072,16 @@ void SW_vUIRender3D(int nPlayer) {
                 RenderState_SetBankTexture(gpSwing->pBank, gpSwing->pClubDown);
             }
             RenderState_Flush();
-            draw.nPrims   = 1;
-            draw.nFirst   = 0;
-            draw.nCount   = pSw->nNumInBlurQueue + 1;
-            mesh.n0       = 1;
-            mesh.nVerts   = pSw->nNumInBlurQueue + 1;
-            mesh.pDraw    = &draw;
-            mesh.pIndices = idx;
-            mesh.pPos     = gpSwing->p94[nView];
-            mesh.pColour  = gpSwing->p9C[nView];
-            mesh.pUV      = gpSwing->pA4[nView];
+            draw.nPrim     = DYNRENDER_PRIM_TRIANGLE_FAN;
+            draw.nStart    = 0;
+            draw.nCount    = pSw->nNumInBlurQueue + 1;
+            mesh.nCount    = 1;
+            mesh.nVerts    = pSw->nNumInBlurQueue + 1;
+            mesh.pDraws    = &draw;
+            mesh.pIndices  = idx;
+            mesh.pPos      = gpSwing->p94[nView];
+            mesh.pColour   = gpSwing->p9C[nView];
+            mesh.pTexCoord = gpSwing->pA4[nView];
             SD_FillShaderObject((ShaderObject*)gpSwing->mesh[nView], &mesh, 1);
             SD_DrawShaderObject(gpSwing->mesh[nView]);
             DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);

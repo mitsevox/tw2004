@@ -168,7 +168,7 @@ void RTClock_GetDateTimeString(char* s);
 #define TWOPI 6.28318531f
 #define DEG(x) ((x) * (PI / 180.0f))
 
-void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
+void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see LLObj_Gc.c)
 extern f32 __float_max[];               // FLT_MAX (MSL's)
 
 // UMatFlt.c: 4x4 float matrices and four-float vectors. A vector is a row times a matrix, so a
@@ -426,7 +426,8 @@ struct DynObj;
 int  RPN_RunScript(u8* pCode, int nArg, int nPush, struct DynObj* pObj);
 
 // Find a loaded texture by its packed name: its bank and entry (both NULL if none).
-int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
+int  TG_iFindTextureGroupAndTexture(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
+TexEntry* TX_spGetTextureGroupTextureFromIndex(TexBank* pBank, int nTex);   // the bank's texture nTex
 // Makes a texture bank from a 'txf ' stream object's data (LLTex.c), in pBank or, when it is NULL,
 // a new allocation.
 TexBank* TX_spDownloadData(struct TStreamData* pObject, TexBank* pBank, int n);
@@ -473,7 +474,7 @@ extern u8* lbl_80280DC8;
 void RenderState_SetConstantAlphaActive(u8 bActive);
 
 // The texture bank list (LLTexGrp.c): the banks loaded from 'txf ' stream objects, searched by
-// fn_800102DC.
+// TG_iFindTextureGroupAndTexture.
 typedef struct TexGrpSlot {
     TexBank* pBank;             // 0x0  NULL: a free slot
     int  n4;                    // 0x4  the list's n8 when the bank came in (fn_80010608 frees by it)
@@ -501,7 +502,8 @@ typedef struct TexGrpList {
     u8   bUseRecs;              // 0x0C  set: objects are loaded as pRecs says
     u8   unkD[3];
     int  n10;                   // 0x10
-    u8   b14;                   // 0x14  set: fn_800102DC only looks in slots whose n8 is n10
+    u8   b14;                   // 0x14  set: TG_iFindTextureGroupAndTexture only looks in slots
+                                //       whose n8 is n10
     u8   unk15[3];
     int  nNumRecs;              // 0x18
     TexGrpRec* pRecs;           // 0x1C
@@ -910,7 +912,7 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
 // A particle system (0xAC bytes, the shader object's pData): its run of particles in the particle
 // buffers (lbl_802813A8), and what it draws with.
 typedef struct ParticleSystem {
-    TexBank*  pBank;            // 0x00  } its texture (fn_800102DC)
+    TexBank*  pBank;            // 0x00  } its texture (TG_iFindTextureGroupAndTexture)
     TexEntry* pTex;             // 0x04  }
     u16  nFirst;                // 0x08  its first particle in the buffers
     u16  nCount;                // 0x0A  how many
@@ -937,7 +939,7 @@ typedef struct ShaderObjectHooks {
 
 struct ShaderObject {
     s32   nRow;                 // 0x00  its row of lbl_80188E88
-    u8    unk4[0x20];           // 0x04  the row's own data (rows 0 and 19: a DynRenderObject)
+    u8    aData[0x20];          // 0x04  the row's own data (rows 0 and 19: DynRenderObject.pBuf)
     ShaderObjectHooks* pHooks;  // 0x24  that row's hooks
 };
 LAYOUT_ASSERT(ShaderObject, 0x28);
@@ -948,7 +950,7 @@ void SD_FillShaderObject(ShaderObject* pObj, const void* pData, int n);
 struct UObjMeshPart;
 struct UObjArraySet;
 
-// A shader type's model-part functions (ModuleHooks.part; code_800080D0.c calls them for a
+// A shader type's model-part functions (ModuleHooks.part; LLObj_Gc.c calls them for a
 // dynobj.h UObjMeshPart of that type).
 typedef struct UObjPartFuncs {
     void (*p0)(struct UObjMeshPart* pPart, void* pArg);    // 0x0  sets the part up (fn_8000827C)
@@ -956,7 +958,7 @@ typedef struct UObjPartFuncs {
     void (*p8)(struct UObjMeshPart* pPart);                // 0x8  draws the part (ObjPart_Draw)
 } UObjPartFuncs;
 
-// A mode's array-set functions (HookRow.set; code_800080D0.c calls them for a dynobj.h
+// A mode's array-set functions (HookRow.set; LLObj_Gc.c calls them for a dynobj.h
 // UObjArraySet in that mode).
 typedef struct UObjSetFuncs {
     void (*p0)(struct UObjArraySet* pSet, void* pArg);     // 0x0  sets the set up (fn_800081C8)
@@ -978,7 +980,7 @@ typedef struct ModuleHooks {
     void  (*pfn18)(void);         // 0x18  fn_8006DE68
     void  (*pfn1C)(void);         // 0x1C  fn_8006DF68
     void  (*pfn20)(void);         // 0x20  fn_8006DEE8
-    UObjPartFuncs part;           // 0x24  its model parts' functions (code_800080D0.c)
+    UObjPartFuncs part;           // 0x24  its model parts' functions (LLObj_Gc.c)
     u8    unk30[0x34 - 0x30];
     ShaderObjectHooks shader;     // 0x34  its shader objects' hooks
 } ModuleHooks;
@@ -995,7 +997,7 @@ extern u8 lbl_801893D8[20];         // per row: its pfn0/pfn4 run outside game t
 typedef struct HookRow {
     void  (*pfn0)(void);          // 0x00
     void  (*pfn4)(void);          // 0x04
-    UObjSetFuncs set;             // 0x08  mode 0's array-set functions (code_800080D0.c fn_800081C8)
+    UObjSetFuncs set;             // 0x08  mode 0's array-set functions (LLObj_Gc.c fn_800081C8)
 } HookRow;
 
 extern HookRow lbl_80188E78[1];
@@ -1007,8 +1009,15 @@ extern HookRow lbl_80188E78[1];
 typedef struct DynRenderDraw {
     s32   nStart;               // 0x00  first index
     s32   nCount;               // 0x04  indices
-    s32   nPrim;                // 0x08  primitive kind: a row of lbl_8018C7C8
+    s32   nPrim;                // 0x08  DYNRENDER_PRIM_*
 } DynRenderDraw;                // 0x0C
+
+// A draw's primitive kind: its row of lbl_8018C7C8, which holds the GX primitive it is drawn as.
+enum {
+    DYNRENDER_PRIM_TRIANGLE_STRIP = 0,  // GX_TRIANGLESTRIP
+    DYNRENDER_PRIM_TRIANGLE_FAN = 1,    // GX_TRIANGLEFAN
+    DYNRENDER_PRIM_LINE_STRIP = 3       // GX_LINESTRIP
+};
 
 typedef struct DynRenderDrawList {
     u32           nDraws;       // 0x00
@@ -1017,7 +1026,7 @@ typedef struct DynRenderDrawList {
 
 // A draw as callers hand it in (8 bytes).
 typedef struct DynRenderDrawIn {
-    s32   nPrim;                // 0x00
+    s32   nPrim;                // 0x00  DYNRENDER_PRIM_*
     u16   nStart;               // 0x04
     u16   nCount;               // 0x06
 } DynRenderDrawIn;
@@ -1038,19 +1047,19 @@ LAYOUT_ASSERT(DynRenderBuffer, 0x34);
 
 extern u32 lbl_8018C7C8[4];     // the GX primitive for each DynRenderDraw nPrim
 
-DynRenderBuffer* fn_8007018C(int nMaxVerts, int nMaxDraws);    // make
-void fn_80070348(DynRenderBuffer* pBuf);                         // free
-void fn_800703B8(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPrim);  // draw
-void fn_800704C4(DynRenderBuffer* pBuf, const void* pPos, const void* pColour, const void* pTexCoord,
-                 int nVerts, u8 bFlip);                          // add vertices
-void fn_800705F0(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart);  // add indices
-void fn_80070764(DynRenderBuffer* pBuf, const DynRenderDrawIn* pDraws, u16 nCount, int nPrim,
-                 u8 bRestart);                                   // add draws
+DynRenderBuffer* DynRenderBuffer_Create(int nMaxVerts, int nMaxDraws);
+void DynRenderBuffer_Free(DynRenderBuffer* pBuf);
+void DynRenderBuffer_Draw(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPrim);
+void DynRenderBuffer_AddVertices(DynRenderBuffer* pBuf, const void* pPos, const void* pColour,
+                                 const void* pTexCoord, int nVerts, u8 bFlip);
+void DynRenderBuffer_AddIndices(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart);
+void DynRenderBuffer_AddDraws(DynRenderBuffer* pBuf, const DynRenderDrawIn* pDraws, u16 nCount, int nPrim,
+                              u8 bRestart);
 
-// A shader object that draws through a dynamic rendering buffer (the hooks of rows 0 and 19 of
-// lbl_80188E88; our names). Only what those hooks read.
+// A shader object that draws through a dynamic rendering buffer, as the hooks of rows 0 and 19 of
+// lbl_80188E88 see it (our names): the ShaderObject with its row's data.
 typedef struct DynRenderObject {
-    u8    unk0[4];
+    s32   nRow;                     // 0x00  its row of lbl_80188E88
     DynRenderBuffer* pBuf;          // 0x04
 } DynRenderObject;
 
@@ -1070,6 +1079,14 @@ typedef struct DynRenderFill {
     const void* pColour;            // 0x10
     const void* pTexCoord;          // 0x14
 } DynRenderFill;
+
+// GoShaderObject_PrelitTextured_Gc.c: row 0's shader-object hooks, a prelit, textured mesh that
+// is drawn through a dynamic rendering buffer and refilled every frame.
+void SD_vShaderObject_PrelitTextured_Dynamic_Init(DynRenderObject* pObj, const DynRenderSize* pSize);
+void SD_vShaderObject_PrelitTextured_Dynamic_Close(DynRenderObject* pObj);
+void SD_vShaderObject_PrelitTextured_Dynamic_Render(DynRenderObject* pObj);
+void SD_vShaderObject_PrelitTextured_Dynamic_Refresh(DynRenderObject* pObj, DynRenderFill* pFill,
+                                                     u8 bRestart);
 
 // A scrolling texture animation (GoShaderObjectCommon_TexAnimManager_Gc.c; our names, after
 // fn_80074BE0's). Each frame its texture matrix is moved by the fraction of fU and fV times the
@@ -1533,31 +1550,6 @@ typedef struct Controllers {
                                   //       unplugged), one bit a pad: 1 << n
 } Controllers;
 LAYOUT_ASSERT(Controllers, 0x84);
-
-// A mesh object's draw description (Skin.c's SD_FillShaderObject loads it; Swing.c's club trail and
-// shadow.c's golfer shadow build one): nPrims strips, each a run of nCount vertices from nFirst.
-typedef struct TrailDraw {
-    s32  nPrims;                // 0x0
-    s16  nFirst;                // 0x4
-    s16  nCount;                // 0x6
-} TrailDraw;
-
-typedef struct TrailMeshDesc {
-    s16        n0;              // 0x00
-    s16        nVerts;          // 0x02
-    TrailDraw* pDraw;           // 0x04
-    s16*       pIndices;        // 0x08
-    f32*       pPos;            // 0x0C
-    u8*        pColour;         // 0x10
-    f32*       pUV;             // 0x14
-} TrailMeshDesc;
-
-// A TrailMeshDesc with four more values after it (GoBreakLine.c's line: BreakLine.fAB10, fAB14,
-// fAB18 and 1 / fAB18).
-typedef struct TrailMeshDescEx {
-    TrailMeshDesc desc;         // 0x00
-    f32        af18[4];         // 0x18
-} TrailMeshDescEx;
 
 // RenderAccessors.c: the depth and alpha test setters and the call that hands them to GX (its
 // viewport getters are in camera.h).

@@ -101,7 +101,7 @@ void SkinBurn_RenumberOptionBits(Skin* pSkin, s32 n) {
 }
 
 // Drops the blended matrices no option uses (SkinModel.p54, one per bit of Skin.aMtxBits). It keeps
-// the first SkinModel.n14 and those SkinPart_MarkAllOptions marks (marked into a scratch bit array
+// the first SkinModel.nBones and those SkinPart_MarkAllOptions marks (marked into a scratch bit array
 // put in place of Skin.aMtxBits), packs their p54 entries to the front, numbered 0, 1, 2..., and
 // renumbers the bits of every option's meshes to match (gBurnNewMtxBits: each old bit's new
 // number, -1 dropped). Then each SkinModel.p44 entry's list (p4) is cut to the kept count at most
@@ -137,8 +137,8 @@ void SkinBurn_DropUnusedMatrices(Skin* pSkin) {
     memset(aOld, -1, nBits * sizeof(s32));
     memset(aNew, -1, nBits * sizeof(s32));
 
-    // The first n14 bits always stay.
-    n = pModel->n14;
+    // The first nBones bits always stay.
+    n = pModel->nBones;
     if (n > pModel->n50) {
         n = pModel->n50;
     }
@@ -253,7 +253,7 @@ void SkinBurn_PackModel(Skin* pSkin) {
     pOld = pSkin->pModel;
     // EA passes &pOld where an array is expected: never NULL, so the model always counts
     nSize = SkinBurn_GetAlignedSize(&pOld, 1, sizeof(SkinModel), 16);
-    nSize += SkinBurn_GetAlignedSize(pOld->p34, pOld->n14, 0x20, 16);
+    nSize += SkinBurn_GetAlignedSize(pOld->p34, pOld->nBones, 0x20, 16);
     nSize += SkinBurn_GetAlignedSize(pOld->p38, 1, 0x50, 16);
     nSize += SkinBurn_GetAlignedSize(pOld->p3C, pOld->n0C, 0x50, 16);
     nSize += SkinBurn_GetAlignedSize(pOld->p54, pOld->n50, sizeof(SkinModel54), 16);
@@ -269,7 +269,7 @@ void SkinBurn_PackModel(Skin* pSkin) {
     nOffset = 0;
     pNew = SkinBurn_CopyAligned(pBase, &nOffset, pOld, sizeof(SkinModel), 16);
     pNew->n08 = nSize;
-    pNew->p34 = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p34, pOld->n14 * 0x20, 16);
+    pNew->p34 = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p34, pOld->nBones * 0x20, 16);
     pNew->p38 = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p38, 0x50, 16);
     pNew->p3C = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p3C, pOld->n0C * 0x50, 16);
     pNew->p54 = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p54, pOld->n50 * sizeof(SkinModel54), 16);
@@ -300,12 +300,12 @@ void SkinBurn_BurnModel(Skin* pSkin, HwsBurn* pBurn) {
 }
 
 // The callback SkinBurn_BurnSkin hands the burn (hwsBurn.c calls it on each material entry):
-// patches the entry for copy 0's chosen sets (SkinPart_ApplySetsToMaterialEntry), then clears flag
-// 2 and n16, so the burnt entry keeps the texture scale and offset it got and no longer looks one
-// up in SkinDesc.pB8.
+// patches the entry for copy 0's chosen sets (SkinPart_ApplySetsToMaterialEntry), then clears
+// SKINDESC14_UV_FROM_SETS and n16, so the burnt entry keeps the texture scale and offset it got and
+// no longer looks one up in SkinDesc.pB8.
 void SkinBurn_BakeMaterialEntry(Skin* pSkin, SkinDesc14* pEntry) {
     SkinPart_ApplySetsToMaterialEntry(pSkin, pEntry, NULL, NULL, 0);
-    pEntry->u08 &= ~2;
+    pEntry->uFlags &= ~SKINDESC14_UV_FROM_SETS;
     pEntry->n16 = 0;
 }
 

@@ -15,7 +15,6 @@
 #include "camera.h"
 #include "lldyntex.h"
 
-void  fn_80112614(SkinDesc14* pEntry, SkinDesc18* pMaterial, TexBank* pBank);
 void  fn_80113774(int nPart, int nVariant, int nOption);
 void  fn_8011387C(void);
 void  fn_8011389C(void);
@@ -492,7 +491,8 @@ s32 SkinPart_GetSetVariant(Skin* pSkin, int nSet, int nCopy) {
 }
 
 // The texture scale-and-offset a set's variant picks (SkinDesc7C.nUVIndex):
-// SkinPart_ApplySetsToMaterialEntry gives a patched p14 entry that entry of its SkinDesc.pB8 run.
+// SkinPart_ApplySetsToMaterialEntry gives a patched pMaterialEntries entry that entry of its
+// SkinDesc.pB8 run.
 // -1 when the set or the variant is out of range.
 s32 SkinPart_GetSetVariantUVIndex(Skin* pSkin, int nSet, int nVariant) {
     SkinDesc* pDesc;
@@ -918,11 +918,11 @@ void SkinPart_ApplyVariantLink(Skin* pSkin, int nPart, int nVariant, int nLink) 
 }
 
 // Starts drawing the skin's parts for view nView (Skin.c: then SkinPart_DrawPart for each part and
-// SkinPart_EndDraw): once the skin is loaded (uFlags & 2) and has a description, flushes the render
-// state with clipping on and the camera's matrices, resets the skin renderer (hwsRender_Gc.c) and
-// hands it the description and the view's mesh overrides (a10A0[nView]).
+// SkinPart_EndDraw): once the skin has its render data (SKIN_HAS_RENDER_DATA) and a description,
+// flushes the render state with clipping on and the camera's matrices, resets the skin renderer
+// (hwsRender_Gc.c) and hands it the description and the view's mesh overrides (a10A0[nView]).
 void SkinPart_BeginDraw(Skin* pSkin, int nView) {
-    if (pSkin->pModel->pDesc != NULL && (pSkin->uFlags & 2)) {
+    if (pSkin->pModel->pDesc != NULL && (pSkin->uFlags & SKIN_HAS_RENDER_DATA)) {
         RenderState_SetClipMode(GX_CLIP_DISABLE);
         RenderState_SetCameraMatrices();
         RenderState_Flush();
@@ -940,7 +940,7 @@ void SkinPart_DrawPart(Skin* pSkin, int nPart) {
     s32 nVariant;
     s32 nOption;
 
-    if (pSkin->uFlags & 2) {
+    if (pSkin->uFlags & SKIN_HAS_RENDER_DATA) {
         nVariant = SkinPart_GetPartVariant(pSkin, nPart, 0);
         nOption = SkinPart_GetPartOption(pSkin, nPart, 0);
         if (nVariant != -1) {
@@ -951,7 +951,7 @@ void SkinPart_DrawPart(Skin* pSkin, int nPart) {
 
 // Ends drawing a loaded skin's parts (SkinPart_BeginDraw): hwsRender_Gc.c's end step (fn_8011389C).
 void SkinPart_EndDraw(Skin* pSkin) {
-    if (pSkin->pModel->pDesc != NULL && (pSkin->uFlags & 2)) {
+    if (pSkin->pModel->pDesc != NULL && (pSkin->uFlags & SKIN_HAS_RENDER_DATA)) {
         fn_8011389C();
     }
 }
@@ -969,10 +969,10 @@ void SkinPart_ShutdownSkin(void) {
 void SkinPart_UpdateSkin(void) {
 }
 
-// Sets up the skin's materials (SkinDesc.p18) from their entries (p14) as copy 0's chosen sets
-// patch them (SkinPart_ApplySetsToMaterialEntry), with textures from the character's dynamic
-// textures (pTarget is a DynTex; its p4 has TexBank's layout). char.c and FEgolferanim.c call it
-// for each skin once new textures are in.
+// Sets up the skin's materials (SkinDesc.pMaterials) from their entries (pMaterialEntries) as copy
+// 0's chosen sets patch them (SkinPart_ApplySetsToMaterialEntry), with textures from the
+// character's dynamic textures (pTarget is a DynTex; its p4 has TexBank's layout). char.c and
+// FEgolferanim.c call it for each skin once new textures are in.
 void SkinPart_SetupMaterials(Skin* pSkin, SkinTarget* pTarget) {
     SkinDesc* pDesc;
     SkinDesc14 entry;
@@ -981,10 +981,10 @@ void SkinPart_SetupMaterials(Skin* pSkin, SkinTarget* pTarget) {
     if (pSkin == NULL || pSkin->pModel == NULL) return;
     pDesc = pSkin->pModel->pDesc;
     if (pDesc != NULL) {
-        for (i = 0; i < pDesc->n10; i++) {
-            Mem_cpy(&entry, &pDesc->p14[i], sizeof(SkinDesc14));
+        for (i = 0; i < pDesc->nMaterials; i++) {
+            Mem_cpy(&entry, &pDesc->pMaterialEntries[i], sizeof(SkinDesc14));
             SkinPart_ApplySetsToMaterialEntry(pSkin, &entry, NULL, NULL, 0);
-            fn_80112614(&entry, &pDesc->p18[i], pTarget->pBank);
+            HwsMaterial_SetupMaterial(&entry, &pDesc->pMaterials[i], pTarget->pBank);
         }
     }
 }
@@ -1028,11 +1028,12 @@ static inline void fn_800CE224_Loop(Skin* pSkin, SkinDesc14* pEntry, SkinDesc* p
     }
 }
 
-// Patches a material entry (a copy of a SkinDesc.p14 entry) for the sets as copy nCopy chooses
-// them. A set lists texture name codes per variant (SkinDesc.p84, n0C per variant); an entry using
-// one of the first variant's names takes the chosen variant's name in its place and the chosen
-// option's SkinDesc.p8C entry (n18; -1 when the option is out of range). With u08 & 2 it also takes
-// its texture scale and offset (a20) from pB8, at the variant's UV index (0 when out of range).
+// Patches a material entry (a copy of a SkinDesc.pMaterialEntries entry) for the sets as copy nCopy
+// chooses them. A set lists texture name codes per variant (SkinDesc.p84, n0C per variant); an entry
+// using one of the first variant's names takes the chosen variant's name in its place and the chosen
+// option's SkinDesc.p8C entry (n18; -1 when the option is out of range). With SKINDESC14_UV_FROM_SETS
+// it also takes its texture scale and offset (uvScaleOffset) from pB8, at the variant's UV index (0
+// when out of range).
 // With ppOut and pnOut it gives the option entry's recolouring (a08 and n2C), or NULL in *ppOut.
 // Returns whether the name changed or a recolouring was given.
 s32 SkinPart_ApplySetsToMaterialEntry(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy) {
@@ -1050,13 +1051,13 @@ s32 SkinPart_ApplySetsToMaterialEntry(Skin* pSkin, SkinDesc14* pEntry, u8** ppOu
     }
     nUV = 0;
     fn_800CE224_Loop(pSkin, pEntry, pDesc, nCopy, &j, &pSet, &bChanged, &nUV, &nVariant);
-    if (pEntry->u08 & 2) {
+    if (pEntry->uFlags & SKINDESC14_UV_FROM_SETS) {
         if (pEntry->n16 > 0) {
             if (nUV < 0 || nUV >= pEntry->n16) {
                 nUV = 0;
             }
             pB8 = &pDesc->pB8[pEntry->n1C + nUV];
-            pEntry->a20 = *pB8;
+            pEntry->uvScaleOffset = *pB8;
         }
     }
     if (ppOut != NULL && pnOut != NULL) {
@@ -1093,8 +1094,8 @@ static inline void fn_800CE52C_Loop(Skin* pSkin, SkinDesc* pDesc, s32* pIndex, s
                                     SkinListEntry* aList, s32* pnList, int nCopy, SkinDesc14* pEntry,
                                     u8** ppRecolor, s32* pnMode, int* pj) {
     for (*pj = 0; *pj < nIndices; (*pj)++) {
-        if (!(pDesc->p14[*pIndex].u08 & 1)) {
-            Mem_cpy(pEntry, &pDesc->p14[*pIndex], sizeof(SkinDesc14));
+        if (!(pDesc->pMaterialEntries[*pIndex].uFlags & SKINDESC14_UNTEXTURED)) {
+            Mem_cpy(pEntry, &pDesc->pMaterialEntries[*pIndex], sizeof(SkinDesc14));
             *ppRecolor = NULL;
             SkinPart_ApplySetsToMaterialEntry(pSkin, pEntry, ppRecolor, pnMode, nCopy);
             SkinPart_AddToTexList(pEntry->uId, aList, pnList, *ppRecolor, *pnMode);
@@ -1104,9 +1105,9 @@ static inline void fn_800CE52C_Loop(Skin* pSkin, SkinDesc* pDesc, s32* pIndex, s
 }
 
 // Adds to a texture list the textures option n (a SkinDesc.p5C entry) draws with: the material
-// entries of its meshes (p6C to p44 to p20 to p14; entries with u08 & 1 skipped), each patched for
-// copy nCopy's chosen sets (SkinPart_ApplySetsToMaterialEntry) and with its set option's
-// recolouring.
+// entries of its meshes (p6C to p44 to p20 to pMaterialEntries; SKINDESC14_UNTEXTURED ones
+// skipped), each patched for copy nCopy's chosen sets (SkinPart_ApplySetsToMaterialEntry) and with
+// its set option's recolouring.
 void SkinPart_ListOptionTextures(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy) {
     SkinDesc14 entry;
     u8* pRecolor;
@@ -1155,7 +1156,7 @@ s32 SkinPart_ListChosenTextures(Skin** apSkins, int nSkins, SkinListEntry** ppLi
     n = 0;
     for (i = 0; i < nSkins; i++) {
         if (apSkins[i] != NULL && apSkins[i]->pModel != NULL && apSkins[i]->pModel->pDesc != NULL) {
-            n += apSkins[i]->pModel->pDesc->n10;
+            n += apSkins[i]->pModel->pDesc->nMaterials;
         }
     }
     nList = 0;
@@ -1214,7 +1215,7 @@ s32 SkinPart_ListAllTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList)
     n = 0;
     for (i = 0; i < nSkins; i++) {
         if (apSkins[i] != NULL && apSkins[i]->pModel != NULL && apSkins[i]->pModel->pDesc != NULL) {
-            n += apSkins[i]->pModel->pDesc->n10;
+            n += apSkins[i]->pModel->pDesc->nMaterials;
         }
     }
     *ppList = Circular_MemAllocFunc(n * sizeof(SkinListEntry), MEMTYPE_HIGH, 0, "SkinPart.c", 2068);
@@ -1405,11 +1406,11 @@ void SkinPart_FixupDesc(SkinDesc* pDesc) {
         pDesc->uFlags = 1;
         return;
     }
-    if (pDesc->p14 != NULL) {
-        pDesc->p14 = (SkinDesc14*)((u8*)pDesc + (uptr)pDesc->p14);
+    if (pDesc->pMaterialEntries != NULL) {
+        pDesc->pMaterialEntries = (SkinDesc14*)((u8*)pDesc + (uptr)pDesc->pMaterialEntries);
     }
-    if (pDesc->p18 != NULL) {
-        pDesc->p18 = (SkinDesc18*)((u8*)pDesc + (uptr)pDesc->p18);
+    if (pDesc->pMaterials != NULL) {
+        pDesc->pMaterials = (SkinDesc18*)((u8*)pDesc + (uptr)pDesc->pMaterials);
     }
     if (pDesc->p20 != NULL) {
         pDesc->p20 = (s32*)((u8*)pDesc + (uptr)pDesc->p20);

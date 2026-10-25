@@ -643,6 +643,7 @@ config.libs = [
             Object(Matching, "MetroTRK/CircleBuffer.c"),
             Object(Matching, "MetroTRK/gdev/main.c", extra_cflags=["-sdata 8", "-sdata2 8"]),
             Object(Matching, "MetroTRK/MWTrace.c"),
+            Object(Matching, "MetroTRK/MWCriticalSection_gc.c"),
         ],
     },
     {
@@ -707,6 +708,26 @@ config.libs = [
         "objects": [
             Object(Matching, "dolphin/si/SIBios.c"),
             Object(Matching, "dolphin/si/SISamplingRate.c"),
+        ],
+    },
+    {
+        "lib": "amcstubs",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(Matching, "dolphin/amcstubs/AmcExi2Stubs.c"),
+        ],
+    },
+    {
+        "lib": "odenotstub",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(Matching, "dolphin/odenotstub/odenotstub.c"),
         ],
     },
     {
@@ -875,6 +896,7 @@ config.libs = [
             Object(Matching, "runtime/__mem.c"),
             Object(Matching, "runtime/__va_arg.c"),
             Object(Matching, "runtime/buffer_io.c"),
+            Object(Matching, "runtime/critical_regions.gamecube.c"),
             Object(Matching, "runtime/mem.c"),
             Object(Matching, "runtime/misc_io.c"),
             Object(Matching, "runtime/s_copysign.c"),
@@ -904,8 +926,6 @@ config.libs = [
             Object(Matching, "LLFileIO_Gc.c"),
             Object(Matching, "LLDisp_Gc.c"),
             Object(Matching, "LLObj_Gc.c"),
-            Object(Matching, "unsorted/code_800080D0.c"),
-            Object(Matching, "unsorted/code_800082F8.c"),
             Object(Matching, "GoEntry.c"),
             Object(Matching, "MathQuat.c"),
             Object(Matching, "UCirc.c"),
@@ -1140,12 +1160,9 @@ config.libs = [
             Object(Matching, "UISApi.c", extra_cflags=UIS_CFLAGS),
             Object(Matching, "UISScreen.c", extra_cflags=UIS_CFLAGS),
             Object(Matching, "GoDynObjTypes.c"),
-            Object(Matching, "unsorted/sweep_800977CC.c"),
             Object(Matching, "GoDynObjBase.c"),
-            Object(Matching, "unsorted/sweep_8006FF2C.c"),
-            Object(Matching, "ShaderRow0.c"),
+            Object(Matching, "GoShaderObject_PrelitTextured_Gc.c"),
 
-            Object(Matching, "unsorted/sweep_8009A844.c"),
             Object(Matching, "Main.c"),
             # Built optimized for size: under -O4,p the copy and fill loops are unrolled and the
             # four functions take 0xF94 bytes, against EA's 0x5C0.
@@ -1153,14 +1170,11 @@ config.libs = [
             Object(Matching, "fe_craputils.c"),
             Object(Matching, "DynamicRenderingBuffer.c"),
             Object(Matching, "Code80070EC4.c"),
-            Object(Matching, "Code8009A928.c"),
+            Object(Matching, "GlowMgr.c"),
             Object(Matching, "hlaudvoice.c"),
             Object(Matching, "AudLock.c"),
-            Object(Matching, "unsorted/sweep_801654F4.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
 
             Object(Matching, "GxUtil.c"),
-            Object(Matching, "unsorted/sweep_8003944C.c"),
-            Object(Matching, "unsorted/sweep_80070168.c"),
             # Built with opt_propagation off: fn_800922A8's two flag ORs stay separate (ori 4, ori
             # 0x400; with propagation the front end merges them into ori 0x404), no function worse.
             Object(Matching, "uiText.c", extra_cflags=['-pragma "opt_propagation off"']),
@@ -1168,17 +1182,12 @@ config.libs = [
             Object(Matching, "hlaudtrackseq.c"),
             Object(Matching, "hlaudemitterpool.c"),
             Object(Matching, "AudReverb.c"),
-            Object(Matching, "unsorted/sweep_801654D0.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
-            Object(Matching, "unsorted/sweep_80165524.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "RenderAccessors.c"),
             Object(Matching, "LLInput_Gc.c"),
             Object(Matching, "event.c"),
             Object(Matching, "SitDev.c"),
-            Object(Matching, "unsorted/sweep_8009554C.c"),
-            Object(Matching, "Code80095564.c"),
+            Object(Matching, "char_skin.c"),
             Object(Matching, "Code8009B340.c"),
-            Object(Matching, "unsorted/sweep_801338E0.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
-            Object(Matching, "unsorted/sweep_80155F40.c"),
         ],
     },
     {

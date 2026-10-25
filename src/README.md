@@ -49,14 +49,14 @@ see [Game modes](#game-modes).
 | `n290`, `pfn3C`, `u04`, `b0F` | struct fields not named yet: a type letter and the field's offset. `unkXXX` is space no code touches |
 | `// fake match:` | a compiler trick that reproduces EA's bytes (a filler function, a dead store, a register pin); logic unchanged, tagged so it can be removed later |
 | Generated units | `AXComp.c` and `DSPCode.c` (SDK data) and the game's asset fragments are generated from your own `main.dol` at build time (`tools/build/gendata.py`), never committed (`docs/workflow.md` "Units generated from main.dol") |
-| `unsorted/sweep_*.c` | small functions whose EA file isn't proven yet; `fold.py` merges them into their unit |
+| *(... unverified)* | a file boundary that nothing proves: the functions there went to the neighbour the evidence favours, and the commit that moved them gives the evidence for and against (`docs/audit-process.md`, "Folds and other code moves") |
 
 In the file tables, **Name** says where the file name comes from (the file's header comment has the
 details): **EA** EA's own name in this binary (an assert or file string); **T6** / **T7** EA's file
 name in Tiger Woods 2006 / 2007, whose functions match these; **T03** / **T05** a source path in
 Tiger Woods 2003 / 2005 (EA's file string there); **M03** Madden NFL 2003's debug
 symbols; **ours** a name we chose for what the file does; **ph** a placeholder named after its
-address (`CodeXXXXXXXX.c`, `unsorted/*`), its original file unknown.
+address (`CodeXXXXXXXX.c`), its original file unknown.
 Files are listed in link order (address order) within each group.
 
 ## Subsystems
@@ -80,7 +80,6 @@ Files are listed in link order (address order) within each group.
 - [Audio](#audio)
 - [Save data, memory card, EA Sports Bio, GBA link](#save-data)
 - [Disc](#disc)
-- [Unplaced](#unplaced)
 
 ### Boot and game flow
 
@@ -135,9 +134,7 @@ files in [Characters](#characters).
 | File | Name | What it is |
 |---|---|---|
 | LLDisp_Gc.c | EA | the display: video mode, image buffer, CPU/GPU sync, copying each frame out |
-| LLObj_Gc.c | EA | a model's mesh tree from its stream data; bounding-sphere visibility tests |
-| unsorted/code_800080D0.c | ph | vertex format set-up and the per-type function-table dispatch |
-| unsorted/code_800082F8.c | ph | camera and drawable-object accessors (`Vec3Copy`) |
+| LLObj_Gc.c | EA | a model's mesh tree from its stream data; bounding-sphere visibility tests; the parts' type-function dispatch and the camera getters *(from 0x800080D0 on: file unverified)* |
 | LLTex.c | EA | texture banks from `'txf '` objects; byte-code scripts that drive texture items |
 | LLTexGrp.c | EA | the list of loaded texture banks; find a texture by name hash |
 | LLFont.c | EA | the font renderer (`'sfn '` fonts) |
@@ -149,7 +146,7 @@ files in [Characters](#characters).
 | GxUtil.c | ours | a 256x224 copy of the screen as a texture, rectangle alpha clear, texture object set-up |
 | GoRenderSurface.c | EA | five off-screen render surfaces |
 | GoTerrain.c | EA | the terrain renderer: the hole's ground and objects in draw lists by distance and LOD; animated trees, crowd, flag |
-| GoPostFx.c | EA | screen effects over each view (a colour, two effects from a screen copy) |
+| GoPostFx.c | EA | screen effects over each view (a colour, two effects from a screen copy) *(last function's file unverified)* |
 | DepthField.c | T6 | depth-of-field blur |
 | UObject3D.c | EA | a model from a stream object; a recorded display list of renderer state |
 | GoFrameBuf.c | EA | a frame buffer's size and scale |
@@ -160,9 +157,8 @@ files in [Characters](#characters).
 | GoLightFogEnv.c | T7 | the hole's lighting environments (`LF_*`) |
 | goballfx.c | T6 | four sets of five lights, and the ball's ground marker |
 | GoObjShadow.c | ours | object shadows drawn with the "shadow" texture (called from GoDynObj.c) |
-| SunFlr_Gc.c | EA | the sun flare's GameCube part: depth around the sun, how much is visible |
-| unsorted/sweep_8009A844.c | ph | a screen-rectangle point to frame-buffer units (next to the sun flare) |
-| Code8009A928.c | ph | the glows' frame hooks for gomainloop.c |
+| SunFlr_Gc.c | EA | the sun flare's GameCube part: depth around the sun, how much is visible *(last function's file unverified)* |
+| GlowMgr.c | T7 | the glows' set-up, shut-down, per-view update and drawing, for gomainloop.c |
 | Code8009AA28.c | ph | the sun flare's set-up and per-view update; the glow queue's add *(last function's file unverified)* |
 | Code8009B340.c | ph | a list of fading glow nodes *(first function's file unverified)* |
 | GoGreenGrid.c | EA | the grid drawn over the putting green |
@@ -180,26 +176,22 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | File | Name | What it is |
 |---|---|---|
 | Code8006F608.c | ph | the hole's weather: rolls per-course choices and starts/stops effects, the rain among them (PsMgr.c) |
-| GoShaderObjectContainer_OBFData_Gc.c | EA | copies a shader object's chunks into GPU-ready buffers |
-| unsorted/sweep_8006FF2C.c | ph | one of row 0's hooks (sets a vertex array, then calls sweep_80070168.c) |
-| ShaderRow0.c | ours | row 0's hooks on a dynamic rendering buffer |
-| unsorted/sweep_80070168.c | ph | calls a display list, then `fn_800124CC` (LLFont.c) |
-| DynamicRenderingBuffer.c | ours | vertices a shader object rewrites each frame (EA's header name `GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h`) |
+| GoShaderObjectContainer_OBFData_Gc.c | EA | copies a shader object's chunks into GPU-ready buffers *(last function's file unverified)* |
+| GoShaderObject_PrelitTextured_Gc.c | ours (after TW06) | row 0's hooks: a prelit, textured mesh on a dynamic rendering buffer |
+| DynamicRenderingBuffer.c | ours | vertices a shader object rewrites each frame (EA's header name `GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h`) *(first function's file unverified)* |
 | Code80070EC4.c | ph | rows 4 and 2's static hooks (row 2 plays a morph animation) |
 | GoShaderObject_PrelitUVAnimation_Gc.c | EA | row 5: prelit geometry with scrolling textures; init/close of every shader type |
 | GoShaderObjectCommon_ShaderObjectsData_Gc.c | EA | builds the display lists that draw shader objects |
 | GoShaderObjectCommon_TexAnimManager_Gc.c | EA | scrolling-texture matrices |
 | GoShaderObject_Particle_Gc.c | EA | the particle shader; also the main-memory heap made from the OS arena |
-| unsorted/sweep_8009554C.c | ph | six empty functions (GoEntry.c, gomainloop.c and char.c call them) |
-| GoShaderObjectCommon_MorphAnimManager_Gc.c | EA | the list of morph animations |
-| unsorted/sweep_800977CC.c | ph | frees a buffer at +0xC0 *(unverified which file)* |
+| GoShaderObjectCommon_MorphAnimManager_Gc.c | EA | the list of morph animations *(last function's file unverified)* |
 | GoShaderObject_Glows_Gc.c | EA | the glows' shapes and drawing |
 | UFstPart.c | EA | particle emitters |
 | PsMgr.c | EA | weather particle effects (only the rain on GameCube) |
 | PsBallFx.c | EA | the ball's particle effects and sand trail |
 | GoShaderObject_Rain_Gc.c | EA | rain streaks and splashes |
 | GoShaderObject_Grass_Gc.c | ours (after TW06) | the grass shader object: grass shells over the terrain |
-| ShaderRow19.c | ours | row 19's hooks (row 0's code, another primitive kind) |
+| ShaderRow19.c | ours | row 19's hooks (row 0's code, line strips) |
 
 ### Cameras
 
@@ -292,7 +284,7 @@ choice, and the golfer's streamed textures and clothes.
 | Code80037AB8.c | ph | split off Skin.c: bone inverse matrices, morph weights from a pose, frees description bits |
 | animblender.c | T6 *(name unproven)* | blend trees (`SKABlendNode`) and the animation player (`TSKATime`) |
 | CharAnim.c | ours (TW06: `char_state.c`) | the golfer's animation state: clip-group blends, idle and emotion updates, queued state changes |
-| Code80095564.c | ph | with a single view, frees every golfer's body skin |
+| char_skin.c | T03 | in a single view, which golfer's body skin has its render data; six empty hooks *(where the file starts is unverified)* |
 | AnimStream.c | EA | clip streaming for groups 1 and 5 (turned off in every case); base-40 name codes |
 | SkinPart.c | EA | a skin's parts (e.g. the glove), variants, options and sets |
 | CharSliders.c | EA | body sliders: definitions, bone and morph-target blending |
@@ -515,16 +507,3 @@ The `Common/` and `NGC/` files are built with SN ProDG (GCC 2.95), unoptimised, 
 | DiscError.c | ours | the disc-error screens, drawn straight into the frame buffer with an 8x8 font |
 | Code800B7210.c | ph | split off DiscError.c: the messages, drawing one for a drive status, the per-frame drive check |
 | DiscCheck.c | ours | which disc is in the drive; disc changes; course files per disc |
-
-### Unplaced
-
-Small sweep files whose file and subsystem are not known:
-
-| File | What it is |
-|---|---|
-| unsorted/sweep_8003944C.c | a function returning 0, between GoPostFx.c and GoDynamicCam.c |
-
-In the SDK and runtime address range, not EA code: `unsorted/sweep_801338E0.c` (EXI2 / debugger
-stubs), `sweep_801654D0.c`, `sweep_801654F4.c`, `sweep_80165524.c` (Metrowerks critical sections;
-`progress_category="sdk"`), and, by its address *(unverified)*, `sweep_80155F40.c` (MSL's
-critical-region stubs).

@@ -15,6 +15,7 @@ enum critical_regions {
 
 void __begin_critical_region(int region);
 void __end_critical_region(int region);
+void __kill_critical_regions(void);
 
 #ifdef __cplusplus
 };

@@ -8,6 +8,8 @@ reproduce this game's bytes for most of the ~150 TRK functions. Units whose func
 linked (`Matching` in configure.py); the rest only provide the comparison and the names.
 
 Changed for this game:
+- `MetroTRK/MWCriticalSection_gc.c` (new, ours): TRK's critical sections (interrupts off and back
+  on), in reverse of their link order, as `-inline deferred` emits them.
 - `MetroTRK/nubinit.c`: the welcome string says v2.0, as this game's TRK does.
 - `MetroTRK/mslsupp.c`: no `__close_console`. This game's comes from the MSL UART console code
   (0x8015C120, returns 0), which `__files` points at; a second definition here would clash with it.

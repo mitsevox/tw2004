@@ -52,9 +52,9 @@ void TARGET_Init(void) {
     Network_RegisterLoadNetworkCallback(NETWORK_TYPE_PLACE_BALL, fn_8006A7A8);
     lbl_80281E30 = NULL;
     textureID = FEtm_PackName("tball");
-    fn_800102DC(textureID, &lbl_80281E3C, &lbl_80281E40);
+    TG_iFindTextureGroupAndTexture(textureID, &lbl_80281E3C, &lbl_80281E40);
     textureID = FEtm_PackName("shadow");
-    fn_800102DC(textureID, &lbl_80281E34, &lbl_80281E38);
+    TG_iFindTextureGroupAndTexture(textureID, &lbl_80281E34, &lbl_80281E38);
     for (i = 0; i < 5; i++) {
         lbl_801D5BF0[i].f0 = 0.01f;
         lbl_801D5BF0[i].f4 = 0.0f;

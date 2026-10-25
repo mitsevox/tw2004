@@ -30,7 +30,7 @@ TexBank*  lbl_80281F50;         // and its bank
 void BS_vInit(void) {
     s32 desc[2];
     int i;
-    fn_800102DC(FEtm_PackName("shadow"), &lbl_80281F50, &lbl_80281F54);
+    TG_iFindTextureGroupAndTexture(FEtm_PackName("shadow"), &lbl_80281F50, &lbl_80281F54);
     desc[0] = 4;
     desc[1] = 1;
     for (i = 0; i < NUM_SHADOW_MESHES; i++) {
@@ -45,9 +45,9 @@ f32 lbl_802813A0 = 0.01f;       // how far the shadow is pushed from the light p
 // Draws the player's ball shadow: a grey quad 0.14 across on the ground under the ball, pushed
 // 0.01 away from the session's light point (f5B3C, f5B44); nothing where there is no ground.
 void fn_80093DB8(Ball* pBall, int nPlayer) {
-    s16 aIndex[4] = {0, 1, 2, 3};
+    u16 aIndex[4] = {0, 1, 2, 3};
     f32 vAway[4];
-    TrailMeshDesc desc;
+    DynRenderFill desc;
     f32 fGround;
     int i;
     fGround = Ter_GetSupportingWorldHeight(Ter_GetTGD(), pBall->vPos);
@@ -93,13 +93,13 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
         lbl_801D9780[5] = 0.0f;
         lbl_801D9780[6] = 1.0f;
         lbl_801D9780[7] = 1.0f;
-        desc.n0 = 4;
+        desc.nCount = 4;
         desc.nVerts = 4;
-        desc.pDraw = NULL;
+        desc.pDraws = NULL;
         desc.pIndices = aIndex;
         desc.pPos = lbl_801D97B0;
         desc.pColour = lbl_801D97A0[0];
-        desc.pUV = lbl_801D9780;
+        desc.pTexCoord = lbl_801D9780;
         SD_FillShaderObject((ShaderObject*)lbl_801D96B8[nPlayer], &desc, 1);
         SD_DrawShaderObject(lbl_801D96B8[nPlayer]);
         DS_vEnableZBufferUpdate(1);

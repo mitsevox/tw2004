@@ -1,6 +1,6 @@
 // LLTexGrp.c (EA's name, from its asserts; also in EA's 2002 source tree): the list of loaded
 // texture banks. Each 'txf ' stream object becomes a bank in a free slot of the list, and a
-// texture is found by its name's hash in every bank of the list (fn_800102DC).
+// texture is found by its name's hash in every bank of the list (TG_iFindTextureGroupAndTexture).
 
 #include "engine.h"
 
@@ -14,7 +14,6 @@ void fn_800106B8(u8 b);
 void fn_800106D8(int nSlot, int n);
 void fn_80010754(u8 b);
 int  fn_80010760(u32 uId, int nAfter);
-TexEntry* fn_800107E4(TexBank* pBank, int nTex);
 
 // The last free slot, or -1 if the list is full.
 int fn_8001013C(void) {
@@ -78,7 +77,7 @@ void TG_vUnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('txf ');
 }
 
-int fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex) {
+int TG_iFindTextureGroupAndTexture(u64 uHash, TexBank** ppBank, TexEntry** ppTex) {
     int nTex;
     TexGrpSlot* pSlot;
     TexGrpSlot* aSlots;
@@ -99,7 +98,7 @@ int fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex) {
         return TX_NO_TEXTURE_INDEX;
     }
     *ppBank = aSlots[i].pBank;
-    *ppTex = fn_800107E4(*ppBank, nTex);
+    *ppTex = TX_spGetTextureGroupTextureFromIndex(*ppBank, nTex);
     return i;
 }
 
@@ -221,6 +220,6 @@ int fn_800107C0(TStreamData* pObject, TexBank* pBank, int n) {
     return fn_800106F0(TX_spDownloadData(pObject, pBank, n));
 }
 
-TexEntry* fn_800107E4(TexBank* pBank, int nTex) {
+TexEntry* TX_spGetTextureGroupTextureFromIndex(TexBank* pBank, int nTex) {
     return &pBank->pTextures[nTex];
 }

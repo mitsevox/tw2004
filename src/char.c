@@ -144,7 +144,6 @@ void  SKEL_InitHalfJoints(CharModel* pModel, SkelPose* pPose);          // Skele
 void  Character_GetBonePosSwapIfLefty(Character* pChar, int nBone, f32* pPos);
 void  Char_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void  Char_Vec3Sub(f32* pA, f32* pB, f32* pOut);
-void  fn_80095558(void);
 void  AnimLib_ApplySlotCustomAnims(int nSlot);                         // skalib.c
 void  Skalib_PlanBanks(void);                                        // skalib.c
 void  AnimStream_AllocBuffers(void);                                        // AnimStream.c
@@ -165,11 +164,6 @@ void  SKN_InitTris(void);
 void  SKN_FreeTris(void);
 void  SKN_InitModule(int n);
 void  SKN_CloseModule(void);
-void  fn_80095554(void);
-void  fn_8009555C(void);
-void  fn_80095560(void);
-void  fn_80095564(void);
-void  fn_800955F0(int nPlayer);
 void  sApplyUserLogos(void* pChar, void* pModel, SkinChoices* pChoices);   // char_tex_manager.c
 void  fn_8010BA2C(void* p);
 void  FE_StreamInterruptState(void);               // FEgolferanim.c
@@ -743,7 +737,7 @@ void Character_SetPreferedPos(Character* pChar) {
             fn_80037AB8(pChar->pSkin, pChar->pModel, 0, 0);
             SKEL_SetSkinBonePoses(pChar->pModel, pChar->pSkin->pModel->p34);
             SKEL_SetDefaultWorld2BoneMatrices(pChar->pModel, pChar->pSkin->pWorld2Bone);
-            SKEL_SetSkinningMatrices(pChar->pModel, pChar->pSkin->pSkinMtx, pChar->pSkin->pModel->n14);
+            SKEL_SetSkinningMatrices(pChar->pModel, pChar->pSkin->pSkinMtx, pChar->pSkin->pModel->nBones);
         }
     }
 }
@@ -1163,7 +1157,7 @@ Character* Character_Create(void) {
 // The characters' set-up before a hole (and on a restart): with more than two players, the dynamic
 // textures go to the player with the honor (CharacterTex_PreHoleInit).
 void Character_PreHoleInit(void) {
-    fn_80095554();
+    CharacterSkin_PreHoleInit();
     CharacterTex_PreHoleInit();
 }
 
@@ -1742,7 +1736,7 @@ void Character_PostInit(void) {
     int i;
     Character* pChar;
 
-    fn_80095558();
+    CharacterSkin_PostInit();
     if (gSession.nNumPlayers <= 2) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             pChar = gPlayers[i].pChar;
@@ -2381,7 +2375,7 @@ Character* Character_Add(Character* pChar) {
 // copy changed together) and the skin meshes of each view (SKN_InitTris).
 void Character_InitIG(void) {
     int n;
-    fn_8009555C();
+    CharacterSkin_Init();
     CharacterTex_Init();
     SKEL_EnableIK(1);
     n = 6;
@@ -2401,14 +2395,14 @@ void Character_CloseIG(void) {
     SKN_FreeTris();
     SkinPart_Shutdown();
     AnimStream_Close();
-    fn_80095560();
+    CharacterSkin_Close();
     CharacterTex_Close();
 }
 
-// The characters' step at the end of each hole (fn_80095564: outside split screen, every player's
-// skin frees what loading it allocated).
+// The characters' step at the end of each hole: in a single view, every player's golfer's body skin
+// gives back its render data (CharacterSkin_FreeAll).
 void Character_ExitHole(void) {
-    fn_80095564();
+    CharacterSkin_FreeAll();
 }
 
 // Starts the characters for the front end (GO_vInitFE): the dynamic texture pool, IK off, blend
@@ -3064,13 +3058,13 @@ void Character_ResetBlenders(Character* pChar) {
 
 // Wakes the player's golfer for its turn (stateFunc's PreShot, InitialFlyBy and PlaceBall):
 // uCharFlags bit 0x40 cleared so it is drawn again (Character_Sleep set it), its body skin made the
-// loaded one in single view (fn_800955F0) and its textures streamed
+// only one with render data in single view (CharacterSkin_LoadOnlyPlayer) and its textures streamed
 // (CharacterTex_StartStreamingPlayers). In single view, when it is not the golfer last prepared
 // (gCharTexStreamedPlayer), it is also flagged to be dressed again
 // (Character_RequestClothesUpdateIG).
 void Character_PrepareForRendering(int nPlayer) {
     gPlayers[nPlayer].pChar->uCharFlags &= ~0x40;
-    fn_800955F0(nPlayer);
+    CharacterSkin_LoadOnlyPlayer(nPlayer);
     CharacterTex_StartStreamingPlayers(nPlayer);
     if (!gSession.nSplitScreen && gCharTexStreamedPlayer != nPlayer) {
         Character_RequestClothesUpdateIG(nPlayer);

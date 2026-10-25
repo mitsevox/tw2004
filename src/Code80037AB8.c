@@ -5,8 +5,6 @@
 #include "engine.h"
 #include "charstate.h"
 
-void  fn_801127C4(void* pDesc);                // hwsMaterial_Gc.c
-
 // section note: the .bss between Skin.c's and GoPostFx.c's; only lbl_80281100 (the .sdata right
 // after Skin.c's) points at it. Skin.c's tail fits the addresses equally well.
 ScreenCopy lbl_801D4F68;
@@ -27,7 +25,7 @@ void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
 
     if (pSkin->pModel != NULL && !(pSkin->pModel->u30 & 0x8000)) {
         pSkin->pModel->u30 |= 0x8000;
-        for (i = 1; i < pSkin->pModel->n14; i++) {
+        for (i = 1; i < pSkin->pModel->nBones; i++) {
             nBone = i;
             if (i >= nFirst) {
                 nBone = i + nSkip;
@@ -39,7 +37,7 @@ void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
             Quat_Multiply(pSkin->pModel->p34[i].q0, pParent->q0, aQuat);
             Quat_Copy(aQuat, pSkin->pModel->p34[i].q0);
         }
-        for (i = 0; i < pSkin->pModel->n14; i++) {
+        for (i = 0; i < pSkin->pModel->nBones; i++) {
             Quat_QuatToMatrix(pSkin->pModel->p34[i].q0, aMtx);
             Vec4_CopyPoint(pSkin->pModel->p34[i].v10, aMtx[3]);
             LLMath_InvertNormalized(aMtx, pSkin->pWorld2Bone[i]);
@@ -75,7 +73,7 @@ void fn_80037CD8(Skin* pSkin) {
     pModel = pSkin->pModel;
     if (pModel != NULL) {
         if (pModel->pDesc != NULL) {
-            fn_801127C4(pModel->pDesc);
+            HwsMaterial_Destroy(pModel->pDesc);
             Circular_MemFreeFunc(pSkin->pModel->pDesc);
         }
         Circular_MemFreeFunc(pSkin->pModel);
