@@ -48,7 +48,7 @@ void  Circular_StopMemorySizeRecorder(void);
 s32   Circular_GetCurrentMemorySizeRecorder(void);
 // The main-memory heap (GoShaderObject_Particle_Gc.c): fn_80095108 makes it from the arena.
 // Mem_AllocFunc returns a block aligned to nAlign (0: 16) that remembers the heap block and its
-// own padding just before and after it (every caller passes 1 as n, which it does not read).
+// own padding just before and after it (it does not read n).
 typedef struct HeapBlockHead {
     void* pBlock;               // 0x0  the heap block it is in
     u32   uSize;                // 0x4  what was asked for

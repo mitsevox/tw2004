@@ -182,7 +182,7 @@ Swing.c	open
 TerrainGround.c	done	ff3496ef	claude-review
 TibExt.c	open		
 UAudContainers.c	done	b5058d88	claude-review
-UAudMem.c	open		
+UAudMem.c	done	c6fbaff8	claude-review
 UAudMemStack.c	done	6d2534bd	claude-review
 UAudVector.c	done	58556d0e	claude-review
 UByteSwap.c	done	f6808074	claude-review
