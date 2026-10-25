@@ -290,7 +290,7 @@ order	area	file	task	scope	state
 286	Shader objects and effects	unsorted/sweep_800977CC.c	fold	prove its file and fold it in	done
 287	Shader objects and effects	unsorted/sweep_80070168.c	fold	prove its file and fold it in	open
 288	Shader objects and effects	unsorted/sweep_8009554C.c	fold	prove its file and fold it in	open
-289	Shader objects and effects	unsorted/sweep_8006FF2C.c	fold	prove its file and fold it in	open
+289	Shader objects and effects	unsorted/sweep_8006FF2C.c	fold	prove its file and fold it in	done
 290	Shader objects and effects	unsorted/sweep_80097EC4.c	fold	prove its file and fold it in	done
 291	Rendering	GoViewport.c	pass	the whole file	done
 292	Rendering	GoFrameBuf.c	pass	the whole file	done

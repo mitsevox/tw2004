@@ -35,7 +35,7 @@ void fn_8006FDCC(void);
 void fn_8006FDD0(void);
 void fn_8006FED4(u8* p0, s32 p1);
 void fn_8006FF08(u8* p0);
-// sweep_8006FF2C.c
+// GoShaderObjectContainer_OBFData_Gc.c
 void fn_8006FF2C(void* arg0);
 // ShaderRow0.c
 void fn_8006FF80(DynRenderObject* pObj, const DynRenderSize* pSize);

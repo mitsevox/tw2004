@@ -1139,7 +1139,6 @@ config.libs = [
             Object(Matching, "UISScreen.c", extra_cflags=UIS_CFLAGS),
             Object(Matching, "GoDynObjTypes.c"),
             Object(Matching, "GoDynObjBase.c"),
-            Object(Matching, "unsorted/sweep_8006FF2C.c"),
             Object(Matching, "ShaderRow0.c"),
 
             Object(Matching, "unsorted/sweep_8009A844.c"),
