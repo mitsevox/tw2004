@@ -98,7 +98,7 @@ GoCamera.c	open
 GoComicCam.c	open		
 GoDynObj.c	open		
 GoDynObjBase.c	open		
-GoDynObjTypes.c	open		
+GoDynObjTypes.c	done	98a66a7c	claude-review
 GoDynamicCam.c	done	62ac5a6d	claude-review
 GoEntry.c	open		
 GoFog.c	open		
