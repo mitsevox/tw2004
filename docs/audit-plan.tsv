@@ -330,7 +330,7 @@ order	area	file	task	scope	state
 326	Rendering	GoTerrain.c	chunk 4/4	Ter_BuildGrassPatchList .. CharacterRender_RenderSetup	open
 327	Rendering	GoTerrain.c	whole-file review	the whole file	open
 328	Rendering	GoGrass.c	pass	the whole file	open
-329	Rendering	unsorted/sweep_8009B314.c	fold	prove its file and fold it in	open
+329	Rendering	unsorted/sweep_8009B314.c	fold	prove its file and fold it in	done
 330	Rendering	unsorted/code_800080D0.c	fold	prove its file and fold it in	open
 331	Rendering	unsorted/sweep_800136F4.c	fold	prove its file and fold it in	done
 332	Rendering	unsorted/code_800082F8.c	fold	prove its file and fold it in	open

@@ -163,9 +163,8 @@ files in [Characters](#characters).
 | SunFlr_Gc.c | EA | the sun flare's GameCube part: depth around the sun, how much is visible |
 | unsorted/sweep_8009A844.c | ph | a screen-rectangle point to frame-buffer units (next to the sun flare) |
 | Code8009A928.c | ph | the glows' frame hooks for gomainloop.c |
-| Code8009AA28.c | ph | the sun flare's set-up and per-view update; the glow queue's add |
-| unsorted/sweep_8009B314.c | ph | a sun-flare state setter and a node free *(unverified which file)* |
-| Code8009B340.c | ph | a list of fading glow nodes |
+| Code8009AA28.c | ph | the sun flare's set-up and per-view update; the glow queue's add *(last function's file unverified)* |
+| Code8009B340.c | ph | a list of fading glow nodes *(first function's file unverified)* |
 | GoGreenGrid.c | EA | the grid drawn over the putting green |
 | shadow.c | EA | the golfer's shadow, drawn into a 256x256 texture with its own camera |
 | Code800BA940.c | ph | the glows around each view's ball |
