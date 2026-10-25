@@ -64,7 +64,6 @@ void RC_UpdateCurrentScreenMatrices();
 void GrassRender_vBuildAndUploadOneTimeData(void);
 void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst);   // GoShaderObjectCommon
 void Grass_QueueRelease(GrassBuffer* pBuffer);
-void fn_80008380(void);
 void Grass_RegisterStreamClients(void);
 void Grass_LoadNetworkData(TNetwork* netPtr);
 void Grass_CreateTopTexture(void);
@@ -161,7 +160,7 @@ void Grass_CloseModule(void) {
 void Grass_DeInitForHole(void) {
     int i;
     if (gpGrassMgr->p370 != NULL) {
-        fn_80008380();
+        DL_vWaitForEndOfDrawing();
         for (i = 0; i < gpGrassMgr->anF8[gpGrassMgr->n100]; i++) {
             Grass_QueueRelease(gpGrassMgr->apF0[gpGrassMgr->n100][i]);
         }

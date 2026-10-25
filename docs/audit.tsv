@@ -163,7 +163,7 @@ PsBallFx.c	open
 PsMgr.c	open		
 RenderAccessors.c	done	63883fe8	claude-review
 Replay.c	open		
-ScreenClear.c	open		
+ScreenClear.c	done	dc4bce89	claude-review
 SitDev.c	open		
 SitDevCommentaryZones.c	done	503eba0e	claude-review
 SitDevFile.c	open		

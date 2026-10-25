@@ -181,7 +181,6 @@ s32   SkinPart_GetNumSets(Skin* pSkin);         // SkinPart.c: how many choices 
 void  SkinPart_SetChangeAllCopies(u8 b);
 u8    SpeedGolf_IsStartXYHeld(int nPlayer);
 void  fn_8010A668(void* p);
-void  fn_80008380(void);
 void  fn_800106AC(int n);               // LLTexGrp.c
 void  fn_800106B8(u8 b);                // LLTexGrp.c
 void  UI_ParkFileInAram(void);         // uiLoadFile.c: park the UI file's data in ARAM
@@ -1450,7 +1449,7 @@ void Character_ExecuteTextureSwapFE(Character* pChar) {
         Character_CopySkinChoices1To0(pChar);
         sApplyUserLogos(pChar, pModel, &pProfile->choices);
         fn_8010BA2C(pModel);
-        fn_80008380();
+        DL_vWaitForEndOfDrawing();
         for (i = 0; i < pChar->nSkins; i++) {
             SkinPart_SetupMaterials(pChar->apSkins[i], pModel);
         }
@@ -1604,12 +1603,12 @@ void CharacterTex_PreHoleInit(void) {
 
 // With more than two players, the dynamic textures go to player nPlayer (up now) and the next to
 // play (GM_GetSecondHonors). nPlayer's character loses bit 0x40 of uCharFlags; after the display
-// finishes drawing (fn_80008380), every other character holding pool entries (except the one being
-// loaded, the pool's pLoadingChar) gives them back and gets bit 0x40 (not drawn). Unless nPlayer's
-// textures are loaded (bTexLoaded), it takes the entries (the character being loaded giving its
-// back first) and its textures are loaded now (fn_8010BF68); when it is the one being loaded, the
-// loader is just run to the end. The next player's character is then queued the same way, its
-// textures left to CharacterTex_TextureLoader.
+// finishes drawing (DL_vWaitForEndOfDrawing), every other character holding pool entries (except
+// the one being loaded, the pool's pLoadingChar) gives them back and gets bit 0x40 (not drawn).
+// Unless nPlayer's textures are loaded (bTexLoaded), it takes the entries (the character being
+// loaded giving its back first) and its textures are loaded now (fn_8010BF68); when it is the one
+// being loaded, the loader is just run to the end. The next player's character is then queued the
+// same way, its textures left to CharacterTex_TextureLoader.
 void CharacterTex_StartStreamingPlayers(int nPlayer) {
     int i;
     Character* pChar;
@@ -1617,7 +1616,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
 
     if (gSession.nNumPlayers > 2) {
         gPlayers[nPlayer].pChar->uCharFlags &= ~0x40;
-        fn_80008380();
+        DL_vWaitForEndOfDrawing();
         pChar = gPlayers[nPlayer].pChar;
         for (i = 0; i < gSession.nNumPlayers; i++) {
             if (i != nPlayer && gPlayers[i].pChar->apDynTex[gPlayers[i].pChar->nCurDynTex] != NULL &&
@@ -2998,7 +2997,7 @@ void Character_RequestClothesUpdateIG(int n) {
 
 // Each frame in game (gomainloop, outside game types 1 and 3): every player
 // Character_RequestClothesUpdateIG flagged has its golfer dressed again once the GPU is idle
-// (fn_80008380, Character_SetClubsAndClothes), its skin choices copied from set 1 to set 0
+// (DL_vWaitForEndOfDrawing, Character_SetClubsAndClothes), its skin choices copied from set 1 to set 0
 // (Character_CopySkinChoices1To0) and its skins' materials set up again for its current dynamic
 // texture (SkinPart_SetupMaterials); the flag is cleared.
 void Character_UpdateClothesIG(void) {
@@ -3008,7 +3007,7 @@ void Character_UpdateClothesIG(void) {
 
     for (i = 0; i < 5; i++) {
         if (gSession.aD28[i]) {
-            fn_80008380();
+            DL_vWaitForEndOfDrawing();
             pChar = gPlayers[i].pChar;
             Character_SetClubsAndClothes(pChar, i);
             Character_CopySkinChoices1To0(pChar);

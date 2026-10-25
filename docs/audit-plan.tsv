@@ -256,7 +256,7 @@ order	area	file	task	scope	state
 253	Movies	LLPict_Gc.c	pass	the whole file	open
 254	Movies	rcmp_mad_codec.c	pass	the whole file	open
 255	Movies	maddec.c	pass	the whole file	open
-256	Boot and game flow	ScreenClear.c	pass	the whole file	open
+256	Boot and game flow	ScreenClear.c	pass	the whole file	done
 257	Boot and game flow	GoHoleLoader.c	pass	the whole file	open
 258	Boot and game flow	Code8002EE1C.c	pass	the whole file	open
 259	Boot and game flow	BootCourse.c	pass	the whole file	open

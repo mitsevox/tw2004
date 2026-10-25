@@ -1,23 +1,17 @@
-// ScreenClear.c (our name): draws a black full-screen quad for one, two or thirty frames, e.g. to
-// blank the screen between game states.
+// ScreenClear.c: darkens the screen with a black full-screen quad, drawn over a few frames while
+// the controllers and the sound keep running, as the main loop leaves the start-up state.
 
 #include "game_types.h"
 #include "engine.h"
 #include "terrain.h"
 
-void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
-void fn_80008380(void);
-void fn_800162A8(void);
-void fn_80007254(void);
-void fn_800083A0(void);
-void fn_80007260(void);
+// The gnScreenClearMode value ScreenClear_DarkenScreen tests; nothing sets it.
+#define SCREENCLEAR_MODE_ONE_FRAME 1
 
-// Only read here (0x802821F0, 8 bytes in .sbss); nothing in the game writes it, so it stays 0.
-s32 lbl_802821F0;
+// Only read, never written, so always 0, never SCREENCLEAR_MODE_ONE_FRAME.
+s32 gnScreenClearMode;
 
-// fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f, 0.0f and 0.5f (0x80284238), before the 0.0f fn_800BA74C uses first; its body is unknown.
-static f32 ScreenClear_StrippedFn(f32 x) {
+static f32 ScreenClear_OrderConstants(f32 x) {  // fake match: never called, orders the float constants
     x += 1.0f;
     if (x < 0.0f) {
         return 0.0f;
@@ -25,64 +19,66 @@ static f32 ScreenClear_StrippedFn(f32 x) {
     return x * 0.5f;
 }
 
-// Draws a black full-screen quad for a number of frames: with bFade 30 frames at alpha 0.1, the
-// last two at 0.5; otherwise one frame at alpha 0.5 (two while lbl_802821F0 is not 1).
-void fn_800BA74C(u8 bFade) {
-    f32 colour[4];
-    f32 xy[8];
-    u32 bOther;
+// Draws a black quad over the whole screen, once per frame, reading the controllers and running
+// the sound each frame: with bFade, 30 frames at alpha 0.1, the last two at 0.5, each followed by
+// Displ_EndFrameEmpty. The game's one call (GO_bMainLoopDone, as the start-up state's main loop
+// ends) passes bFade 1; no caller passes 0.
+void ScreenClear_DarkenScreen(u8 bFade) {
+    f32 aColour[4];
+    f32 aXY[8];
+    u32 bTwoFrameMode;
     int i;
     int nFrames;
 
-    colour[0] = 0.0f;
-    colour[1] = 0.0f;
-    colour[2] = 0.0f;
-    bOther = lbl_802821F0 != 1;
-    colour[3] = bFade ? 0.1f : 0.5f;
-    RenderView_SetColor(colour);
-    RenderView_MakeQuad(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
-    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
-    fn_80008380();
+    aColour[0] = 0.0f;
+    aColour[1] = 0.0f;
+    aColour[2] = 0.0f;
+    bTwoFrameMode = gnScreenClearMode != SCREENCLEAR_MODE_ONE_FRAME;
+    aColour[3] = bFade ? 0.1f : 0.5f;
+    RenderView_SetColor(aColour);
+    RenderView_MakeQuad(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_SetViewport(0.0f, 0.0f, 1.0f, 1.0f);
+    DL_vWaitForEndOfDrawing();
     if (bFade) {
         nFrames = 30;
     } else {
-        nFrames = bOther ? 2 : 1;
+        nFrames = bTwoFrameMode ? 2 : 1;
     }
     for (i = 0; i < nFrames; i++) {
         if (bFade && i >= nFrames - 2) {
-            colour[3] = 0.5f;
-            RenderView_SetColor(colour);
+            aColour[3] = 0.5f;
+            RenderView_SetColor(aColour);
         }
-        fn_800162A8();
-        fn_80006EDC();
+        RenderView_FrameEmpty();
+        Displ_FrameStart();
         // both cases set the same 512 x 448 area
-        if (bOther) {
+        if (bTwoFrameMode) {
             RenderState_SetScissor(0, 0, 512, 448);
         } else {
             RenderState_SetScissor(0, 0, 512, 448);
         }
         RenderState_SetBlendFactors(4, 5);
         RenderView_SetUseCurrentMatrices(0);
-        RenderState_SetDrawFlags(64);
+        RenderState_SetDrawFlags(0x40);
         DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
         DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
         RenderState_Flush();
-        RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
+        RenderView_DrawPrimitive(0xA1, aXY, NULL, NULL, 2);
         Input_vUpdate();
         Gaud_Cycle();
-        if (!bOther) {
-            fn_80007254();
+        if (!bTwoFrameMode) {
+            Displ_WaitFrameEmpty();
         }
-        fn_800083A0();
-        fn_80006FE8();
-        fn_80008380();
-        if (bOther) {
-            fn_80007260();
+        LLObj_FrameEmpty();
+        Displ_FrameEnd();
+        DL_vWaitForEndOfDrawing();
+        if (bTwoFrameMode) {
+            Displ_EndFrameEmpty();
         }
     }
     DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_Flush();
-    fn_800083A0();
-    fn_80008380();
+    LLObj_FrameEmpty();
+    DL_vWaitForEndOfDrawing();
 }

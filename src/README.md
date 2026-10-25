@@ -95,7 +95,7 @@ The outer loop moves between start-up screens, the front end and rounds (`gSessi
 | gomainloop.c | T6 | the main loop: every system's start-up and shut-down, the frame update, the render passes |
 | GoHoleLoader.c | ph | the hole loader: streams a hole's files in and sets the systems up for it |
 | BootCourse.c | ours | the demo rounds (`DEMO_Start`: four fixed set-ups) and a 120-second idle timer `GoEntry.c` tests |
-| ScreenClear.c | ours | a black full-screen quad for 1, 2 or 30 frames |
+| ScreenClear.c | ours | darkens the screen with a black full-screen quad over 1, 2 or 30 frames as the start-up state ends |
 
 ### Core services
 

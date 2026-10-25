@@ -24,12 +24,10 @@ void fn_800124A8(void);                                // LLFont.c: end the prim
 void fn_800162AC(f32* pPos, f32* pColour, f32* pUV, int nVerts);
 void fn_800169AC(void);     // apply lbl_80280E08's viewport
 void fn_80016208(void);
-void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void fn_80016B6C(f32 fX, f32 fY);
 void fn_800162A0(void);
 void fn_800162A4(void);
-void fn_800162A8(void);
 void fn_80016C7C(s32 p0, s32 p1, s32 p2, s32 p3);
 void fn_80016C94(f32 farg0, f32 farg1, f32 farg2);
 void fn_80016CA8(f32 farg0, f32 farg1);
@@ -49,7 +47,7 @@ void fn_80016198(void) {
     RenderView_SetDefaultColor();
     lbl_80280E08->fF4 = 1.0f;
     lbl_80280E08->fF8 = 1.0f;
-    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_SetViewport(0.0f, 0.0f, 1.0f, 1.0f);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016208();
 }
@@ -73,7 +71,7 @@ void fn_800162A0(void) {
 void fn_800162A4(void) {
 }
 
-void fn_800162A8(void) {
+void RenderView_FrameEmpty(void) {
 }
 
 // ---- end of sweep code ----
@@ -218,21 +216,21 @@ void fn_800168A0(f32* pPos, f32* pColour, f32* pUV) {
 
 // Draw to the whole screen.
 void fn_80016948(void) {
-    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_SetViewport(0.0f, 0.0f, 1.0f, 1.0f);
 }
 
-// Set the viewport's corners, as fractions of the screen.
-void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1) {
+// Set the viewport's left, top, width and height, as fractions of the screen.
+void RenderView_SetViewport(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight) {
     ViewState* pView = lbl_80280E08;
 
-    pView->fD4 = x0;
-    pView->fD8 = y0;
-    pView->fDC = x1;
-    pView->fE0 = y1;
+    pView->fD4 = fLeft;
+    pView->fD8 = fTop;
+    pView->fDC = fWidth;
+    pView->fE0 = fHeight;
     fn_800169AC();
 }
 
-// Work out the viewport in pixels from its corners and the screen size, and its matrix.
+// Work out the viewport in pixels from fD4..fE0 and the screen size, and its matrix.
 void fn_800169AC(void) {
     ViewState* pView = lbl_80280E08;
 
