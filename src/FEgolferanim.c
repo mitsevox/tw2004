@@ -145,8 +145,6 @@ void fn_8010B098(void* p);
 void fn_8010B9BC(void);
 u8   fn_8010BFE0(void);
 void UStream_Stop(void);
-int  Stream_OpenStreamFiles(const UStreamParams* pParams);     // UStream.c
-int  UStream_Close(int nStream);                                // UStream.c
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0, before the 0.5 and 0.0 FE_CharMgrInit uses first; its body is unknown, this one only
@@ -223,7 +221,7 @@ void FE_CharMgrInit(void) {
     }
     gpCrAPState->pShown = &gpCrAPState->aGolfer[0];
     gPlayers[0].pChar = gpCrAPState->pShown->pChar;
-    gpCrAPState->pB8 = &gpCrAPState->aGolfer[0];
+    gpCrAPState->pLoadingGolfer = &gpCrAPState->aGolfer[0];
     gpCrAPState->n190 = 0;
     FE_StreamInitStateMgr();
     gpCrAPState->nTexSwapState = 0;
@@ -307,7 +305,7 @@ void FE_StreamFunc_IdleClose(void) {
 }
 
 // The idle state's update: pick the next golfer to load, the shown one first, then its pNext and
-// pPrev, skipping one already loaded (bLoaded) or with no id. The pick becomes pB8 (nBC says
+// pPrev, skipping one already loaded (bLoaded) or with no id. The pick becomes pLoadingGolfer (nBC says
 // which); a slot that still holds a character is flagged to be freed first (bFree), and once the
 // memory is free (FE_StreamManageCRaPMemory) the state finishes, on to the skin state. A golfer
 // another slot already has is not loaded again (for the shown one, FE_vClearGolferCache stops the
@@ -328,10 +326,10 @@ void FE_StreamFunc_IdleUpdate(void) {
             FE_vClearGolferCache();
             return;
         }
-        gpCrAPState->pB8 = gpCrAPState->pShown;
+        gpCrAPState->pLoadingGolfer = gpCrAPState->pShown;
         gpCrAPState->nBC = 0;
-        if (gpCrAPState->pB8->pChar != NULL) {
-            gpCrAPState->pB8->bFree = 1;
+        if (gpCrAPState->pLoadingGolfer->pChar != NULL) {
+            gpCrAPState->pLoadingGolfer->bFree = 1;
             return;
         }
         if (FE_StreamManageCRaPMemory()) {
@@ -339,10 +337,10 @@ void FE_StreamFunc_IdleUpdate(void) {
         }
     } else if (pGolfer->pNext->bLoaded == 0 && pGolfer->pNext->nGolferId != -1) {
         if (FE_IsGolferInOtherSlot(pGolfer->pNext->nGolferId, pGolfer->pNext)) return;
-        gpCrAPState->pB8 = gpCrAPState->pShown->pNext;
+        gpCrAPState->pLoadingGolfer = gpCrAPState->pShown->pNext;
         gpCrAPState->nBC = 1;
-        if (gpCrAPState->pB8->pChar != NULL) {
-            gpCrAPState->pB8->bFree = 1;
+        if (gpCrAPState->pLoadingGolfer->pChar != NULL) {
+            gpCrAPState->pLoadingGolfer->bFree = 1;
             return;
         }
         if (FE_StreamManageCRaPMemory()) {
@@ -350,10 +348,10 @@ void FE_StreamFunc_IdleUpdate(void) {
         }
     } else if (pGolfer->pPrev->bLoaded == 0 && pGolfer->pPrev->nGolferId != -1) {
         if (FE_IsGolferInOtherSlot(pGolfer->pPrev->nGolferId, pGolfer->pPrev)) return;
-        gpCrAPState->pB8 = gpCrAPState->pShown->pPrev;
+        gpCrAPState->pLoadingGolfer = gpCrAPState->pShown->pPrev;
         gpCrAPState->nBC = 2;
-        if (gpCrAPState->pB8->pChar != NULL) {
-            gpCrAPState->pB8->bFree = 1;
+        if (gpCrAPState->pLoadingGolfer->pChar != NULL) {
+            gpCrAPState->pLoadingGolfer->bFree = 1;
             return;
         }
         if (FE_StreamManageCRaPMemory()) {
@@ -366,13 +364,14 @@ void FE_StreamFunc_IdleInterrupt(void) {
 }
 
 // The skin state's start: open the stream of the front-end character file of the golfer being
-// loaded (pB8; StreamManagerFEChar_SetupFileStream, FE_OpenGolferStream) and note his id as
+// loaded (pLoadingGolfer; StreamManagerFEChar_SetupFileStream, FE_OpenGolferStream) and note his id as
 // streamed (nStreamedId, n8C); n190 counts the loads.
 void FE_StreamFunc_SkinInit(void) {
-    StreamManagerFEChar_SetupFileStream(gpCrAPState->pB8->nGolferId, gpCrAPState->pB8->nIndex);
+    StreamManagerFEChar_SetupFileStream(gpCrAPState->pLoadingGolfer->nGolferId,
+                                        gpCrAPState->pLoadingGolfer->nIndex);
     FE_OpenGolferStream();
-    gpCrAPState->pB8->nStreamedId = gpCrAPState->pB8->nGolferId;
-    gpCrAPState->n8C = gpCrAPState->pB8->nGolferId;
+    gpCrAPState->pLoadingGolfer->nStreamedId = gpCrAPState->pLoadingGolfer->nGolferId;
+    gpCrAPState->n8C = gpCrAPState->pLoadingGolfer->nGolferId;
     gpCrAPState->n190++;
 }
 
@@ -386,7 +385,7 @@ void FE_StreamFunc_SkinClose(void) {
 void FE_StreamFunc_SkinUpdate(void) {
     if (!UStream_Update()) {
         if (gFEStreamStateMgr.bAbort) {
-            gpCrAPState->pB8->bLoaded = 0;
+            gpCrAPState->pLoadingGolfer->bLoaded = 0;
         }
         FE_StreamPopState();
     }
@@ -396,7 +395,7 @@ void FE_StreamFunc_SkinInterrupt(void) {
     UStream_Stop();
 }
 
-// The texture state's start, for the golfer just streamed in (pB8): profiles set up, his clubs and
+// The texture state's start, for the golfer just streamed in (pLoadingGolfer): profiles set up, his clubs and
 // clothes set for the current profile's slot (golfers 7 and 29 first get FE_CrAP_EquipDefaults's parts), his
 // dynamic textures emptied and a texture load requested (the front end's load callbacks).
 void FE_StreamFunc_TexturesInit(void) {
@@ -404,14 +403,14 @@ void FE_StreamFunc_TexturesInit(void) {
 
     Session_SetupProfiles();
     SkinPart_SetChangeAllCopies(1);
-    nGolfer = gpCrAPState->pB8->pChar->nGolferId;
+    nGolfer = gpCrAPState->pLoadingGolfer->pChar->nGolferId;
     if (nGolfer == 7 || nGolfer == 29) {
         FE_CrAP_EquipDefaults();
     }
-    Character_SetClubsAndClothes(gpCrAPState->pB8->pChar, gpFEProfile->nSlot);
+    Character_SetClubsAndClothes(gpCrAPState->pLoadingGolfer->pChar, gpFEProfile->nSlot);
     SkinPart_SetChangeAllCopies(0);
-    fn_8010B098(gpCrAPState->pB8->pChar->apDynTex[gpCrAPState->pB8->pChar->nCurDynTex]);
-    Character_AddTextureLoadRequest(gpCrAPState->pB8->pChar, Character_BeginLoadTexturesCallbackFE,
+    fn_8010B098(gpCrAPState->pLoadingGolfer->pChar->apDynTex[gpCrAPState->pLoadingGolfer->pChar->nCurDynTex]);
+    Character_AddTextureLoadRequest(gpCrAPState->pLoadingGolfer->pChar, Character_BeginLoadTexturesCallbackFE,
                                     Character_EndLoadTexturesCallbackFE);
 }
 
@@ -424,12 +423,12 @@ void FE_StreamFunc_TexturesClose(void) {
 void FE_StreamFunc_TexturesUpdate(void) {
     if (!fn_8010BFE0()) {
         if (gFEStreamStateMgr.bAbort) {
-            gpCrAPState->pB8->bLoaded = 0;
+            gpCrAPState->pLoadingGolfer->bLoaded = 0;
         } else {
-            gpCrAPState->pB8->bLoaded = 1;
+            gpCrAPState->pLoadingGolfer->bLoaded = 1;
             gFELastDrawnSlot = -1;
             gFELastDrawnGolfer = -1;
-            gpCrAPState->pB8->nSetupKind = -1;
+            gpCrAPState->pLoadingGolfer->nSetupKind = -1;
         }
         gpCrAPState->n8C = -1;
         FE_StreamPopState();
@@ -844,7 +843,7 @@ void FE_vUpdateGolferAll(void) {
                 gSession.nGolfer[0] = gpCrAPState->pShown->nGolferId;
             }
         } else if (FE_StreamGetCurrentState() != 1) {
-            gpCrAPState->pShown = gpCrAPState->pB8;
+            gpCrAPState->pShown = gpCrAPState->pLoadingGolfer;
             gpCrAPState->pShown->bLoaded = 0;
         }
         gpCrAPState->pShown->pNext->nGolferId = gFEGolferCycle[gpCrAPState->n198][gpCrAPState->n194];
@@ -1367,7 +1366,7 @@ void FE_vFreeUnusedCharacters(void) {
         }
         if (gpCrAPState->aGolfer[0].bFree
             && (gpCrAPState->pShown->bLoaded == 0 || &gpCrAPState->aGolfer[0] != gpCrAPState->pShown)
-            && (FE_StreamGetCurrentState() == 1 || &gpCrAPState->aGolfer[0] != gpCrAPState->pB8)) {
+            && (FE_StreamGetCurrentState() == 1 || &gpCrAPState->aGolfer[0] != gpCrAPState->pLoadingGolfer)) {
             if (gpCrAPState->aGolfer[0].pChar != NULL) {
                 fn_80008380();
                 Character_Free(gpCrAPState->aGolfer[0].pChar);
@@ -1903,10 +1902,11 @@ void FE_ResetCrAPGolferFromPreview(void) {
     FE_SetDelayTextureSwap(0, 0.0f);
 }
 
-// Open the stream of stream list 3, the front-end golfer file StreamManagerFEChar_SetupFileStream
-// puts there, and keep it in gpStreamManagerLists->nStream.
+// Open the stream of the FE character list, the front-end golfer file
+// StreamManagerFEChar_SetupFileStream puts there, and keep it in gpStreamManagerLists->nStream.
 void FE_OpenGolferStream(void) {
-    gpStreamManagerLists->nStream = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[3]);
+    gpStreamManagerLists->nStream =
+        Stream_OpenStreamFiles(&STREAM_LIST(STREAM_FILE_FECHAR));
 }
 
 void FE_CloseGolferStream(void) {

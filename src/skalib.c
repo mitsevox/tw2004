@@ -48,7 +48,7 @@ u8             gSkaKeySpace[0x6290];
 // This file's .sdata (character.h).
 s32 gTrimMinLeafClips = 3;
 s32 gClipsPerLeaf = 6;
-u32 gCurLibSlot = 1;
+u32 gCurLibSlot = ANIM_SLOT_FEMALE;
 
 // This file's .sbss (character.h), in reverse address order as the compiler lays it out.
 f32            gSlot0BankShare;
@@ -399,15 +399,15 @@ u8 Skalib_IsDoubleBuffered(void) {
 u32 Skalib_NextSlot(void) {
     if (Skalib_IsDoubleBuffered()) {
         gCurLibSlot = (gCurLibSlot == 0);
-    } else if (Skalib_HasOverlays(0)) {
-        gCurLibSlot = 0;
+    } else if (Skalib_HasOverlays(ANIM_SLOT_MALE)) {
+        gCurLibSlot = ANIM_SLOT_MALE;
     } else {
-        gCurLibSlot = 1;
+        gCurLibSlot = ANIM_SLOT_FEMALE;
     }
     return gCurLibSlot;
 }
 
-// The slot Skalib_NextSlot last picked (Skalib_SetBudgets starts it at random); streammanagerhole.c
+// The slot Skalib_NextSlot last picked (Skalib_SetBudgets starts it at random); StreamManager.c
 // streams that slot's sac file.
 u32 Skalib_CurSlot(void) {
     return gCurLibSlot;
@@ -434,7 +434,7 @@ void Skalib_SetBudgets(void) {
     aBytes[2] = 0xE6000;
     aBytes[3] = 0xE6000;
     gSlotsDoubleBuffered = 0;
-    if (!Skalib_HasOverlays(0) || !Skalib_HasOverlays(1)) {
+    if (!Skalib_HasOverlays(ANIM_SLOT_MALE) || !Skalib_HasOverlays(ANIM_SLOT_FEMALE)) {
         gClipsPerLeaf = aKeepSingle[gSession.nNumPlayers - 1];
         gClipBankBudget = aBytes[0];
     } else {
@@ -447,8 +447,8 @@ void Skalib_SetBudgets(void) {
     }
     gCurLibSlot = (Misc_RandFunc(RANDOM_PRESENTATION) & 1) ^ 1;
     if (gSlotsDoubleBuffered) {
-        pSlot0 = &gLibSlots[0];
-        pSlot1 = &gLibSlots[1];
+        pSlot0 = &gLibSlots[ANIM_SLOT_MALE];
+        pSlot1 = &gLibSlots[ANIM_SLOT_FEMALE];
         nSize0 = pSlot0->pLib->nClipBytes;
         nSize1 = pSlot1->pLib->nClipBytes;
         for (i = 0; pSlot0->nOverlays > i; i++) {
@@ -1111,7 +1111,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     ClipBank*   pBank;
     int         n;
 
-    if (gLibSlots[0].nOverlays != 0 && gLibSlots[1].nOverlays != 0) {
+    if (gLibSlots[ANIM_SLOT_MALE].nOverlays != 0 && gLibSlots[ANIM_SLOT_FEMALE].nOverlays != 0) {
         bBoth = 1;
     }
     if (pSlot->nOverlays == 0) {
@@ -1238,7 +1238,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     if (nSlot != 2) {
         nBudget = gClipBankBudget;
         if (gSlotsDoubleBuffered) {
-            if (nSlot == 0) {
+            if (nSlot == ANIM_SLOT_MALE) {
                 nBudget = 942080.0f * gSlot0BankShare;
             } else {
                 nBudget = 942080.0f * (1.0f - gSlot0BankShare);
@@ -1292,7 +1292,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                     Mem_cpy(pOvs[i].pWork->pTree, apTree[i], pOvs[i].nTree);
                 }
                 if (!AnimLib_TrimToFit(&ctx, pLib, pOvs, nOvs, 1)) {
-                    if (nSlot == 1 || !bBoth) {
+                    if (nSlot == ANIM_SLOT_FEMALE || !bBoth) {
                         nBudget = ctx.nBytes;
                     } else {
                         nBudget      = ctx.nBytes;
@@ -2250,7 +2250,7 @@ void ClipBank_Stash(int nSlot) {
             Circular_MemFreeFunc(gClipBankFiles[nSlot]);
         }
         gClipBankFiles[nSlot] = NULL;
-        if (nSlot == 0 && gClipBankRestoreFile == NULL) {
+        if (nSlot == ANIM_SLOT_MALE && gClipBankRestoreFile == NULL) {
             gClipBankRestoreFile = Circular_MemAllocFunc(gClipBankAramSizes[nSlot], MEMTYPE_LOW, 0x20,
                                                          "skalib.c", 4671);
         }

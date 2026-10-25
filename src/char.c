@@ -14,6 +14,7 @@
 #include "unsorted/cull.h"
 #include "game_types.h"
 #include "endian.h"
+#include "ustream.h"
 
 // data order: these lead the unity's .data (0x80186CC8), ahead of char_tex_manager.c's
 // "_usrtextr", so they are defined before its #include.
@@ -73,9 +74,6 @@ char gClubGripVariantNames[6][13] = {"Defaults", "Defaults", "Defaults", "Defaul
 // char.c's first string at 0x801870FC, which a separate char.o could not start at).
 #include "../src/char_tex_manager.c"
 
-void  StreamManagerIngame_SetupSacFiles(void);
-void  StreamManagerIngame_SetupCurSlotSacFiles(void);
-void  StreamManagerIngame_StreamSacFiles(void);
 void  Character_ExecuteTextureSwapFE(Character* pChar);
 void  CharacterTex_Init(void);
 void  CharacterTex_Close(void);
@@ -696,7 +694,7 @@ void Character_SetSkin(Character* pChar, Skin* pSkin) {
             mat44flt_Invert(pMtxRToe, mRToeInv);
             mat44flt_Invert(pMtxLFoot, mLFootInv);
             mat44flt_Invert(pMtxRFoot, mRFootInv);
-            if (pChar->nSlot == 0) {
+            if (pChar->nSlot == ANIM_SLOT_MALE) {
                 vBoneToToe.x = 0.0f;
                 vBoneToToe.y = -0.031f;
                 vBoneToToe.z = 0.0f;
@@ -2761,7 +2759,7 @@ void Character_ClubStreamCallbackFE(UStreamObject* pObject) {
     Circular_MemFreeFunc(pObject);
 }
 
-// Registers Character_ClubStreamCallbackIG for 'CLB ' objects (streammanagerhole's in-game list).
+// Registers Character_ClubStreamCallbackIG for 'CLB ' objects (the stream manager's in-game list).
 void Character_RegisterClubStreamClientIG(void) {
     Stream_RegisterLoadChunkCallback('CLB ', Character_ClubStreamCallbackIG);
 }
@@ -2817,18 +2815,18 @@ void Character_GolferStreamCallbackIG(UStreamObject* pObject) {
     Circular_MemFreeFunc(pObject);
 }
 
-// Registers Character_GolferStreamCallbackIG for 'CHR ' objects (streammanagerhole's in-game list).
+// Registers Character_GolferStreamCallbackIG for 'CHR ' objects (the stream manager's in-game list).
 void Character_RegisterGolferStreamClientIG(void) {
     Stream_RegisterLoadChunkCallback('CHR ', Character_GolferStreamCallbackIG);
 }
 
 // The front end's 'CHR ' stream handler, for the golfer the create-a-player menu is loading
-// (gpCrAPState->pB8): the UI file is parked in ARAM so its buffer can take a copy of the object
+// (gpCrAPState->pLoadingGolfer): the UI file is parked in ARAM so its buffer can take a copy of the object
 // (header and data), and the object is freed; the character is made from the copy (the static heap
 // counting what it takes) and its textures loaded, then the UI file is brought back. The character
 // is placed at gFEGolferPos facing f19C, given the profile's created-golfer look for golfers 7 and
 // 29 (Character_ApplyCrAPSettings), set to club class 5 (the wedges) and its first clip. When it
-// is still the golfer the menu wants (pB8->nGolferId is n8C), its body and six club skins are
+// is still the golfer the menu wants (pLoadingGolfer->nGolferId is n8C), its body and six club skins are
 // listed on it (created golfers with one texture pool entry get two) and it takes its pool entries.
 void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     UStreamObject* pCopy;
@@ -2842,22 +2840,23 @@ void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     Mem_cpy(pCopy, pObject, pObject->uSize + 0x80);
     Circular_MemFreeFunc(pObject);
     pCopy->pData = (u8*)pCopy + 0x80;
-    gpCrAPState->pB8->pChar = Character_CreateFromMem(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
+    gpCrAPState->pLoadingGolfer->pChar = Character_CreateFromMem(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
     Circular_StopMemorySizeRecorder();
     Circular_GetCurrentMemorySizeRecorder();
-    Character_LoadTextures(gpCrAPState->pB8->pChar, NULL, 0);
+    Character_LoadTextures(gpCrAPState->pLoadingGolfer->pChar, NULL, 0);
     UI_RestoreFileFromAram();
-    gpCrAPState->pB8->pChar->nPlays = -1;
-    Character_SetPosition(gpCrAPState->pB8->pChar, gFEGolferPos, 1);
-    Character_SetOrientation(gpCrAPState->pB8->pChar, gpCrAPState->fFacing);
-    if (gpCrAPState->pB8->pChar->nGolferId == 7 || gpCrAPState->pB8->pChar->nGolferId == 29) {
-        Character_ApplyCrAPSettings(gpCrAPState->pB8->pChar, &FE_GetCurrentProfile()->choices);
+    gpCrAPState->pLoadingGolfer->pChar->nPlays = -1;
+    Character_SetPosition(gpCrAPState->pLoadingGolfer->pChar, gFEGolferPos, 1);
+    Character_SetOrientation(gpCrAPState->pLoadingGolfer->pChar, gpCrAPState->fFacing);
+    if (gpCrAPState->pLoadingGolfer->pChar->nGolferId == 7
+        || gpCrAPState->pLoadingGolfer->pChar->nGolferId == 29) {
+        Character_ApplyCrAPSettings(gpCrAPState->pLoadingGolfer->pChar, &FE_GetCurrentProfile()->choices);
     }
-    Character_SelectClub(gpCrAPState->pB8->pChar, 5);
-    pClip = Char_SetClip(gpCrAPState->pB8->pChar, 0, 0, NULL);
-    Character_PlayClip(gpCrAPState->pB8->pChar, pClip, 1, 0.0f);
-    if (gpCrAPState->pB8->nGolferId == gpCrAPState->n8C) {
-        pChar = gpCrAPState->pB8->pChar;
+    Character_SelectClub(gpCrAPState->pLoadingGolfer->pChar, 5);
+    pClip = Char_SetClip(gpCrAPState->pLoadingGolfer->pChar, 0, 0, NULL);
+    Character_PlayClip(gpCrAPState->pLoadingGolfer->pChar, pClip, 1, 0.0f);
+    if (gpCrAPState->pLoadingGolfer->nGolferId == gpCrAPState->n8C) {
+        pChar = gpCrAPState->pLoadingGolfer->pChar;
         pChar->nSkins = 7;
         pChar->apSkins[0] = pChar->pSkin;
         pChar->apSkins[1] = pChar->pClubSet->apSkins[0];

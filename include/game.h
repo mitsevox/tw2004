@@ -225,6 +225,8 @@ extern BuiltRound gCompilationCourses[NUM_BUILT_ROUNDS];    // 0x801FA1F8
 extern CourseData gCourseInfo[NUM_COURSE_DATA];     // 0x801FA2F4
 
 void GM_CourseInfo_DeInit(void);
+void GM_CourseInfo_RegisterStreamClients(void);
+void GM_CourseInfo_UnRegisterStreamClients(void);
 int  GM_GetCurrentHolePrevailingWindDir(void);
 f32  GM_GetCurrentHolePrevailingWindSpeed(void);
 s32  GM_GetTotalPar(int nCourse, int nTeeSet);    // a course's par from a tee set
@@ -673,6 +675,8 @@ void PlayNow_SetCalendarFlag(u8 bOn);
 u8   PlayNow_GetCalendarFlag(void);
 void PlayNow_ForceWeather(f32 fAmount);
 void PlayNow_SendMessage18(s32 nPlayer);
+void PlayNow_RegisterStreamClients(void);
+void PlayNow_UnregisterStreamClients(void);
 
 void GameModePractice_ReadPlaceBallSticks(int nPlayer);          // GameMode_Practice.c
 void GameModeDriverPGATour_FreeStreamMemory(void);                 // GameModeDriverPGATour.c

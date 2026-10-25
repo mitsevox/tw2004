@@ -239,5 +239,7 @@ void GM_ClearShotBonusStats(int nPlayer);  // clear the player's flags bHitObjec
 void GM_ClearHoleBonusStats(int nPlayer);  // clear GM_RecordBonusShotStats's flags (bBunkerThisHole..b312)
 void GM_ClearGameBonusStats(int nPlayer);  // clear the player's money breakdown for the round
 u8   Earnings_IsTourAwardEarned(int nPlayer, int nAward);
+void EarningsInfo_RegisterStreamClients(void);
+void EarningsInfo_UnRegisterStreamClients(void);
 
 #endif

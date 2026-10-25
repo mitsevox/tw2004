@@ -7,7 +7,7 @@
 // UI_DrawLoadingScreenAndProgressBar, the jobs of UI_InitLoadingBar and
 // UI_DrawLoadingScreenAndProgressBar here; TW07's uiProcessPolygon.h is included from Golf/MainLoop,
 // Golf/entry and golf/streaming, where this file's callers are (gomainloop.c, GoEntry.c,
-// streammanagerhole.c); TW06 lists uiprocesspolygon.c among the iStudio runtime files; and it links
+// StreamManager.c); TW06 lists uiprocesspolygon.c among the iStudio runtime files; and it links
 // between uiProcessInterface.c and uiText.c / uiTransform.c, in the UI runtime's alphabetical order.
 // EA's FE_Movies.c (TW06, TW07: FE_MakeMoviePath, FE_movieFade, FE_PlayIntroMovies) is
 // FE_Manager.c's movie code in this build.
@@ -453,26 +453,27 @@ void UI_InitLoadingBar(void) {
     }
 }
 
-// One step of the loading screen while something streams in (streammanagerhole.c calls it between
+// One step of the loading screen while something streams in (StreamManager.c calls it between
 // stream updates), unless the session has flag 4. The seconds since the last step are added to
 // fElapsed. Until fElapsed passes fNextTile the screen is redrawn only every 2 seconds
 // (fNextRedraw); a redraw draws the loading picture over the whole screen and the bar tiles shown
 // so far (0 to nLastTile, at most 8) in one frame. When fElapsed passes fNextTile (or no tile is
 // shown yet) the next tile is shown (UI_ShowLoadingBarTile) and fNextTile moves on by fTileSecs.
-// nMode 1 ends it: every tile not yet shown is shown, a frame each, and bRunning is cleared.
-void UI_DrawLoadingScreenAndProgressBar(int nMode) {
+// UI_LOADSCREEN_DONE ends it: every tile not yet shown is shown, a frame each, and bRunning is
+// cleared.
+void UI_DrawLoadingScreenAndProgressBar(UI_LoadScreen_state state) {
     f32 fSecs;
     int i;
 
     if (gSession.uFlags & 4) return;
-    if (nMode == 1) {
+    if (state == UI_LOADSCREEN_DONE) {
         gUILoadingScreen.bRunning = 0;
     }
     gUILoadingScreen.uTime = TI_sRead();
     fSecs = TI_fConvertTimeDifToSeconds(gUILoadingScreen.uTime, gUILoadingScreen.uLastTime);
     gUILoadingScreen.uLastTime = gUILoadingScreen.uTime;
     gUILoadingScreen.fElapsed += fabsf(fSecs);
-    if (nMode != 1 && gUILoadingScreen.fElapsed <= gUILoadingScreen.fNextTile) {
+    if (state != UI_LOADSCREEN_DONE && gUILoadingScreen.fElapsed <= gUILoadingScreen.fNextTile) {
         if (gUILoadingScreen.fElapsed > gUILoadingScreen.fNextRedraw) {
             gUILoadingScreen.fNextRedraw += 2.0f;
         } else {
@@ -499,7 +500,7 @@ void UI_DrawLoadingScreenAndProgressBar(int nMode) {
         if (++gUILoadingScreen.nLastTile >= 8) return;
         UI_ShowLoadingBarTile(gUILoadingScreen.nLastTile);
     }
-    if (nMode == 1) {
+    if (state == UI_LOADSCREEN_DONE) {
         if (gUILoadingScreen.nLastTile < 0) {
             gUILoadingScreen.nLastTile = 0;
         }

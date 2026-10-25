@@ -485,5 +485,7 @@ int  fn_80007B2C(UObjMesh* pMesh, void* pCamera, f32 a, f32 fSize, f32 c);
 
 void DynObj_InitForHole(void);
 void DynObj_DeInitForHole(void);
+void DynObj_RegisterStreamClients(void);
+void DynObj_UnRegisterStreamClients(void);
 
 #endif

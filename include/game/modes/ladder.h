@@ -20,6 +20,8 @@ void GameMode4_StartEvent(void);                       // sets the session up fo
 int  GameMode4_GetEventN0(int nEvent);                 // LadderEvent.n0, the first word of its 'TCM ' record
 void GameMode4_GetEventName(int nEvent, char* szOut);  // its name
 int  GameMode4_GetEventTourStop(int nEvent);           // its tour stop number
+void GameMode4_RegisterStreamClients(void);
+void GameMode4_UnregisterStreamClients(void);
 
 // GameMode4Menu.c and LadderMap.c: the map. Each event has a node on it; the menus place the
 // nodes, and the cursor jumps to the nearest node in the direction pressed. The first 18 nodes are

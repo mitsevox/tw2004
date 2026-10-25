@@ -1078,7 +1078,7 @@ void GM_SetupDefaultProfile(void) {
     int i;
     u8  bDead = 0;
     u8  bAny;
-    if (gSession.n5B34 == 0) {
+    if (gSession.bHoleFileOverride == 0) {
         // Dead code in the original: a loop over the holes testing a flag that is always 0 here.
         // Only the empty counting loop survives compilation, so the body is unknown.
         for (i = 0; i < 18; i++) {

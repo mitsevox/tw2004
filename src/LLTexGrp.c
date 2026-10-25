@@ -68,11 +68,14 @@ void fn_80010180(UStreamObject* pObject) {
     Circular_MemFreeFunc(pObject);
 }
 
-void fn_80010284(void) {
+// Has the stream loader hand every 'txf ' object (a texture bank) to this file's handler, which
+// puts it in the bank list.
+void TG_vRegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('txf ', fn_80010180);
 }
 
-void fn_800102B4(void) {
+// Stops the stream loader handing 'txf ' objects to the bank list.
+void TG_vUnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('txf ');
 }
 

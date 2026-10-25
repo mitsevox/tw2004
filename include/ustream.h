@@ -57,41 +57,97 @@ typedef struct UStreamBuffer {
     u8   data[USTREAM_BUFFER_SIZE];
 } UStreamBuffer;
 
+// What UStream calls when it opens a stream's file and when it is done with it, with that file's
+// apOpenedArg / apClosedArg.
+typedef void (*StreamBeginCallback)(void* pData);
+typedef void (*StreamEndCallback)(void* pData);
+
 // What the caller passes to Stream_OpenStreamFiles (0x284 bytes) - the file list and per-file callbacks.
 typedef struct {
     int   nNumFiles;                                 // 0x000
     char  aszName[USTREAM_MAX_FILES][0x40];          // 0x004
-    void  (*apfnOpened[USTREAM_MAX_FILES])(void*);   // 0x204
-    void  (*apfnClosed[USTREAM_MAX_FILES])(void*);   // 0x224
+    StreamBeginCallback apfnOpened[USTREAM_MAX_FILES];   // 0x204
+    StreamEndCallback   apfnClosed[USTREAM_MAX_FILES];   // 0x224
     void* apOpenedArg[USTREAM_MAX_FILES];            // 0x244
     void* apClosedArg[USTREAM_MAX_FILES];            // 0x264
 } UStreamParams;
+LAYOUT_ASSERT(UStreamParams, 0x284);
 
-// The stream manager's file lists (gpStreamManagerLists): streammanagerhole.c and FEgolferanim.c open
-// one of them with Stream_OpenStreamFiles and keep the stream; LoadData.c empties list 2. Only the part
-// the code reaches is known.
+int  Stream_OpenStreamFiles(const UStreamParams* pParams);  // a new stream; its index or < 0
+int  UStream_Close(int nStream);                            // nStream or -1
+
+// ---- the stream manager (StreamManager.c) -----------------------------------------------------
+
+// The kinds of stream the stream manager keeps a file list for (StreamLists.aParams).
+typedef enum StreamFileType {
+    STREAM_FILE_INGAME,         // the round: GlbData.gcb, GlbChar.gcb, the golfers' character
+                                // files, then their sac files
+    STREAM_FILE_FRONTEND,       // the front end: FEnd.gcb, FEChar.gcb
+    STREAM_FILE_LOADSCREEN,     // a loading screen's picture: Load<n>.gcb
+    STREAM_FILE_FECHAR,         // the menu golfer being loaded: his FEChars file
+    STREAM_FILE_GLOBALS,        // the global data: LoadOnce.gcb
+    STREAM_FILE_STARTUP,        // the start-up: LoadOnce.gcb and startup.gcb
+    STREAM_FILE_HOLE,           // a hole: data/<course>/<hole>/hole.hog
+    STREAM_NUM_FILE_TYPES
+} StreamFileType;
+
+// The stream manager's file lists (gpStreamManagerLists, 0x11A0 bytes) and the stream open on one
+// of them. FEgolferanim.c opens and closes the FE character list itself.
 typedef struct StreamLists {
-    UStreamParams aParams[7];   // 0x000
+    UStreamParams aParams[STREAM_NUM_FILE_TYPES];  // 0x000  by StreamFileType
     int  nStream;               // 0x119C  the open stream (Stream_OpenStreamFiles)
 } StreamLists;
+LAYOUT_ASSERT(StreamLists, 0x11A0);
 extern StreamLists* gpStreamManagerLists;
-extern char gszStreamLoadScreenFileFmt[]; // "data/Load/Load%d.gcb" (streammanagerhole.c
-                                          // StreamManager_AddLoadScreenFile)
-extern char gszStreamFECharFileFmt[]; // "data/FEChars/%02dcharfe.gcb" (streammanagerhole.c
-                                      // StreamManagerFEChar_SetupFileStream)
-extern char gszStreamFrontendFile[]; // "data/FEnd/FEnd.gcb" (streammanagerhole.c StreamManager_InitModule)
-extern char gszStreamFECharFile[]; // "FEChar.gcb" (StreamManager_InitModule)
-extern char gszStreamLoadOnceFile[]; // "LoadOnce.gcb" (StreamManager_InitModule)
-extern char gszStreamStartupFile[]; // "startup.gcb" (StreamManager_InitModule)
-extern char gszStreamGlbDataFile[]; // "GlbData.gcb" (StreamManagerIngame_SetupFileStream)
-extern char gszStreamGlbCharFile[]; // "GlbChar.gcb" (StreamManagerIngame_SetupFileStream)
-extern char gszStreamCharFileFmt[]; // "data/Chars/%02dchar.gcb" (StreamManagerIngame_SetupFileStream)
-extern u8   gStreamManagerCharAdded[0x38]; // streammanagerhole.c: 30 flag bytes its list setups clear
-extern char gszStreamCourseDirFmt[]; // "data/%s/" (StreamManagerHole_StreamFiles)
-extern char gszStreamHoleFileName[]; // "/hole.hog" (StreamManagerHole_StreamFiles)
-extern char gszStreamMaleSacFile[]; // "malesac.gcb" (streammanagerhole.c)
-extern char gszStreamFemaleSacFile[]; // "femsac.gcb" (streammanagerhole.c)
-extern char gszStreamCharSacFileFmt[]; // "data/CharSac/%02dchrsac.gcb" (streammanagerhole.c)
+
+// The file list of stream kind eType (a StreamFileType).
+#define STREAM_LIST(eType) (gpStreamManagerLists->aParams[eType])
+
+// The file names the lists are made of; the Fmt ones go through sprintf.
+extern char gszStreamFrontendFile[];        // "data/FEnd/FEnd.gcb"
+extern char gszStreamFECharFile[];          // "FEChar.gcb"
+extern char gszStreamLoadOnceFile[];        // "LoadOnce.gcb"
+extern char gszStreamStartupFile[];         // "startup.gcb"
+extern char gszStreamLoadScreenFileFmt[];   // "data/Load/Load%d.gcb"
+extern char gszStreamCourseDirFmt[];        // "data/%s/"
+extern char gszStreamHoleFileName[];        // "/hole.hog"
+extern char gszStreamGlbDataFile[];         // "GlbData.gcb"
+extern char gszStreamGlbCharFile[];         // "GlbChar.gcb"
+extern char gszStreamCharFileFmt[];         // "data/Chars/%02dchar.gcb"
+extern char gszStreamMaleSacFile[];         // "malesac.gcb"
+extern char gszStreamFemaleSacFile[];       // "femsac.gcb"
+extern char gszStreamCharSacFileFmt[];      // "data/CharSac/%02dchrsac.gcb"
+extern char gszStreamFECharFileFmt[];       // "data/FEChars/%02dcharfe.gcb"
+
+// One flag per character, which the list set-ups clear (the first STREAM_NUM_CHAR_ADDED of
+// them) and nothing reads.
+#define STREAM_NUM_CHAR_ADDED 30
+extern u8   gStreamManagerCharAdded[0x38];
+
+void StreamManager_InitOnce(void);
+void StreamManager_CloseOnce(void);
+void StreamManager_AddLoadScreenFile(int nFile);
+void StreamManagerIngame_RegisterStreamClients(void);
+void StreamManagerIngame_UnregisterStreamClients(void);
+void StreamManagerIngame_StreamFiles(void);
+void StreamManagerFrontend_RegisterStreamClients(void);
+void StreamManagerFrontend_UnregisterStreamClients(void);
+void StreamManagerFrontend_StreamFiles(void);
+void StreamManagerLoadScreen_StreamFiles(void);
+void StreamManagerStartup_RegisterStreamClients(void);
+void StreamManagerStartup_UnregisterStreamClients(void);
+void StreamManagerStartup_StreamFiles(void);
+void StreamManagerGlobals_RegisterStreamClients(void);
+void StreamManagerGlobals_UnregisterStreamClients(void);
+void StreamManagerGlobals_StreamFiles(void);
+void StreamManagerHole_RegisterStreamClients(void);
+void StreamManagerHole_UnregisterStreamClients(void);
+void StreamManagerHole_StreamFiles(void);
+void StreamManagerIngame_SetupFileStream(void);
+void StreamManagerIngame_SetupSacFiles(void);
+void StreamManagerIngame_SetupCurSlotSacFiles(void);
+void StreamManagerIngame_StreamSacFiles(void);
+void StreamManagerFEChar_SetupFileStream(s32 nGolferId, s32 nIndex);
 
 // A stream (0x2E0 bytes).
 typedef struct {
@@ -130,10 +186,5 @@ typedef struct UStreamFill {
 u8   UStream_Update(void);              // runs the loader once; 0 when nothing is left to read
 void UStream_AddBufferRef(UStreamBuffer** ppList);          // a chunk of the buffer is kept
 void UStream_ReleaseObjectBuffer(UStreamBuffer** ppBuffer);  // a kept chunk is done with
-
-// streammanagerhole.c
-void StreamManagerHole_RegisterStreamClients(void);
-void StreamManagerHole_UnregisterStreamClients(void);
-void StreamManagerHole_StreamFiles(void);
 
 #endif

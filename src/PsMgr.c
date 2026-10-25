@@ -60,11 +60,13 @@ void fn_800A2934(void) {
 void fn_800A2958(void) {
 }
 
-void fn_800A295C(void) {
+// Has the stream loader hand 'sfxd' objects to this file's handler.
+void PsMgr_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('sfxd', fn_800A29B4);
 }
 
-void fn_800A298C(void) {
+// Stops the stream loader handing 'sfxd' objects to this file's handler.
+void PsMgr_UnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('sfxd');
 }
 

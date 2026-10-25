@@ -919,7 +919,7 @@ config.libs = [
             Object(Matching, "LLFont.c"),
             Object(Matching, "UFont.c"),
             Object(Matching, "GoRenderCtx_Gc.c"),
-            Object(Matching, "streammanagerhole.c"),
+            Object(Matching, "StreamManager.c"),
             Object(Matching, "Code80015470.c"),
             Object(Matching, "Code80016198.c"),
             Object(Matching, "GoViewCont.c"),

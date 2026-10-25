@@ -379,6 +379,10 @@ void AnimLib_Free(AnimLib* pLib);       // skalib.c
 void ClipBank_Release(int nSlot);       // skalib.c
 void MtaLib_CloseModule(void);                 // mtalib.c
 void AnimBlender_CloseModule(void);                 // animblender.c
+void Skalib_Register(void);                   // skalib.c
+void Skalib_Unregister(void);                 // skalib.c
+void MtaLib_Register(void);                   // mtalib.c
+void MtaLib_Unregister(void);                 // mtalib.c
 
 // animblender.c's pools (AnimBlender_InitModule creates them, AnimBlender_CloseModule destroys them): blend tree nodes by
 // type (0x34, 0x2C and 0x20 bytes), then pose buffers of format 0 (0x1040) and format 1 (0x114C).
@@ -871,6 +875,13 @@ void  Character_SetSkeleton(Character* pChar, CharModel* pModel);
 void  Character_Free(Character* pChar);    // frees the character
 void  Character_SelectClub(Character* pChar, int n);
 void  Character_RegisterGolferStreamClientFE(void);
+void  Character_RegisterGolferStreamClientIG(void);
+void  Character_UnregisterGolferStreamClient(void);
+void  Character_RegisterClubStreamClientIG(void);
+void  Character_RegisterClubStreamClientFE(void);
+void  Character_UnregisterClubStreamClient(void);
+void  SkeletalObject_RegisterStreamClient(void);
+void  SkeletalObject_UnregisterStreamClient(void);
 void  Character_SetClubsAndClothes(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
 void  Character_ApplyCrAPSettings(Character* pChar, struct SkinChoices* pChoices);  // applies a look (char.c)
 void  Character_SetLeftHanded(Character* pChar, u8 b);    // sets the model's bLeftHanded
@@ -1019,6 +1030,13 @@ typedef struct LibOverlay {
 } LibOverlay;
 LAYOUT_ASSERT(LibOverlay, 0x20);
 
+// The animation slots (gLibSlots, Character.nSlot) of the male and the female golfers' libraries,
+// whose sac files are malesac.gcb and femsac.gcb.
+typedef enum AnimSlot {
+    ANIM_SLOT_MALE   = 0,
+    ANIM_SLOT_FEMALE = 1
+} AnimSlot;
+
 // One of the three animation slots.
 typedef struct LibSlot {
     AnimLib*   pLib;            // 0x000  the loaded (swapped) library
@@ -1107,6 +1125,8 @@ extern u8          gSlotsDoubleBuffered;        // double buffering: libraries a
 extern u32         gClipBankBudget;        // bytes of clips a slot may keep
 extern UStreamObject* gClipBankRestoreFile;     // the buffer banks are brought back from ARAM into
 extern u8          gSacReloading;
+u32  Skalib_CurSlot(void);              // the current slot (gCurLibSlot)
+int  Skalib_HasOverlays(int nSlot);     // the slot has overlay libraries
 extern s32         gWalkGroup;        // group, style, club and key being merged
 extern s32         gWalkStyle;
 extern s32         gWalkClub;

@@ -12,6 +12,7 @@
 #include "game/frontend.h"
 #include "frontend/fe.h"
 #include "llpict.h"
+#include "ustream.h"
 
 void*       lbl_80281E60;
 FB_SFrameBuffer* lbl_80281E5C;
@@ -42,19 +43,6 @@ void RC_vApplyRenderCtxToRenderState(void* pCamera);
 void RC_vClearRenderCtxScreen(void* pCamera, int n, void** ppSlot);
 void RC_vSetCurrentRenderCtx(void* pCamera);        // the current render camera (gppCurrentRenderCtx)
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
-void StreamManagerIngame_RegisterStreamClients(void);
-void StreamManagerIngame_UnregisterStreamClients(void);
-void StreamManagerIngame_StreamFiles(void);
-void StreamManagerFrontend_RegisterStreamClients(void);
-void StreamManagerFrontend_UnregisterStreamClients(void);
-void StreamManagerFrontend_StreamFiles(void);
-void StreamManagerStartup_RegisterStreamClients(void);
-void StreamManagerStartup_UnregisterStreamClients(void);
-void StreamManagerStartup_StreamFiles(void);
-void StreamManagerGlobals_RegisterStreamClients(void);
-void StreamManagerGlobals_UnregisterStreamClients(void);
-void StreamManagerGlobals_StreamFiles(void);
-void StreamManagerIngame_SetupFileStream(void);
 void DS_vInitModule(void);
 void DS_vCloseModule(void);
 void fn_80016198(void);
@@ -168,7 +156,6 @@ void UI_SendPendingMessages(void);
 void UI_vCloseModule(void);
 void UI_ExitFade(void);
 void UI_FreeMarkedEntryPictures(void);
-void UI_LoadLoadingBarTexture(void);
 void UI_FreeLoadingBarTexture(void);
 void fn_80093AD4(void);
 void fn_80093D14(void);

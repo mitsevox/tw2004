@@ -981,8 +981,8 @@ typedef struct CrAPState {
     u8   unk92[2];
     CrAPGolfer aGolfer[CRAP_NUM_GOLFERS];   // 0x094
     CrAPGolfer* pShown;         // 0x0B4  the golfer shown
-    CrAPGolfer* pB8;            // 0x0B8  the golfer being loaded
-    s32  nBC;                   // 0x0BC  which of pShown, its pNext or its pPrev pB8 is (0..2)
+    CrAPGolfer* pLoadingGolfer; // 0x0B8  the golfer being loaded
+    s32  nBC;                   // 0x0BC  which of pShown, its pNext or its pPrev pLoadingGolfer is (0..2)
     f32  mC0[4][4];             // 0x0C0
     f32  v100[4];               // 0x100
     f32  v110[4];               // 0x110

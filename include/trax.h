@@ -29,4 +29,7 @@ LAYOUT_ASSERT(TraxState, 0x14);
 extern TraxState gEATraxDisplay;
 extern TraxTrack gEATraxSongs[TRAX_NUM_TRACKS];
 
+void UI_vEATraxRegisterStreamClients(void);
+void UI_vEATraxUnRegisterStreamClients(void);
+
 #endif

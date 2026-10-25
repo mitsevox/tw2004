@@ -25,7 +25,6 @@
 
 // Outside this file.
 void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
-void fn_80010284(void);
 void FE_StreamInterruptState(void);
 void FE_StreamSetNextState(int a);
 void FE_StreamWaitForState(int a);
@@ -135,19 +134,19 @@ void FE_Manager_FreeStreamMemory(void) {
 }
 
 // Has the stream loader hand 'BIO ' objects (the golfers' bios) to FE_CharBios_LoadBIOfromStream.
-// Called by the front end's stream-client registration (streammanagerhole.c
+// Called by the front end's stream-client registration (StreamManager.c
 // StreamManagerFrontend_RegisterStreamClients).
 void FE_CharBios_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback(TAG('B', 'I', 'O', ' '), FE_CharBios_LoadBIOfromStream);
 }
 
-// Empty in this build. Called by the front end's stream-client registration (streammanagerhole.c
+// Empty in this build. Called by the front end's stream-client registration (StreamManager.c
 // StreamManagerFrontend_RegisterStreamClients), right after FE_CharBios_RegisterStreamClients.
 void FE_Manager_RegisterStreamClients(void) {
 }
 
 // Stops the stream loader handing 'BIO ' objects to FE_CharBios_LoadBIOfromStream
-// (streammanagerhole.c StreamManagerFrontend_UnregisterStreamClients).
+// (StreamManager.c StreamManagerFrontend_UnregisterStreamClients).
 void FE_CharBios_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback(TAG('B', 'I', 'O', ' '));
 }
@@ -307,11 +306,11 @@ void FE_PlayTrophyBallHighlight(Replay* pReplay) {
     GM_SetCurrentCourse(gReplayData.nCourse);
 }
 
-// Starts the front end (GO_vInitFE): the 'txf ' texture-group stream client (fn_80010284), the
-// menus' message table, the manager (FE_InitManager), the menu golfers' module, and the profile
-// backups back from ARAM (FE_RestoreBackupsFromARAM).
+// Starts the front end (GO_vInitFE): the 'txf ' texture-group stream client
+// (TG_vRegisterStreamClients), the menus' message table, the manager (FE_InitManager), the menu
+// golfers' module, and the profile backups back from ARAM (FE_RestoreBackupsFromARAM).
 void FE_vInitModule(void) {
-    fn_80010284();
+    TG_vRegisterStreamClients();
     FE_InitGameMessages();
     FE_InitManager();
     FE_vInitFECharModule();

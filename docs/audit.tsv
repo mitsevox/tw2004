@@ -176,6 +176,7 @@ SkinBurn.c	open
 SkinMorph.c	open		
 SkinPart.c	open		
 StateGolfer.c	done	2b0ee2a1	claude-review
+StreamManager.c	done	7511d865	claude-review
 SunFlr_Gc.c	open		
 Swing.c	open		
 TerrainData.c	open		
@@ -237,7 +238,6 @@ skalib.c	open
 startUp.c	open		
 stateFunc.c	open		
 statemain.c	done	eee7aafb	claude-review
-streammanagerhole.c	open		
 target.c	open		
 uiArc.c	open		
 uiEATrax.c	open		

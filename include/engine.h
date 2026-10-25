@@ -419,8 +419,8 @@ extern TexBank* lbl_801A26DC[NUM_TXF2_BANKS];
 void fn_8000B884(void);                 // clear the banks
 void fn_8000B8F4(void);                 // free the banks
 void fn_8000B984(void);                 // allocate the buffers of the 'load' and 'txf2' objects
-void fn_8000B9E4(void);                 // register the 'txf2' handler
-void fn_8000BA14(void);                 // unregister it
+void FEtm_vRegisterStreamClients(void);        // register the 'txf2' handler
+void FEtm_vUnregisterStreamClients(void);      // unregister it
 void fn_8000BAE0(void);                 // load the loading-screen stream file of the current mode/course
 u8   fn_8000BD80(char* pName, u8** ppPixels);   // a texture's pixels by name; 0 if none
 // Find a texture by name: its bank's index, or -1 (bank and entry NULL).
@@ -438,10 +438,6 @@ extern LoadObjInfo lbl_801A25F0;
 extern u8* lbl_80281C04;                // the 'load' object's data (147700 bytes)
 extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2' object with id 10000
 
-void StreamManager_AddLoadScreenFile(int n); // add loading file n to stream list 2 (sprintf'd name)
-void StreamManagerLoadScreen_StreamFiles(void); // streammanagerhole.c
-void StreamManagerFEChar_SetupFileStream(s32 nChar, s32 nUnused); // streammanagerhole.c: stream list 3 = one
-                                                                  // FEChars file
 // LLTex.c: points at a flag byte RenderState_SetConstantAlphaActive (Code80015470.c) sets; while
 // it is set, the shader objects' untextured stage takes its alpha from the constant colour, not
 // the vertex colour (GoShaderObjectCommon_ShaderObjectsData_Gc.c fn_800740F4).
@@ -1652,10 +1648,14 @@ void EASBio_SetGamePlayState(u8 bFlag);
 void EASBio_IncrementGamesWon(u32 uCount);
 void EASBio_SetCurrentGameWon(u8 bWon);
 u8   EASBio_IsCurrentGameWon(void);
+void EASBio_RegisterStreamClients(void);
+void EASBio_UnregisterStreamClients(void);
 
 // LLTexGrp.c
 void fn_800106A0(int n);
 void fn_80010608(int n);
+void TG_vRegisterStreamClients(void);
+void TG_vUnregisterStreamClients(void);
 // GoPostFx.c
 void fn_80037E50(void);
 // UFstPart.c

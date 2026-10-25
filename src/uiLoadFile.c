@@ -61,7 +61,7 @@ void UI_SetInterfaceName(char* szSet) {
 
 // Pick the UI set by the game type (4, a round starting: "ingame"; 0, boot: "startup"; any other:
 // "frontend") and register the handlers of the UI's stream objects: 'DATS' the UI file, 'TXFS'
-// texture banks, 'FONS' fonts, 'GRPS' and 'MPCS' the picture list. streammanagerhole.c calls it
+// texture banks, 'FONS' fonts, 'GRPS' and 'MPCS' the picture list. StreamManager.c calls it
 // before the menus', a round's and start-up's files are streamed.
 void UI_RegisterStreamClients(void) {
     if (gSession.nGameType == 4) {
@@ -79,7 +79,7 @@ void UI_RegisterStreamClients(void) {
 }
 
 // Take the UI's stream object handlers off again ('DATS', 'TXFS', 'FONS', 'GRPS', 'MPCS';
-// streammanagerhole.c).
+// StreamManager.c).
 void UI_UnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('DATS');
     Stream_UnregisterLoadChunkCallback('TXFS');

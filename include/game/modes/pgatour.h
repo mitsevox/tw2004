@@ -115,5 +115,7 @@ s32  GameModeDriverPGATour_GetCurrentSeasonYear(void);                 // the cu
 s32  GameModeDriverPGATour_GetCurrentEventID(void);
 s32  GameModeDriverPGATour_GetSponsorshipProgress(s32 i);                // aSponsorship[i].nProgress
 s32  GameModeDriverPGATour_GetSponsorshipStartCash(s32 i);                // aSponsorship[i].nStartCash
+void GameModeDriverPGATour_RegisterStreamClients(void);
+void GameModeDriverPGATour_UnregisterStreamClients(void);
 
 #endif

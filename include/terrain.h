@@ -239,6 +239,8 @@ extern s32 gTerLODDataFar;                 // } until then
 
 // GoTerrain.c
 void Ter_vCloseModule(void);             // frees the terrain
+void Ter_vRegisterStreamClients(void);
+void Ter_vUnregisterStreamClients(void);
 void Ter_StopCrowdAnimation(u8 bReset);
 f32  Ter_GetCrowdAnimationCountdown(void);
 f32  Ter_GetCrowdAnimationDelayedStartPercentage(void);

@@ -173,5 +173,7 @@ void SitDev_NetworkLoadCallback(u8* netPtr);        // the loader for commentary
 u32  SitDev_GetCommentaryZones(f32* location);
 
 void SitDev_vInitBeforeHole(void);
+void SitDev_vRegisterStreamClients(void);
+void SitDev_vUnregisterStreamClients(void);
 
 #endif

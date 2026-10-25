@@ -48,5 +48,7 @@ s32  GM_RealtimeMode_GetIconIDByTrophyGroup(s32 nId);
 void GM_RealtimeMode_GetNameByTrophyGroup(s32 nId, char* pDst);
 s32  GM_RealtimeMode_GetTrophyID(s32 i);
 u8   GameModeDriverRTE_IsEventComplete(s32 nProfile, s32 i);
+void GameModeDriverRTE_RegisterStreamClients(void);
+void GameModeDriverRTE_UnregisterStreamClients(void);
 
 #endif

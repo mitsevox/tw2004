@@ -246,5 +246,7 @@ extern f32 SD_gafGrassFade[2][4];
 extern f32 SD_gafGrassTexGen[2][4];
 
 void Grass_DeInitForHole(void);
+void Grass_RegisterStreamClients(void);
+void Grass_UnRegisterStreamClients(void);
 
 #endif
