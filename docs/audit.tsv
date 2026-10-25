@@ -118,7 +118,7 @@ GoShaderObjectContainer_OBFData_Gc.c	open
 GoShaderObject_Glows_Gc.c	open		
 GoShaderObject_Grass_Gc.c	open		
 GoShaderObject_Particle_Gc.c	open		
-GoShaderObject_PrelitTexturedLine_Gc.c	open		
+GoShaderObject_PrelitTexturedLine_Gc.c	done	598b5f2b	claude-review
 GoShaderObject_PrelitTextured_Gc.c	done	e9d81c8e	claude-review
 GoShaderObject_PrelitUVAnimation_Gc.c	open		
 GoShaderObject_Rain_Gc.c	open		
