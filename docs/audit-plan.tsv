@@ -331,9 +331,9 @@ order	area	file	task	scope	state
 327	Rendering	GoTerrain.c	whole-file review	the whole file	open
 328	Rendering	GoGrass.c	pass	the whole file	open
 329	Rendering	unsorted/sweep_8009B314.c	fold	prove its file and fold it in	open
-330	Rendering	unsorted/code_800080D0.c	fold	prove its file and fold it in	open
+330	Rendering	unsorted/code_800080D0.c	fold	prove its file and fold it in	done
 331	Rendering	unsorted/sweep_800136F4.c	fold	prove its file and fold it in	done
-332	Rendering	unsorted/code_800082F8.c	fold	prove its file and fold it in	open
+332	Rendering	unsorted/code_800082F8.c	fold	prove its file and fold it in	done
 333	Rendering	unsorted/sweep_8009A844.c	fold	prove its file and fold it in	open
 334	EA UI Studio library	UIStudio.c	pass	the whole file	open
 335	EA UI Studio library	UISScreen.c	chunk 1/2	_IsChildOfControl .. _ParseInitialize	open

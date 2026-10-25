@@ -33,17 +33,11 @@ LLDisp_Gc.c:
 	.sbss2      start:0x80285200 end:0x80285204
 
 LLObj_Gc.c:
-	.text       start:0x800073B4 end:0x800080D0
+	.text       start:0x800073B4 end:0x800083A4
 	.data       start:0x80186768 end:0x80186778
-	.sdata2     start:0x80282A80 end:0x80282A88
-
-unsorted/code_800080D0.c:
-	.text       start:0x800080D0 end:0x800082F8
 	.bss        start:0x801A24A0 end:0x801A24B8
 	.sdata      start:0x80280DA0 end:0x80280DA8
-
-unsorted/code_800082F8.c:
-	.text       start:0x800082F8 end:0x800083A4
+	.sdata2     start:0x80282A80 end:0x80282A88
 
 GoEntry.c:
 	.text       start:0x800083A4 end:0x8000883C

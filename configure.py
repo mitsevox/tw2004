@@ -904,8 +904,6 @@ config.libs = [
             Object(Matching, "LLFileIO_Gc.c"),
             Object(Matching, "LLDisp_Gc.c"),
             Object(Matching, "LLObj_Gc.c"),
-            Object(Matching, "unsorted/code_800080D0.c"),
-            Object(Matching, "unsorted/code_800082F8.c"),
             Object(Matching, "GoEntry.c"),
             Object(Matching, "MathQuat.c"),
             Object(Matching, "UCirc.c"),

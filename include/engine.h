@@ -168,7 +168,7 @@ void RTClock_GetDateTimeString(char* s);
 #define TWOPI 6.28318531f
 #define DEG(x) ((x) * (PI / 180.0f))
 
-void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
+void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see LLObj_Gc.c)
 extern f32 __float_max[];               // FLT_MAX (MSL's)
 
 // UMatFlt.c: 4x4 float matrices and four-float vectors. A vector is a row times a matrix, so a
@@ -948,7 +948,7 @@ void SD_FillShaderObject(ShaderObject* pObj, const void* pData, int n);
 struct UObjMeshPart;
 struct UObjArraySet;
 
-// A shader type's model-part functions (ModuleHooks.part; code_800080D0.c calls them for a
+// A shader type's model-part functions (ModuleHooks.part; LLObj_Gc.c calls them for a
 // dynobj.h UObjMeshPart of that type).
 typedef struct UObjPartFuncs {
     void (*p0)(struct UObjMeshPart* pPart, void* pArg);    // 0x0  sets the part up (fn_8000827C)
@@ -956,7 +956,7 @@ typedef struct UObjPartFuncs {
     void (*p8)(struct UObjMeshPart* pPart);                // 0x8  draws the part (ObjPart_Draw)
 } UObjPartFuncs;
 
-// A mode's array-set functions (HookRow.set; code_800080D0.c calls them for a dynobj.h
+// A mode's array-set functions (HookRow.set; LLObj_Gc.c calls them for a dynobj.h
 // UObjArraySet in that mode).
 typedef struct UObjSetFuncs {
     void (*p0)(struct UObjArraySet* pSet, void* pArg);     // 0x0  sets the set up (fn_800081C8)
@@ -978,7 +978,7 @@ typedef struct ModuleHooks {
     void  (*pfn18)(void);         // 0x18  fn_8006DE68
     void  (*pfn1C)(void);         // 0x1C  fn_8006DF68
     void  (*pfn20)(void);         // 0x20  fn_8006DEE8
-    UObjPartFuncs part;           // 0x24  its model parts' functions (code_800080D0.c)
+    UObjPartFuncs part;           // 0x24  its model parts' functions (LLObj_Gc.c)
     u8    unk30[0x34 - 0x30];
     ShaderObjectHooks shader;     // 0x34  its shader objects' hooks
 } ModuleHooks;
@@ -995,7 +995,7 @@ extern u8 lbl_801893D8[20];         // per row: its pfn0/pfn4 run outside game t
 typedef struct HookRow {
     void  (*pfn0)(void);          // 0x00
     void  (*pfn4)(void);          // 0x04
-    UObjSetFuncs set;             // 0x08  mode 0's array-set functions (code_800080D0.c fn_800081C8)
+    UObjSetFuncs set;             // 0x08  mode 0's array-set functions (LLObj_Gc.c fn_800081C8)
 } HookRow;
 
 extern HookRow lbl_80188E78[1];

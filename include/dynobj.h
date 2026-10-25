@@ -228,7 +228,7 @@ UObjMesh*  fn_80045F5C(UObjMesh* pMesh, int i);     // pMesh's child mesh i
 UObjMesh*  fn_80045F6C(UObjModelRoot* pRoot);       // pRoot->pMesh
 UObjModelRoot* fn_800073B4(u8* pData, int n);       // builds a model's mesh tree from stream data
 
-// code_800080D0.c: the parts' type functions and the array sets' mode functions.
+// LLObj_Gc.c: the parts' type functions and the array sets' mode functions.
 void fn_800081C8(UObjArraySet* pSet, int nMode, void* pArg);
 void fn_80008214(UObjArraySet* pSet);
 void fn_80008248(UObjMeshPart* pPart);

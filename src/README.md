@@ -135,9 +135,7 @@ files in [Characters](#characters).
 | File | Name | What it is |
 |---|---|---|
 | LLDisp_Gc.c | EA | the display: video mode, image buffer, CPU/GPU sync, copying each frame out |
-| LLObj_Gc.c | EA | a model's mesh tree from its stream data; bounding-sphere visibility tests |
-| unsorted/code_800080D0.c | ph | vertex format set-up and the per-type function-table dispatch |
-| unsorted/code_800082F8.c | ph | camera and drawable-object accessors (`Vec3Copy`) |
+| LLObj_Gc.c | EA | a model's mesh tree from its stream data; bounding-sphere visibility tests; the parts' type-function dispatch and the camera getters *(from 0x800080D0 on: file unverified)* |
 | LLTex.c | EA | texture banks from `'txf '` objects; byte-code scripts that drive texture items |
 | LLTexGrp.c | EA | the list of loaded texture banks; find a texture by name hash |
 | LLFont.c | EA | the font renderer (`'sfn '` fonts) |

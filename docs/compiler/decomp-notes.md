@@ -65,7 +65,7 @@ CodeWarrior versions (GameCube)
 - **[verified] Float copies.** Copying three floats: GC/1.3.2 loads and stores one at a time;
   GC/2.0 - 2.7 interleave (load, load, store, load, store, store); GC/3.0 loads all then stores all.
   The interleave needs a `const` source: `Vec3Copy(f32* pSrc, f32* pDst)` gave load/store in turns
-  and the linked DOL failed; `(const f32* pSrc, f32* pDst)` matched (code_800082F8 `Vec3Copy`).
+  and the linked DOL failed; `(const f32* pSrc, f32* pDst)` matched (LLObj_Gc.c `Vec3Copy`).
 - **[verified] Null pointer compare.** GC/2.x and older use an unsigned compare (`cmplwi`), GC/3.0 a signed one (`cmpwi`).
 - **[verified] GC/2.0 vs 2.5+.** Differ when a byte-sized value is masked and then used as an
   index, and in bit-field packing. GC/2.5, 2.6 and 2.7 never differed from each other in our tests.
