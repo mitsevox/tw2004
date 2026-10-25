@@ -1143,7 +1143,7 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800977CC.c"),
             Object(Matching, "GoDynObjBase.c"),
             Object(Matching, "unsorted/sweep_8006FF2C.c"),
-            Object(Matching, "ShaderRow0.c"),
+            Object(Matching, "GoShaderObject_PrelitTextured_Gc.c"),
 
             Object(Matching, "unsorted/sweep_8009A844.c"),
             Object(Matching, "Main.c"),

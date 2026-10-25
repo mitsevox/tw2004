@@ -635,15 +635,15 @@ void fn_800A3A84(void) {
         pDraw = aDraws;
         if (nFirst < nEnd) {
             fill.nCount = 1;
-            pDraw[0].nPrim = 0;
+            pDraw[0].nPrim = DYNRENDER_PRIM_TRIANGLE_STRIP;
             pDraw[0].nStart = nFirst;
             pDraw[0].nCount = nEnd - nFirst;
         } else {
             fill.nCount = 2;
-            pDraw[0].nPrim = 0;
+            pDraw[0].nPrim = DYNRENDER_PRIM_TRIANGLE_STRIP;
             pDraw[0].nStart = nFirst;
             pDraw[0].nCount = 600 - nFirst;
-            pDraw[1].nPrim = 0;
+            pDraw[1].nPrim = DYNRENDER_PRIM_TRIANGLE_STRIP;
             pDraw[1].nStart = 0;
             pDraw[1].nCount = nEnd;
         }

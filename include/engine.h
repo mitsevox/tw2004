@@ -939,7 +939,7 @@ typedef struct ShaderObjectHooks {
 
 struct ShaderObject {
     s32   nRow;                 // 0x00  its row of lbl_80188E88
-    u8    unk4[0x20];           // 0x04  the row's own data (rows 0 and 19: a DynRenderObject)
+    u8    aData[0x20];          // 0x04  the row's own data (rows 0 and 19: DynRenderObject.pBuf)
     ShaderObjectHooks* pHooks;  // 0x24  that row's hooks
 };
 LAYOUT_ASSERT(ShaderObject, 0x28);
@@ -1009,8 +1009,15 @@ extern HookRow lbl_80188E78[1];
 typedef struct DynRenderDraw {
     s32   nStart;               // 0x00  first index
     s32   nCount;               // 0x04  indices
-    s32   nPrim;                // 0x08  primitive kind: a row of lbl_8018C7C8
+    s32   nPrim;                // 0x08  DYNRENDER_PRIM_*
 } DynRenderDraw;                // 0x0C
+
+// A draw's primitive kind: its row of lbl_8018C7C8, which holds the GX primitive it is drawn as.
+enum {
+    DYNRENDER_PRIM_TRIANGLE_STRIP = 0,  // GX_TRIANGLESTRIP
+    DYNRENDER_PRIM_TRIANGLE_FAN = 1,    // GX_TRIANGLEFAN
+    DYNRENDER_PRIM_LINE_STRIP = 3       // GX_LINESTRIP
+};
 
 typedef struct DynRenderDrawList {
     u32           nDraws;       // 0x00
@@ -1019,7 +1026,7 @@ typedef struct DynRenderDrawList {
 
 // A draw as callers hand it in (8 bytes).
 typedef struct DynRenderDrawIn {
-    s32   nPrim;                // 0x00
+    s32   nPrim;                // 0x00  DYNRENDER_PRIM_*
     u16   nStart;               // 0x04
     u16   nCount;               // 0x06
 } DynRenderDrawIn;
@@ -1040,19 +1047,19 @@ LAYOUT_ASSERT(DynRenderBuffer, 0x34);
 
 extern u32 lbl_8018C7C8[4];     // the GX primitive for each DynRenderDraw nPrim
 
-DynRenderBuffer* fn_8007018C(int nMaxVerts, int nMaxDraws);    // make
-void fn_80070348(DynRenderBuffer* pBuf);                         // free
-void fn_800703B8(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPrim);  // draw
-void fn_800704C4(DynRenderBuffer* pBuf, const void* pPos, const void* pColour, const void* pTexCoord,
-                 int nVerts, u8 bFlip);                          // add vertices
-void fn_800705F0(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart);  // add indices
-void fn_80070764(DynRenderBuffer* pBuf, const DynRenderDrawIn* pDraws, u16 nCount, int nPrim,
-                 u8 bRestart);                                   // add draws
+DynRenderBuffer* DynRenderBuffer_Create(int nMaxVerts, int nMaxDraws);
+void DynRenderBuffer_Free(DynRenderBuffer* pBuf);
+void DynRenderBuffer_Draw(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPrim);
+void DynRenderBuffer_AddVertices(DynRenderBuffer* pBuf, const void* pPos, const void* pColour,
+                                 const void* pTexCoord, int nVerts, u8 bFlip);
+void DynRenderBuffer_AddIndices(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart);
+void DynRenderBuffer_AddDraws(DynRenderBuffer* pBuf, const DynRenderDrawIn* pDraws, u16 nCount, int nPrim,
+                              u8 bRestart);
 
-// A shader object that draws through a dynamic rendering buffer (the hooks of rows 0 and 19 of
-// lbl_80188E88; our names). Only what those hooks read.
+// A shader object that draws through a dynamic rendering buffer, as the hooks of rows 0 and 19 of
+// lbl_80188E88 see it (our names): the ShaderObject with its row's data.
 typedef struct DynRenderObject {
-    u8    unk0[4];
+    s32   nRow;                     // 0x00  its row of lbl_80188E88
     DynRenderBuffer* pBuf;          // 0x04
 } DynRenderObject;
 
@@ -1072,6 +1079,14 @@ typedef struct DynRenderFill {
     const void* pColour;            // 0x10
     const void* pTexCoord;          // 0x14
 } DynRenderFill;
+
+// GoShaderObject_PrelitTextured_Gc.c: row 0's shader-object hooks, a prelit, textured mesh that
+// is drawn through a dynamic rendering buffer and refilled every frame.
+void SD_vShaderObject_PrelitTextured_Dynamic_Init(DynRenderObject* pObj, const DynRenderSize* pSize);
+void SD_vShaderObject_PrelitTextured_Dynamic_Close(DynRenderObject* pObj);
+void SD_vShaderObject_PrelitTextured_Dynamic_Render(DynRenderObject* pObj);
+void SD_vShaderObject_PrelitTextured_Dynamic_Refresh(DynRenderObject* pObj, DynRenderFill* pFill,
+                                                     u8 bRestart);
 
 // A scrolling texture animation (GoShaderObjectCommon_TexAnimManager_Gc.c; our names, after
 // fn_80074BE0's). Each frame its texture matrix is moved by the fraction of fU and fV times the
@@ -1535,31 +1550,6 @@ typedef struct Controllers {
                                   //       unplugged), one bit a pad: 1 << n
 } Controllers;
 LAYOUT_ASSERT(Controllers, 0x84);
-
-// A mesh object's draw description (Skin.c's SD_FillShaderObject loads it; Swing.c's club trail and
-// shadow.c's golfer shadow build one): nPrims strips, each a run of nCount vertices from nFirst.
-typedef struct TrailDraw {
-    s32  nPrims;                // 0x0
-    s16  nFirst;                // 0x4
-    s16  nCount;                // 0x6
-} TrailDraw;
-
-typedef struct TrailMeshDesc {
-    s16        n0;              // 0x00
-    s16        nVerts;          // 0x02
-    TrailDraw* pDraw;           // 0x04
-    s16*       pIndices;        // 0x08
-    f32*       pPos;            // 0x0C
-    u8*        pColour;         // 0x10
-    f32*       pUV;             // 0x14
-} TrailMeshDesc;
-
-// A TrailMeshDesc with four more values after it (GoBreakLine.c's line: BreakLine.fAB10, fAB14,
-// fAB18 and 1 / fAB18).
-typedef struct TrailMeshDescEx {
-    TrailMeshDesc desc;         // 0x00
-    f32        af18[4];         // 0x18
-} TrailMeshDescEx;
 
 // RenderAccessors.c: the depth and alpha test setters and the call that hands them to GX (its
 // viewport getters are in camera.h).

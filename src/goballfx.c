@@ -44,8 +44,8 @@ void fn_80093AD4(void) {
 // Draws the player's ball marker: a quad 0.04 across in the player's colour, just above the ground
 // under the ball; nothing where there is no ground.
 void BFX_vRender(Ball* pBall, int nPlayer) {
-    s16 aIndex[4] = {0, 1, 2, 3};
-    TrailMeshDesc desc;
+    u16 aIndex[4] = {0, 1, 2, 3};
+    DynRenderFill desc;
     f32* pPos;
     f32 fGround;
     f32 fSize;
@@ -109,13 +109,13 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
         RenderState_SetDrawFlags(0x70);
         RenderState_SetClipMode(GX_CLIP_ENABLE);
         RenderState_Flush();
-        desc.n0 = 4;
+        desc.nCount = 4;
         desc.nVerts = 4;
-        desc.pDraw = NULL;
+        desc.pDraws = NULL;
         desc.pIndices = aIndex;
         desc.pPos = pPos;
         desc.pColour = lbl_801D9578[nPlayer];
-        desc.pUV = lbl_801D94D8[nPlayer];
+        desc.pTexCoord = lbl_801D94D8[nPlayer];
         SD_FillShaderObject((ShaderObject*)lbl_801D94B0, &desc, lbl_80281F40);
         SD_DrawShaderObject(lbl_801D94B0);
         lbl_80281F40 = 0;

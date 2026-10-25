@@ -41,8 +41,8 @@ f32 lbl_802814B0 = 0.08f;
 f32* lbl_80282170;
 u8* lbl_8028216C;
 f32* lbl_80282168;
-s16* lbl_80282164;
-TrailDraw* lbl_80282160;
+u16* lbl_80282164;
+DynRenderDrawIn* lbl_80282160;
 s32 lbl_8028215C;
 s32 lbl_80282158;
 
@@ -383,9 +383,9 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
 // strip, lifted by lbl_802814B0 and mapped onto the whole shadow texture. pCentre is moved to the
 // square's far corner.
 void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
-    s16           aIndex[4] = {0, 1, 2, 3};
+    u16           aIndex[4] = {0, 1, 2, 3};
     u32           aColour[4];
-    TrailMeshDesc desc;
+    DynRenderFill desc;
     f32           aUV[4][2];
     f32           aPos[4][3];
     Shadow*       p = lbl_802814A8;
@@ -426,13 +426,13 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     DS_vEnableZBufferUpdate(0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_Flush();
-    desc.n0 = 4;
+    desc.nCount = 4;
     desc.nVerts = 4;
-    desc.pDraw = NULL;
+    desc.pDraws = NULL;
     desc.pIndices = aIndex;
     desc.pPos = aPos[0];
-    desc.pColour = (u8*)aColour;
-    desc.pUV = aUV[0];
+    desc.pColour = aColour;
+    desc.pTexCoord = aUV[0];
     SD_FillShaderObject((ShaderObject*)p->aMesh[0], &desc, 1);
     SD_DrawShaderObject(p->aMesh[0]);
     DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
@@ -446,7 +446,7 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
 void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     TGD_PolygonReference aList[SHADOW_NUM_STRIPS];
     f32           aQuad[4][4];
-    TrailMeshDesc desc;
+    DynRenderFill desc;
     f32           vCentre[4];
     Shadow*       p = lbl_802814A8;
     f32           fHalfX = p->f424;
@@ -551,8 +551,8 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
             lbl_80282168[n * 2 + 1] = fV * fScaleZ;
             lbl_80282164[n] = n;
         }
-        lbl_80282160[nStrips].nPrims = 0;
-        lbl_80282160[nStrips].nFirst = nVerts;
+        lbl_80282160[nStrips].nPrim = DYNRENDER_PRIM_TRIANGLE_STRIP;
+        lbl_80282160[nStrips].nStart = nVerts;
         lbl_80282160[nStrips].nCount = nCount;
         nStrips++;
         nVerts += nCount;
@@ -563,13 +563,13 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     if (nVerts > lbl_8028215C) {
         lbl_8028215C = nVerts;
     }
-    desc.n0 = nStrips;
+    desc.nCount = nStrips;
     desc.nVerts = nVerts;
-    desc.pDraw = lbl_80282160;
+    desc.pDraws = lbl_80282160;
     desc.pIndices = lbl_80282164;
     desc.pPos = lbl_80282170;
     desc.pColour = lbl_8028216C;
-    desc.pUV = lbl_80282168;
+    desc.pTexCoord = lbl_80282168;
     SD_FillShaderObject((ShaderObject*)p->aMesh[nView], &desc, 1);
     SD_DrawShaderObject(p->aMesh[nView]);
     DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
