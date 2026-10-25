@@ -107,7 +107,6 @@ void Kernel_InitModule(void);
 void Kernel_CloseModule(void);
 void Kernel_InitOnStartup(void);
 void Kernel_CloseOnShutdown(void);
-void Ter_Init(void);
 void Physics_InitOnce(void);
 void Physics_InitModule(void);
 void Physics_CloseModule(void);

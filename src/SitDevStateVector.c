@@ -334,7 +334,8 @@ void modifyFinalLie(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer) {
     bWater = nSurface >= 0 && nSurface < NUM_SURFACE_TYPES &&
              (gSurfaceTypes[nSurface].nClass == SURFCLASS_WATER_e
                  || gSurfaceTypes[nSurface].nClass == SURFCLASS_WATER_OOB_e);
-    bNoLie = nSurface >= 0 && nSurface < NUM_SURFACE_TYPES && !(gSurfaceTypes[nSurface].uFlags & 1) &&
+    bNoLie = nSurface >= 0 && nSurface < NUM_SURFACE_TYPES &&
+             !(gSurfaceTypes[nSurface].uFlags & MATERIAL_BALL_CAN_LIE) &&
              (gSurfaceTypes[nSurface].uFlags & 2);
     if ((!Ter_PointInOOBNetwork(pBall->vPos) && !bWater) || (bNoLie && !bWater)) {
         *pClass = SURFCLASS_NOT_PLAYABLE_e;

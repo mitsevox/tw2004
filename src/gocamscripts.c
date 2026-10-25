@@ -68,8 +68,6 @@ u8   CamScript_IngoreCameraCollisionSurface(int n);
 u8   CamScript_PlayableSurface(TGD_MaterialInfo* pSurface);
 void fn_800386F0(int n, f32* pVec);
 f32  CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
-u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep,
-                                         u8 bSlope, f32 fMaxSlope);   // GoTerrainCollision.c
 void CamScript_PickArcDirection(CameraScriptSettings_t* pScript, f32* pSub, int nPlayer, f32* pPrev,
                                 f32 fTime);
 u8   GameEffects_SimulateBall(int nPlayer);          // GameEffects.c: the ball is simulated from its position

@@ -911,19 +911,19 @@ void Ter_BuildObjectDrawLists(void) {
         if ((Ter_GetMeshFlags(pModel, 3) & 0x10) || (Ter_GetMeshFlags(pModel, 3) & 0x20)) {
             uFlags0 |= 0x20;
             uFlags2 &= ~0x80;
-            uFlags0 &= ~0x40;
+            uFlags0 &= ~UOBJMESH_F0_NO_FADE;
         }
         if (!CameraController_IsFlybyDone(
                 ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext))) {
             uFlags0 &= ~0x20;
         }
         uCrowd = uFlags0 & 0x20;
-        if (uCrowd == 0 && !(uFlags0 & 0x40)) {
+        if (uCrowd == 0 && !(uFlags0 & UOBJMESH_F0_NO_FADE)) {
             fNear = 0.1f * gTerRenderer.fFOVScale;
             fFar = 0.2f * gTerRenderer.fFOVScale;
             fFarSquared = fFar * fFar;
             fRange = fFar - fNear;
-        } else if (uCrowd != 0 && !(uFlags0 & 0x40)) {
+        } else if (uCrowd != 0 && !(uFlags0 & UOBJMESH_F0_NO_FADE)) {
             fNear = gTerRenderer.fCrowdFadeDistanceMin * gTerRenderer.fFOVScale;
             fFar = gTerRenderer.fCrowdFadeDistanceMax * gTerRenderer.fFOVScale;
             if (fNear < 0.1f) {
@@ -946,7 +946,7 @@ void Ter_BuildObjectDrawLists(void) {
                         pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
         } else if (gTerRenderer.pObjectSortList[i].fDistanceSquared < fFarSquared) {
             fDistance = Math_Sqrt(gTerRenderer.pObjectSortList[i].fDistanceSquared);
-            if (fDistance > fFar || (uFlags0 & 0x40)
+            if (fDistance > fFar || (uFlags0 & UOBJMESH_F0_NO_FADE)
                 || (uCrowd == 0
                     && ((gTerRenderer.pObjectSortList[i].f14 > gTerRenderer.fXZDistanceToClosestBallSquared
                          && gTerRenderer.pObjectSortList[i].f18 > 0.0f)
@@ -985,7 +985,7 @@ void Ter_BuildObjectDrawLists(void) {
         }
         if (gSession.b11 == 0) {
             pRef = &gTerRenderer.pObjectSortList[i];
-            if (pRef->fAlpha != 0.0f && !(uFlags0 & 0x40)) {
+            if (pRef->fAlpha != 0.0f && !(uFlags0 & UOBJMESH_F0_NO_FADE)) {
                 Ter_AddObjectDraw(&gTerRenderer.pTranslucentObjectList[gTerRenderer.iTranslucentObjects],
                             &gTerRenderer.iTranslucentObjects, 200, pRef->apObject[pRef->iTranslucentLOD],
                             pRef->fAlpha, gTerRenderer.fDefaultObjectMipmapBias[pRef->iTranslucentLOD],
@@ -1962,7 +1962,7 @@ void Ter_HoleDataLoadCallback(TStreamData* pObject) {
 
 // The 'tgd ' (course) chunk arrived: clears the pin and tee positions (Ter_TeeLoadCallback and
 // Ter_PinLoadCallback fill them), readies the collision data, fills light sets 2, 0 and 1 from the
-// hole's lights and makes set 3 current, and hands the glows the course's values (p3C, or
+// hole's lights and makes set 3 current, and hands the glows the course's values (pGlow, or
 // defaults). The light vector gSession.f5B3C..f5B48 is the hole's own (v60) when it has one, else
 // the glows' vector; it is raised to at least its distance across the ground and made at least 2000
 // long.
@@ -1989,17 +1989,17 @@ void Ter_CourseLoadCallback(TStreamData* pObject) {
     Ter_InitTGD(gTerRenderer.pCourse);
     LF_vSetCurrentLightFogEnvironment(2);
     LF_vSetLightingEnvironment(&gTerRenderer.pCourse->lights);
-    LF_vSetFoggingEnvironment(gTerRenderer.pCourse->p38);
+    LF_vSetFoggingEnvironment(gTerRenderer.pCourse->pFog);
     LF_vSetCurrentLightFogEnvironment(0);
     LF_vSetLightingEnvironment(&gTerRenderer.pCourse->lights);
-    LF_vSetFoggingEnvironment(gTerRenderer.pCourse->p38);
+    LF_vSetFoggingEnvironment(gTerRenderer.pCourse->pFog);
     LF_vSetCurrentLightFogEnvironment(1);
     LF_vSetLightingEnvironment(&gTerRenderer.pCourse->lights);
-    LF_vSetFoggingEnvironment(gTerRenderer.pCourse->p38);
+    LF_vSetFoggingEnvironment(gTerRenderer.pCourse->pFog);
     LF_vSetCurrentLightFogEnvironment(3);
     LF_SetCurrentDefaultLights();
     LF_ResetCurrentFogSettings();
-    pGlow = gTerRenderer.pCourse->p3C;
+    pGlow = gTerRenderer.pCourse->pGlow;
     if (pGlow != NULL) {
         v18[0] = pGlow->v10[0];
         v18[1] = pGlow->v10[1];

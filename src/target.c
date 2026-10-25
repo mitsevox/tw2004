@@ -588,7 +588,7 @@ u8 PlaceBall_IsValidDropLocation(f32* pPos) {
 
     Ter_GetSupportingGroundData(Ter_GetTGD(), pPos, &pSurface, vNormal);
     if (Ter_PointInOOBNetwork(pPos) && !Ter_PointInFreeDropNetwork(pPos) && pSurface != NULL
-        && (pSurface->uFlags & 1) && pSurface->nClass != SURFCLASS_WATER_e
+        && (pSurface->uFlags & MATERIAL_BALL_CAN_LIE) && pSurface->nClass != SURFCLASS_WATER_e
         && pSurface->nClass != SURFCLASS_WATER_OOB_e && pSurface->nClass != SURFCLASS_CUP_e
         && fabsf(vNormal[1]) > 0.86603f) {
         if (pSurface->nClass == SURFCLASS_TEE_e || Ter_IsValidDropSurface(pSurface - gSurfaceTypes)
@@ -980,7 +980,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
         fn_8006A988(vPos, gPlayers[nPlayer].ball.vPos, vBallDir);
         fBallDist = Math_Sqrt(vBallDir[0] * vBallDir[0] + vBallDir[2] * vBallDir[2]);
     } else {
-        fn_8006A988(vPos, gPlayers[nPlayer].vA44, vTeeDir);
+        fn_8006A988(vPos, gPlayers[nPlayer].vTeePos, vTeeDir);
         fTeeDist = Math_Sqrt(vTeeDir[0] * vTeeDir[0] + vTeeDir[2] * vTeeDir[2]);
     }
     fn_8006A988(vPos, gpGame->pPinPos, vHoleDir);

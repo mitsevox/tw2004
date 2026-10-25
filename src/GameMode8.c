@@ -730,7 +730,7 @@ void SpeedGolf_TradeEventPoints(int nPlayer, int nEvent) {
 // lateral hazard (SURFCLASS_WATER_e) or replaced, the run flag, arrow, tip and prompt are cleared and
 // the golfer goes back to state 1 (in mode 7 now if gSpeedGolfCanSwitchToShot allows, else deferred
 // through bit 20), with mode 7's penalties: event 4 out of bounds, 5 in a hazard (nSGFlags bit 11),
-// 30 and 31 on the replay. In mode 7 a tee shot (vBall at the tee spot vA44) records the drive's
+// 30 and 31 on the replay. In mode 7 a tee shot (vBall at the tee spot vTeePos) records the drive's
 // length in fDriveLength (nSGFlags bit 5): the longer first drive on a par 4 or 5 gets event 1; the
 // replay's drive gets event 24 when longer than the other's best (taking their drive flags) or 25
 // when longer than one's own. Returns 0 when the golfer goes back to state 1 (or waits to), else 1.
@@ -807,7 +807,7 @@ u8 SpeedGolf_OnBallAtRest(int nPlayer) {
     }
     fX = gPlayers[nPlayer].vBall[0];
     fZ = gPlayers[nPlayer].vBall[2];
-    if (fX == gPlayers[nPlayer].vA44[0] && fZ == gPlayers[nPlayer].vA44[2]) {
+    if (fX == gPlayers[nPlayer].vTeePos[0] && fZ == gPlayers[nPlayer].vTeePos[2]) {
         dx = gPlayers[nPlayer].ball.vPos[0] - fX;
         dz = gPlayers[nPlayer].ball.vPos[2] - fZ;
         fDist = Math_Sqrt(dx * dx + dz * dz);
@@ -1120,7 +1120,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
         if (!(gPlayers[nPlayer].uC48 & 1) && !(gPlayers[nOther].uC48 & 1)) {
             SpeedGolf_TradeEventPoints(nPlayer, 0);
         }
-        if (p->vA44[0] == p->ball.vPos[0] && p->vA44[2] == p->ball.vPos[2] && (p->nSGFlags & 8)) {
+        if (p->vTeePos[0] == p->ball.vPos[0] && p->vTeePos[2] == p->ball.vPos[2] && (p->nSGFlags & 8)) {
             if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == gPlayers[nPlayer].nC60 &&
                 !(gPlayers[nPlayer].uC48 & 0x4000000000LL)) {
                 SpeedGolf_TradeEventPoints(nPlayer, 0x26);
@@ -1184,7 +1184,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                 pHole = Ter_GetTGD();
                 Physics_InitBall(&p->ball, &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
                 LLMath_CopyVec(&pHole->tee[gSession.nTeeSet[nPlayer]].x, p->vBall);
-                LLMath_CopyVec(&pHole->tee[gSession.nTeeSet[nPlayer]].x, p->vA44);
+                LLMath_CopyVec(&pHole->tee[gSession.nTeeSet[nPlayer]].x, p->vTeePos);
                 gPlayers[nPlayer].nSGFlags &= ~1;
                 if (gSpeedGolfCanSwitchToShot) {
                     GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
@@ -1510,7 +1510,7 @@ void SpeedGolf_UpdatePlayers(void) {
                         LLMath_CopyVec(&pHole->tee[gSession.nTeeSet[nPlayer]].x,
                                  gPlayers[nPlayer].vBall);
                         LLMath_CopyVec(&pHole->tee[gSession.nTeeSet[nPlayer]].x,
-                                 gPlayers[nPlayer].vA44);
+                                 gPlayers[nPlayer].vTeePos);
                         gPlayers[nPlayer].nSGFlags &= ~1;
                         SpeedGolf_ShowBallDirection(gPlayers[nPlayer].nUISlot, 0);
                         SpeedGolf_ShowRunTip(gPlayers[nPlayer].nUISlot, 0);
@@ -1532,7 +1532,7 @@ void SpeedGolf_UpdatePlayers(void) {
                 pHole = Ter_GetTGD();
                 Physics_InitBall(&gPlayers[i].ball, &pHole->tee[gSession.nTeeSet[i]].x, i);
                 LLMath_CopyVec(&pHole->tee[gSession.nTeeSet[i]].x, gPlayers[i].vBall);
-                LLMath_CopyVec(&pHole->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
+                LLMath_CopyVec(&pHole->tee[gSession.nTeeSet[i]].x, gPlayers[i].vTeePos);
                 gPlayers[i].nSGFlags &= ~1;
                 SpeedGolf_ShowBallDirection(gPlayers[i].nUISlot, 0);
                 SpeedGolf_ShowRunTip(gPlayers[i].nUISlot, 0);

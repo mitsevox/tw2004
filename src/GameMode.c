@@ -401,7 +401,7 @@ u8 GM_CheckForBallOOB(int nPlayer) {
     if (pSurf == NULL) {
         bOut  = 1;
         bDrop = 0;
-    } else if ((pSurf->uFlags & 1) && !Ter_PointInFreeDropNetwork(pBall->vPos)) {
+    } else if ((pSurf->uFlags & MATERIAL_BALL_CAN_LIE) && !Ter_PointInFreeDropNetwork(pBall->vPos)) {
         bDrop = 0;
     } else {
         bDrop = 1;
@@ -481,7 +481,7 @@ void GM_ShowYardage(int nPlayer) {
 
 // With the mode's obstruction relief on (bBumpObstructions), a ball off the tee that rests against
 // an object or hazard (within 1.5, Ter_CheckObjectAndHazardObstruction) is dropped at a legal point
-// nearby, or else put back where it was before the shot (vPreShot) and, when vA44 matches vBall in
+// nearby, or else put back where it was before the shot (vPreShot) and, when vTeePos matches vBall in
 // x and z, set up there again (Physics_InitBall).
 void GM_BumpBallForObstructions(int nPlayer) {
     int n;                      // fake match: a copy of nPlayer for the register order (permuter)
@@ -499,8 +499,8 @@ void GM_BumpBallForObstructions(int nPlayer) {
                     return;
                 }
                 Physics_DropBall(pBall, gPlayers[nPlayer].vPreShot);
-                if (gPlayers[n].vA44[0] == gPlayers[n].vBall[0] &&
-                    gPlayers[n].vA44[2] == gPlayers[n].vBall[2]) {
+                if (gPlayers[n].vTeePos[0] == gPlayers[n].vBall[0] &&
+                    gPlayers[n].vTeePos[2] == gPlayers[n].vBall[2]) {
                     Physics_InitBall(pBall, gPlayers[nPlayer].vPreShot, n);
                 }
             }
@@ -750,7 +750,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
         } else {
             fSlope = 0.0f;
         }
-        if (!Ter_PointInOOBNetwork(vPos) || (pSurf != NULL && !(pSurf->uFlags & 1))
+        if (!Ter_PointInOOBNetwork(vPos) || (pSurf != NULL && !(pSurf->uFlags & MATERIAL_BALL_CAN_LIE))
             || pSurf->nClass == SURFCLASS_WATER_e ||
             pSurf->nClass == SURFCLASS_WATER_OOB_e || (fabsf(fSlope) > 0.1f && fRise > 0.2f)) {
             return 0;
@@ -864,7 +864,7 @@ f32 GM_GetGolferDistanceToPin(int nPlayer) {
 
 // A ball that must be dropped (b30E), or one in bounds (Ter_PointInOOBNetwork) after a shot with no
 // penalty, is dropped at a legal point nearby when there is one. Otherwise (out of bounds, or after
-// a penalty) it goes back where it was before the shot (vPreShot) and, when vA44 matches vBall in x
+// a penalty) it goes back where it was before the shot (vPreShot) and, when vTeePos matches vBall in x
 // and z, is set up there again (Physics_InitBall).
 void GM_ReplaceOOBBall(int nPlayer) {
     f32   v[4];
@@ -879,15 +879,15 @@ void GM_ReplaceOOBBall(int nPlayer) {
     pBall = &gPlayers[nPlayer].ball;
     pPre  = gPlayers[nPlayer].vPreShot;
     Physics_DropBall(pBall, pPre);
-    if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].vBall[0] &&
-        gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].vBall[2]) {
+    if (gPlayers[nPlayer].vTeePos[0] == gPlayers[nPlayer].vBall[0] &&
+        gPlayers[nPlayer].vTeePos[2] == gPlayers[nPlayer].vBall[2]) {
         Physics_InitBall(pBall, pPre, nPlayer);
     }
 }
 
 // A ball in a lateral water hazard (GameMode8 calls it when the penalty was water, surface class
 // 7): dropped at a legal point nearby when there is one, otherwise put back where it was before the
-// shot and, when vA44 matches vBall in x and z, set up there again. GM_ReplaceOOBBall without its
+// shot and, when vTeePos matches vBall in x and z, set up there again. GM_ReplaceOOBBall without its
 // in-bounds test.
 void GM_ReplaceLateralHazardBall(int nPlayer) {
     f32   v[4];
@@ -900,8 +900,8 @@ void GM_ReplaceLateralHazardBall(int nPlayer) {
     pBall = &gPlayers[nPlayer].ball;
     pPre  = gPlayers[nPlayer].vPreShot;
     Physics_DropBall(pBall, pPre);
-    if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].vBall[0] &&
-        gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].vBall[2]) {
+    if (gPlayers[nPlayer].vTeePos[0] == gPlayers[nPlayer].vBall[0] &&
+        gPlayers[nPlayer].vTeePos[2] == gPlayers[nPlayer].vBall[2]) {
         Physics_InitBall(pBall, pPre, nPlayer);
     }
 }

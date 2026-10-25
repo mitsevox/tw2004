@@ -142,6 +142,8 @@ typedef struct UObjMeshInfo {
                                     // sway, a crowd's or an animal's pose blend)
 #define UOBJMESH_F0_POSES      0x02 // with UOBJMESH_F0_ANIMATED, by poses: a child mesh is drawn in
                                     // its place (the crowd)
+#define UOBJMESH_F0_NO_FADE    0x40 // a course object that stays solid near the camera instead of
+                                    // fading (GoTerrain.c Ter_BuildObjectDrawLists)
 // UObjMeshInfo.aFlags[2] of an object's mesh (a terrain patch's ground uses the byte otherwise).
 #define UOBJMESH_F2_POSE_KIND0 0x01 // } with UOBJMESH_F0_ANIMATED, the other two kinds of poses
 #define UOBJMESH_F2_POSE_KIND1 0x02 // }   (an animal's kinds 0 and 1): a child mesh is drawn too

@@ -66,8 +66,7 @@ typedef struct TGD_MaterialInfo {
     f32  f28;                   // 0x28  bounce: base softness. TW06: surfaceFriction
     u32  nClass;                // 0x2C  surface class (SurfaceClass_t), not a Lie_t
     u32  nSoundId;              // 0x30  TW06: soundID; nothing here reads it yet
-    u32  uFlags;                // 0x34  Bit 0x1: a ball may lie or be dropped here (without it
-                                //       GameManager takes the ball out); 0x2: taking it out sets the
+    u32  uFlags;                // 0x34  MATERIAL_BALL_CAN_LIE; 0x2: taking the ball out sets the
                                 //       player's bPenaltyShot; 0x10: event 0x25 on landing; 0x80 is
                                 //       read by GoTerrainCollision; MATERIAL_NO_SHADOW
     u32  nCollisionEffectId;    // 0x38  TW06: uiCollisionEffectID
@@ -75,6 +74,10 @@ typedef struct TGD_MaterialInfo {
     u32  nSwingEffectId;        // 0x40  TW06: uiSwingEffectID
 } TGD_MaterialInfo;
 LAYOUT_ASSERT(TGD_MaterialInfo, 0x44);
+
+// TGD_MaterialInfo.uFlags: a ball may lie or be dropped here (without it GameManager takes the
+// ball out)
+#define MATERIAL_BALL_CAN_LIE 0x01
 
 // TGD_MaterialInfo.uFlags: bits 5 and 6, either of which keeps the golfer's shadow off the surface
 // (the cup has both; a cart path row and three others have 0x20)

@@ -38,8 +38,6 @@ int      CameraController_GetClippedGolfer(void);
 void     CameraController_BallIsOnScreen(int nPlayer);
 void     GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut);
 int      GolfCamera_LimitPositionChange(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
-// The segment crosses the outline (at pHit).
-u8       Ter_CollisionWithOOBNetwork(f32* pFrom, f32* pTo, f32* pHit);
 f32      Camera_GetLensFovScale(CamLens* pLens);            // char.c: the lens's fB0
 CamShot* GolfCamera_GetAlternateSwingCamera(int nFirst, int nPlayer);
 void     GolfCamera_UpdateSwingSlowMoCamera(View* pView, f32* pCam, f32* pSub, int nPlayer);
