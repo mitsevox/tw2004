@@ -1549,7 +1549,6 @@ typedef struct Controllers {
 } Controllers;
 LAYOUT_ASSERT(Controllers, 0x84);
 
-
 // RenderAccessors.c: the depth and alpha test setters and the call that hands them to GX (its
 // viewport getters are in camera.h).
 void RenderState_Flush(void);

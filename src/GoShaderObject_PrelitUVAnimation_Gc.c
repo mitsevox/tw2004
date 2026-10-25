@@ -215,8 +215,7 @@ void fn_800713B4(PrelitUVObject* pObj, PrelitUVFill* pFill, u8 bRestart) {
         DynRenderBuffer_AddIndices(pObj->pBuf, pFill->fill.pIndices, nIndices, bRestart);
     }
     DynRenderBuffer_AddVertices(pObj->pBuf, pFill->fill.pPos, pFill->fill.pColour, pFill->fill.pTexCoord,
-                                pFill->fill.nVerts,
-                bRestart);
+                                pFill->fill.nVerts, bRestart);
 }
 
 // ---- sweep code (not yet cleaned up) ----
