@@ -121,6 +121,63 @@ jobs:
       with:
         path: site
 
+  # ---- The shared portfolio site (mitsevox.github.io/games/tw2004/), main pushes only ------------
+  # Turns the build's report.json and the progress page's history into the site's report-v1
+  # package (tools/dashboard/site_report.py). The site imports it only while its producer policy
+  # (config/tw2004-producer.json there) lists this file's git blob: a change to build.yml needs that
+  # policy updated too. A separate job, so a failure here never holds back the progress page.
+  site-report:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Download report
+      uses: actions/download-artifact@v4
+      with:
+        name: GW4E69_report
+        path: build/GW4E69
+
+    # The site's packager, from a fixed site revision (it reads the public files only)
+    - name: Checkout site tools
+      uses: actions/checkout@v4
+      with:
+        repository: mitsevox/mitsevox.github.io
+        ref: 83fa7350997affb95e3e585b52d0be0a9718f807
+        path: portfolio
+        persist-credentials: false
+
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: Site report
+      run: |
+        git fetch origin pages-history
+        git show FETCH_HEAD:history.json > pages-history.json
+        python3 tools/dashboard/site_report.py build/GW4E69/report.json pages-history.json site-report \
+            "$GITHUB_SHA" "$(git rev-parse "$GITHUB_SHA^{tree}")" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" \
+            "$(git rev-parse "$GITHUB_SHA:.github/workflows/build.yml")"
+
+    - name: Package site report
+      working-directory: portfolio
+      run: |
+        uv run --locked python tools/package_report.py --input ../site-report/public-input \
+            --metadata ../site-report/metadata.json --policy ../site-report/policy.json \
+            --output ../site-report/package
+
+    - name: Upload site report
+      uses: actions/upload-artifact@v4
+      with:
+        name: site-report
+        path: site-report/package/*
+        if-no-files-found: error
+
   pages:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
