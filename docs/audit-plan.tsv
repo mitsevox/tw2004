@@ -62,7 +62,7 @@ order	area	file	task	scope	state
 59	Audio	UAudMemStack.c	pass	the whole file	done
 60	Audio	HLAudMaster.c	pass	the whole file	done
 61	Audio	UAudContainers.c	pass	the whole file	done
-62	Audio	UAudMem.c	pass	the whole file	open
+62	Audio	UAudMem.c	pass	the whole file	done
 63	Audio	startUp.c	chunk 1/2	HwVoice_MixerCallback .. AudAram_Free	open
 64	Audio	startUp.c	chunk 2/2	AudAram_AllocStreamBuffer .. Startup_LoadOptionsFromCard	open
 65	Audio	startUp.c	whole-file review	the whole file	open
