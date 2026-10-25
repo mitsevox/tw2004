@@ -15,7 +15,6 @@ void Wind_GetDirection(f32* pOut);                // Ball.c: the wind's directio
 void SKEL_TransformBones(CharModel* pModel, u32* auBits);
 f32  fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength);
 f32  fn_80116468(void);
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                                             // identity
 void fn_80114540(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80115348(CharModel* pModel, DynChain* pChain, f32 f);

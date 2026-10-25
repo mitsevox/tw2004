@@ -162,7 +162,7 @@ void StaticCam_ParseStaticCameraActor(TStreamData* pCameraActor) {
     gpStaticCams->aStatic[gpStaticCams->nStatic].vLook[1] = PI * (camPtr->aAngle[1] / 180.0f);
     gpStaticCams->aStatic[gpStaticCams->nStatic].vLook[2] = PI * (camPtr->aAngle[2] / 180.0f);
     pShot = &gpStaticCams->aStatic[gpStaticCams->nStatic];
-    mat44flt_EulerAngles(eulerMatrix, pShot->vLook[1], pShot->vLook[0], pShot->vLook[2]);
+    mat44flt_EulerAngles(pShot->vLook[1], pShot->vLook[0], pShot->vLook[2], eulerMatrix);
     LLMath_mat44fltMultiply33(eulerMatrix, straightAheadVec,
                               gpStaticCams->aStatic[gpStaticCams->nStatic].vLook);
     LLMath_Add3(gpStaticCams->aStatic[gpStaticCams->nStatic].vLook,

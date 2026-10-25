@@ -8,9 +8,6 @@
 
 #include "camera.h"
 
-void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: copy a 4x4 matrix
-void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: rotation+translation inverse
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                     // identity
 f32  Math_Tan(f32 x);                              // tan, as a float
 void Camera_SetLensFarClip(u8* p, f32 v);             // GoTerrain.c: sets the lens's far clip, fAC
 void CA_vSetCameraViewToWorldMatrix(CamLens* pLens, f32 (*pMtx)[4]);

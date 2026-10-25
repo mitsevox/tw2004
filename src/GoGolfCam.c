@@ -35,7 +35,6 @@ void     GolfCamera_CreateReplayCamera(View* pView, f32* pCam, f32* pSub, int nP
 u8       GolfCamera_IsCameraTrackingPlayer(View* pView);
 void     fn_800380A8(u8 a, f32* pVec, u8 b, int nSlot, f32 f1, f32 f2);
 int      CameraController_GetClippedGolfer(void);
-void     mat44flt_EulerAngles(f32 (*m)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void     CameraController_BallIsOnScreen(int nPlayer);
 void     GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut);
 int      GolfCamera_LimitPositionChange(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
@@ -2344,7 +2343,7 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
         if (pView->script.pShot == NULL) {
             pView->script.fCamTime = 0.0f;
             pView->script.bFairwayFix = 0;
-            mat44flt_EulerAngles(m, pSub[1], pSub[0], pSub[2]);
+            mat44flt_EulerAngles(pSub[1], pSub[0], pSub[2], m);
             LLMath_mat44fltMultiply33(m, v, pSub);
             GolfCam_Vec3Add(pSub, pCam, pSub);
             CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);

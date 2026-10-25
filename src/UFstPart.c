@@ -18,7 +18,6 @@ void SD_InitShaderObject(ShaderObject* pObj, int nRow, const void* pDesc);
 void SD_FreeShaderObject(ShaderObject* pObj);
 void SD_DrawShaderObject(ShaderObject* pObj);
 
-void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 f32  Ter_GetTimeInCycle(u32 n, f32 fPeriod);                   // GoTerrain.c
 
 void fn_80098BDC(PsEmitter* pEmitter);
@@ -253,7 +252,7 @@ u32 fn_8009912C(PsEmitter* pEmitter, int n, f32 fStep, f32 fLiveStep) {
     }
     if (pEmitter->params.f4C != 0.0f) {
         pEmitter->params.f40 += pEmitter->params.f4C * fStep;
-        mat44flt_EulerAngles(pEmitter->mtx, pEmitter->params.f40, pEmitter->params.f44, pEmitter->params.f48);
+        mat44flt_EulerAngles(pEmitter->params.f40, pEmitter->params.f44, pEmitter->params.f48, pEmitter->mtx);
     }
     // fake match: 0U, as EA compares n50 unsigned here (cmplwi) but signed against n54 below
     if ((pEmitter->params.u58 & 0x10000) && pEmitter->n50 == 0U) {
@@ -478,7 +477,7 @@ PsEmitter* fn_80099758(ParticleParams* pParams) {
                               * (f32)Math_Sqrt(LLMath_LengthSquared3(pParams->vB0));
     }
     pEmitter->p40 = NULL;
-    mat44flt_EulerAngles(pEmitter->mtx, pEmitter->params.f40, pEmitter->params.f44, pEmitter->params.f48);
+    mat44flt_EulerAngles(pEmitter->params.f40, pEmitter->params.f44, pEmitter->params.f48, pEmitter->mtx);
     LLMath_CopyVec(pEmitter->params.v80, pEmitter->mtx[3]);
     pEmitter->f4C = 0.0f;
     pEmitter->n50 = 0;

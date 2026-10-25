@@ -24,9 +24,6 @@ void RC_vSetRenderCtxCamera(Camera* pCamera, CamLens* pLens);
 void RC_vSetDefaultRenderCtx(Camera* pCamera);
 void RenderState_SetClipZFromRenderCtx(Camera* pCamera);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
-void Mtx_OrthoScale(f32 (*pMtx)[4], f32 f1, f32 f2);   // matrix builders, not decompiled yet
-void Mtx_Perspective(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
-void Mtx_PerspectiveDepthOverNear(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4);
 f32 CA_fGetCameraFarZ(u8* p);
 f32 CA_fGetCameraNearZ(u8* p);
 f32 Math_Tan(f32 x0);
@@ -74,12 +71,9 @@ static f32 GoRenderCtx_Gc_StrippedFn(f32 x) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 LLMath_CopyMat44();
-s32 LLMath_Transpose44();
 void RC_vSetCurrentRenderCtx(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera);   // not decompiled yet
 void RC_vStoreRenderCtxTransformationMatrix(u8* arg0, f32 (*arg1)[4]);
-s32 LLMath_IdentifyMat();
 f32 VM_fGetViewportHeightRatio(VM_SViewport* pViewport);
 f32 VM_fGetViewportWidthRatio(VM_SViewport* pViewport);
 f32 VM_fGetViewportOneOverHeightRatio(VM_SViewport* pViewport);
@@ -218,15 +212,15 @@ void RC_vUpdateRenderCtxTransformationMatrices(void* pCamera) {
     u8* arg0 = pCamera;
 
     if ((u8) (*(u8*)((u8*)(arg0) + 0x1DC)) != 0) {
-        LLMath_CopyMat44((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x11C);
-        LLMath_CopyMat44(arg0 + 0xDC, arg0 + 0x19C);
+        LLMath_CopyMat44((f32 (*)[4])((*(s32*)((u8*)(arg0) + 0x10)) + 0x44), (f32 (*)[4])(arg0 + 0x11C));
+        LLMath_CopyMat44((f32 (*)[4])(arg0 + 0xDC), (f32 (*)[4])(arg0 + 0x19C));
     } else {
         LLMath_mat44fltMultiplyList((f32 (*)[4])((*(s32*)((u8*)(arg0) + 0x10)) + 0x44),
                                     (f32 (*)[4])(arg0 + 0x1C), (f32 (*)[4])(arg0 + 0x11C), 4);
         LLMath_mat44fltMultiplyList((f32 (*)[4])(arg0 + 0xDC), (f32 (*)[4])(arg0 + 0x1C),
                                     (f32 (*)[4])(arg0 + 0x19C), 4);
     }
-    LLMath_Transpose44(arg0 + 0x11C, arg0 + 0x15C);
+    LLMath_Transpose44((f32 (*)[4])(arg0 + 0x11C), (f32 (*)[4])(arg0 + 0x15C));
 }
 
 // Empty in this build: RC_vUpdateRenderCtxScreen calls it right after the screen matrices are
@@ -257,11 +251,11 @@ void RC_vSetRenderCtxTransformationMatrix(void* pCamera, f32 (*pMtx)[4]) {
 // here.
 void RC_vStoreRenderCtxTransformationMatrix(u8* arg0, f32 (*arg1)[4]) {
     if (arg1 == NULL) {
-        LLMath_IdentifyMat(arg0 + 0x1C);
+        LLMath_IdentifyMat((f32 (*)[4])(arg0 + 0x1C));
         (*(s8*)((u8*)(arg0) + 0x1DC)) = 1;
         return;
     }
-    LLMath_CopyMat44(arg1, arg0 + 0x1C);
+    LLMath_CopyMat44(arg1, (f32 (*)[4])(arg0 + 0x1C));
     (*(s8*)((u8*)(arg0) + 0x1DC)) = 0;
 }
 

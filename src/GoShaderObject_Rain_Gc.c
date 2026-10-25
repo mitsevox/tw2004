@@ -11,7 +11,6 @@
 #include "unsorted/cull.h"
 #include "core/startup.h"
 
-void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);      // UMemPool.c: copy a 4x4 matrix
 void fn_80070168(void);                                 // calls a display list (see fn_800B4FA4)
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
 void fn_800124A8(void);                                // LLFont.c: end the primitive

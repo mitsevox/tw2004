@@ -66,8 +66,6 @@ f32  Camera_GetLensFovScale(CamLens* pLens);       // char.c: the lens's fB0
 u8   GameEffects_IsDoubleTimeOn(void);
 u8   CamScript_IngoreCameraCollisionSurface(int n);
 u8   CamScript_PlayableSurface(SurfaceType* pSurface);
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
-void LLMath_Transpose33(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: transposes the 3x3 part
 void fn_800386F0(int n, f32* pVec);
 f32  CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
 u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep,

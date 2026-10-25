@@ -74,7 +74,6 @@ void  Ter_ResetObjectRenderState(void);
 u8    Ter_SetManageZUpdate(u8 b);
 f32*  Ter_GetMeshBounds(UObjMesh* pMesh);
 u8    Ter_SetObjectRenderState(Ter_ObjectDrawData* pDraw, u8 bForce);
-void  LLMath_IdentifyMat(f32 (*pMtx)[4]);  // identity matrix
 void  LF_SetCurrentDefaultLights(void);
 void  Ter_DrawGrassPatches(int nRenderPass);
 void  Ter_DrawGrassPatchesPass3(void);

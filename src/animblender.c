@@ -29,11 +29,11 @@ f32  SKATime_CalcStep(TSKATime* pPlayer, f32 fT);
 
 // The pools (AnimBlender_InitModule), defined here last address first (CodeWarrior lays out .sbss
 // in reverse).
-UMemPool* gSKAChannelPool;      // channels (nType 0, SKASourceNode, 0x34 bytes)
-UMemPool* gSKABlenderPool;      // blenders (nType 1, SKABlendNode, 0x2C bytes)
-UMemPool* gSKABlendDataPool;    // other node types (0x20 bytes: the fields before the union)
-UMemPool* gSkelPosePool;        // format 0 pose buffers (SkelPose)
-UMemPool* gMorphPosePool;       // format 1 pose buffers (SkelPose1: morph weights and a SkelPose)
+MemPoolPtr gSKAChannelPool;      // channels (nType 0, SKASourceNode, 0x34 bytes)
+MemPoolPtr gSKABlenderPool;      // blenders (nType 1, SKABlendNode, 0x2C bytes)
+MemPoolPtr gSKABlendDataPool;    // other node types (0x20 bytes: the fields before the union)
+MemPoolPtr gSkelPosePool;        // format 0 pose buffers (SkelPose)
+MemPoolPtr gMorphPosePool;       // format 1 pose buffers (SkelPose1: morph weights and a SkelPose)
 
 // Creates the blend tree's pools, nNumEntries of each (10 in the front end, game types 10 and 3,
 // else 50): nodes by type (channels 0x34 bytes, blenders 0x2C, other nodes 0x20), then pose buffers

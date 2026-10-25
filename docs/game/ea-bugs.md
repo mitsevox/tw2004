@@ -122,6 +122,9 @@ The code allows it, but whether it ever happens depends on the game's data or on
 | FETextureMgr.c FEtm_vStreamCallback | a 'txf2' bank goes in gFEtmBanks[id % 100000] with no test against FETM_NUM_BANKS (200): an object id whose remainder is 200 or more (other than FETM_LOADING_BAR_ID) writes past both tables | the 'txf2' object ids in the front end's stream files |
 | FETextureMgr.c FEtm_CloseFETextureMgr | frees slots 0 to gFEtmNumBanks - 1, but a bank sits in the slot of its object's id: when the ids are not 0, 1, 2... in a row, banks above the count are never freed and empty slots below it pass NULL to Circular_MemFreeFunc | the 'txf2' object ids in the front end's stream files |
 | FETextureMgr.c FEtm_vLoadScreenStreamCallback | copies the 'load' object's whole data into the FETM_LOAD_SCREEN_DATA_SIZE (147700) byte buffer with no size test | the size of the largest data/Load/Load%d.gcb picture |
+| UMatFlt.c mat44flt_ExtractEulerAngles | with M[2][2] not 0 but M[0][1] and M[1][1] both 0 the roll is never set, and whatever the local holds is handed back. For a rotation that needs cos(pitch) = 0, which makes M[2][2] (cos(pitch) cos(yaw)) 0 too, so only rounding could get there | whether a matrix char.c or GoAnimalActors.c reads can have a pitch within rounding of a quarter turn |
+| UMatFlt.c mat44flt_ExtractEulerAngles | with M[2][2] and M[2][0] both 0 (the pitch a quarter turn) and M[0][0] not 0, the yaw is -atan2(M[0][0], M[0][0]): a whole eighth turn (-45 or +135 degrees) whatever the matrix, where -atan2(M[0][2], M[0][0]) gives the yaw back | whether a matrix char.c or GoAnimalActors.c reads can have a pitch of exactly a quarter turn |
+| UMatFlt.c mat44flt_gaussj | when no entry left to pivot on compares >= 0 (all NaN), irow and icol are never set and the row swap and the pivot use whatever they hold | whether a matrix mat44flt_Invert gets (char.c's foot bones) can hold a NaN |
 
 Checked and not bugs
 --------------------

@@ -62,7 +62,7 @@ int    sscanf(const char* pStr, const char* pFmt, ...);   // 0x80159408, before 
 double atan(double x);
 double sin(double x);
 double cos(double x);
-double fabs(double x);                  // 0x8000AE94
+double fabs(double x);
 double floor(double x);
 double fmod(double x, double m);
 // MSL's NaN and infinity (0x80281B18, 0x80281B1C: one float each). fake match: declared unsized,

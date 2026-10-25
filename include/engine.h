@@ -125,25 +125,28 @@ void  SKA_UnpackSwappedName(u64* pId, char* szName);      // for a code stored w
 extern char gSKANameChars[40];                   // the 40 characters a name code is made of
 extern s32  gSKANameCodes[128];                  // each character's code, -1 for none
 
-// A pool of fixed-size nodes carved from one allocation (UMemPool.c): the header, then the nodes.
-// A free node holds the next free one in its first word.
+// UMemPool.c: a pool of fixed-size nodes carved from one block of the game's heap: the header,
+// padded to the pool's alignment, then the nodes. A free node holds the next free one in its first
+// word.
 typedef struct UMemPoolNode {
     struct UMemPoolNode* pNext; // 0x0  the next free node
 } UMemPoolNode;
 
-typedef struct UMemPool {
+typedef struct UMemPoolS {
     u32  uNodeSize;             // 0x0  one node, rounded up to the alignment
-    u8*  pEnd;                  // 0x4  the end of the pool's memory
-    u16  nNodes;                // 0x8
-    u16  nFree;                 // 0xA
+    u8*  pEnd;                  // 0x4  the end of the pool's block: a pointer between the pool and pEnd
+                                //      is one of its nodes (UKernel.c)
+    u16  nNodes;                // 0x8  how many nodes the pool has
+    u16  nFree;                 // 0xA  how many are on the free list
     UMemPoolNode* pFree;        // 0xC  the free list
-} UMemPool;
-LAYOUT_ASSERT(UMemPool, 0x10);
+} UMemPoolS;
+LAYOUT_ASSERT(UMemPoolS, 0x10);
+typedef UMemPoolS* MemPoolPtr;
 
-UMemPool* CreateMemPool(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // create
-void  DeleteMemPool(UMemPool* pPool);                     // destroy
-void* AllocPoolMem(UMemPool* pPool);                     // take a node (NULL when none is free)
-void  ReturnPoolMem(UMemPool* pPool, void* pNode);        // give a node back
+MemPoolPtr CreateMemPool(int numToPreallocate, u32 sizeOfEntry, TTypeAcces memoryType, u32 alignment);
+void  DeleteMemPool(MemPoolPtr memPool);                  // frees the pool and all its nodes
+void* AllocPoolMem(MemPoolPtr memPool);                   // a node, NULL when none is free
+void  ReturnPoolMem(MemPoolPtr memPool, void* poolEntry); // gives a node back
 // Sorts nCount items of nSize bytes with pfnCompare (MSL, 0x8015929C).
 void  qsort(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
@@ -167,19 +170,39 @@ void RTClock_GetDateTimeString(char* s);
 
 void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
 extern f32 __float_max[];               // FLT_MAX (MSL's)
-void LLMath_CopyVec(const f32* pSrc, f32* pDst);   // 0x8000AD10 (const: see Vec3Copy)
-f32  atan2f(f32 y, f32 x);         // atan2f
-f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
-f32  logf(f32 x);                // natural logarithm
-// A rotation matrix's yaw (about z), pitch (about y) and roll (about x), radians (UMemPool.c).
-void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pYaw, f32* pPitch, f32* pRoll);
-// A rotation matrix from yaw (about y), pitch (about x) and roll (about z), radians, into rows 0-2
-// of pMtx (UMemPool.c).
-void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll);
-// Inverts a rotation-plus-translation matrix into pDst (UMemPool.c).
-void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);
-void Math_InitLog2Table(void);                 // make the log2 table (gLog2Table)
-void Math_FreeLog2Table(void);                 // free the log2 table
+
+// UMatFlt.c: 4x4 float matrices and four-float vectors. A vector is a row times a matrix, so a
+// matrix's row 3 is its translation.
+void LLMath_CopyMat44(f32 (*src)[4], f32 (*dest)[4]);
+void LLMath_CopyMat34(f32 (*src)[4], f32 (*dest)[4]);   // rows 0-2; row 3 is left as it is
+// A rotation from the yaw y (about the y axis), the pitch p (about x) and the roll r (about z),
+// radians, into rows 0-2 of M; row 3 is left as it is.
+void mat44flt_EulerAngles(f32 y, f32 p, f32 r, f32 (*M)[4]);
+// The yaw, pitch and roll of the rotation in rows 0-2 of M, as mat44flt_EulerAngles takes them.
+void mat44flt_ExtractEulerAngles(f32 (*M)[4], f32* pYaw, f32* pPitch, f32* pRoll);
+void LLMath_Transpose33(f32 (*src)[4], f32 (*dst)[4]);  // the 3x3 part; dst may be src
+void LLMath_Transpose44(f32 (*src)[4], f32 (*dst)[4]);  // dst may be src
+// The inverse of a rotation-plus-translation matrix (no scale) into invA, which may be A.
+void LLMath_InvertNormalized(f32 (*A)[4], f32 (*invA)[4]);
+void mat44flt_Invert(f32 (*A)[4], f32 (*invA)[4]);     // any 4x4 inverse (Gauss-Jordan)
+// The render context's projections (row vectors, w = -z): Mtx_Perspective for a lens whose nType is
+// 0, else Mtx_OrthoScale's flat view times Mtx_PerspectiveDepthOverNear.
+void Mtx_OrthoScale(f32 (*pDst)[4], f32 fWidth, f32 fHeight);
+void Mtx_Perspective(f32 (*pDst)[4], f32 fScale, f32 fScaleX, f32 fScaleY, f32 fNear, f32 fFar);
+void Mtx_PerspectiveDepthOverNear(f32 (*pDst)[4], f32 fScaleX, f32 fScaleY, f32 fNear, f32 fFar);
+void LLMath_CopyVec(const f32* src, f32* dest);
+f32  atan2f(f32 y, f32 x);              // atan2() rounded to a float
+f32  fabsf(f32 x);                      // fabs() rounded to a float
+void LLMath_IdentifyMat(f32 (*dest)[4]);
+void LLMath_Scale(f32 Amul, const f32* A, f32* dest);                  // dest = A x Amul (four floats)
+void LLMath_MultiplyVec(const f32* A, const f32* B, f32* dest);        // component by component
+void LLMath_AddScale(const f32* A, const f32* B, f32 Bmul, f32* dest); // dest = A + B x Bmul
+
+// UMath.c: the math module's start-up and shut-down, and the float log.
+void MF_vInitOnce(void);                // makes a table of log2 (1 + i / 1024), i = 0..1023
+void MF_vCloseOnce(void);               // frees it
+f32  logf(f32 x);                       // log() rounded to a float
+
 double acos(double x);                  // 0x8015F784 (MSL)
 double asin(double x);                  // 0x8015F7A4 (MSL)
 double atan2(double y, double x);       // 0x8015F7C4 (MSL)
@@ -213,8 +236,6 @@ f32  Misc_RandFuncf(eRandomType type);  // a float in [0, 1)
 f32  Math_Sqrtf(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void LLMath_AddScale3(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  Vec3_Dot(f32* pA, f32* pB);     // dot product
-void LLMath_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
-void LLMath_AddScale(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
 void LLMath_Interpolate(f32* pA, f32* pB, f32 fT, f32* pOut);    // out = a + (b - a) x fT (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float

@@ -27,15 +27,12 @@ void SKEL_TransformIKChainFromBones(CharModel* pModel, IKChain* pChain);
 f32  SKEL_AdjustHipHeight(CharModel* pModel, IKChain* pChain, f32* pTarget);
 void SKA_BlendVec3(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void SKA_BlendQuat(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two rotations by fT
-void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: rotation+translation inverse
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
 void Character_PlaceFeetOnGround(Character* pChar);                     // char.c
 void fn_80113E60(void);                                 // DynChain.c
 void fn_80114080(void);                                 // DynChain.c
 void fn_80114398(struct DynChain* pChain);              // DynChain.c: frees a chain
 void fn_8011443C(CharModel* pModel, struct DynChain* pChain, f32 fDelta);   // DynChain.c
-void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                        // identity
 void SKEL_SetHalfJoint(CharModel* pModel, int nBone, int nJoint, f32* pRest);
 void SKEL_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void SKEL_VecSub(f32* pA, f32* pB, f32* pOut);

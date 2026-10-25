@@ -433,8 +433,8 @@ extern DynObj* gKernelFirstObject;
 extern DynObj* gKernelLastObject;
 extern s32 gKernelLastObjectId;
 extern u32 gKernelOverflowSlotMask;
-extern UMemPool* gKernelSmallObjectPool;
-extern UMemPool* gKernelLargeObjectPool;
+extern MemPoolPtr gKernelSmallObjectPool;
+extern MemPoolPtr gKernelLargeObjectPool;
 
 // LLObj_Gc.c
 void fn_800075CC(UObjModelRoot* pRoot);    // frees a model fn_800073B4 made

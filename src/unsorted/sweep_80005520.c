@@ -19,7 +19,7 @@ void fn_80005520(void) {
     fn_80095108();
     AudMem_InitOnce();
     GoARAM_InitOnce();
-    Math_InitLog2Table();
+    MF_vInitOnce();
     FEtm_AllocBuffers();
     Circular_CreateBuffer();
     File_InitOnce();

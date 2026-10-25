@@ -61,13 +61,9 @@ void GameModeSkillZoneBase_GetCupPosition(int i, f32* pOut);     // GameModeRepl
 void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void BFX_vRender(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void Object_SetLod(UObject* pObj, s8 nLod);
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 int  CameraController_GetClippedGolfer(void);
 void DynObj_LaunchDirection(f32* pOut, f32 fTurn, f32 fTilt);
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
-void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
-void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
-void LLMath_CopyMat34(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
 void GoDynObj_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void GoDynObj_Vec4Add(f32* pA, f32* pB, f32* pOut);
 void GoDynObj_Vec3Add(f32* pA, f32* pB, f32* pOut);
@@ -524,7 +520,7 @@ void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
     }
     LLMath_IdentifyMat(mTurn);
     LLMath_IdentifyMat(gpDynObjState->apDivotHole[nPlayer]->obj.m0);
-    mat44flt_EulerAngles(mTurn, -gPlayers[nPlayer].fAim, 0.0f, 0.0f);
+    mat44flt_EulerAngles(-gPlayers[nPlayer].fAim, 0.0f, 0.0f, mTurn);
     LLMath_mat44fltMultiplyList(gpDynObjState->apDivotHole[nPlayer]->obj.m0, mTurn, mObj, 4);
     LLMath_CopyMat44(mObj, gpDynObjState->apDivotHole[nPlayer]->obj.m0);
     LLMath_CopyVec(vPos, gpDynObjState->apDivotHole[nPlayer]->obj.m80[3]);
@@ -907,7 +903,7 @@ void DynObj_UpdateDivot(int nPlayer) {
     pB->b0 = 0;
     if (pB->bF5) {
         LLMath_IdentifyMat(pB->mB0);
-        mat44flt_EulerAngles(pB->mB0, pB->fC, 0.0f, 0.0f);
+        mat44flt_EulerAngles(pB->fC, 0.0f, 0.0f, pB->mB0);
         LLMath_mat44fltMultiplyList(pB->pF0->obj.m0, pB->mB0, mTmp, 4);
         LLMath_CopyMat44(mTmp, pB->pF0->obj.m0);
         UObject_ComposeRotation(pB->pF0->obj.m0);
@@ -945,7 +941,7 @@ void DynObj_UpdateDivot(int nPlayer) {
     }
     GoDynObj_Vec4Add(pB->v60, pB->v50, pB->v50);
     LLMath_IdentifyMat(pB->mB0);
-    mat44flt_EulerAngles(pB->mB0, pB->fC + pB->v50[0], pB->v50[1], pB->v50[2]);
+    mat44flt_EulerAngles(pB->fC + pB->v50[0], pB->v50[1], pB->v50[2], pB->mB0);
     LLMath_CopyMat34(pB->mB0, pB->pF0->obj.m0);
     UObject_ComposeRotation(pB->pF0->obj.m0);
     LLMath_CopyVec(pB->v30, pB->pF0->obj.m80[3]);
@@ -1021,7 +1017,7 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
         }
     }
     LLMath_IdentifyMat(pA->mB4);
-    mat44flt_EulerAngles(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
+    mat44flt_EulerAngles(pA->v50[0], pA->v50[1], pA->v50[2], pA->mB4);
     LLMath_CopyMat34(pA->mB4, pA->pF4->obj.m0);
     LLMath_CopyVec(pA->v20, pA->v30);
     LLMath_CopyVec(pA->v20, pA->pF4->obj.m80[3]);
@@ -1050,7 +1046,7 @@ void DynObj_UpdateTee(int nPlayer) {
         if (pA->bF9) {
             pA->fC = -gPlayers[nPlayer].fAim + Misc_RandFuncf(RANDOM_PRESENTATION) - 0.5f;
             LLMath_IdentifyMat(pA->mB4);
-            mat44flt_EulerAngles(pA->mB4, pA->fC, 0.0f, 0.0f);
+            mat44flt_EulerAngles(pA->fC, 0.0f, 0.0f, pA->mB4);
             LLMath_mat44fltMultiplyList(pA->pF4->obj.m0, pA->mB4, mTmp, 4);
             LLMath_CopyMat44(mTmp, pA->pF4->obj.m0);
             UObject_ComposeRotation(pA->pF4->obj.m0);
@@ -1087,14 +1083,14 @@ void DynObj_UpdateTee(int nPlayer) {
         }
         GoDynObj_Vec4Add(pA->v60, pA->v50, pA->v50);
         LLMath_IdentifyMat(pA->mB4);
-        mat44flt_EulerAngles(pA->mB4, pA->fC + pA->v50[0], pA->v50[1], pA->v50[2]);
+        mat44flt_EulerAngles(pA->fC + pA->v50[0], pA->v50[1], pA->v50[2], pA->mB4);
         LLMath_CopyMat34(pA->mB4, pA->pF4->obj.m0);
         UObject_ComposeRotation(pA->pF4->obj.m0);
         LLMath_CopyVec(pA->v30, pA->pF4->obj.m80[3]);
         pA->pF4->obj.m80[3][3] = 1.0f;
     } else {
         LLMath_IdentifyMat(pA->mB4);
-        mat44flt_EulerAngles(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
+        mat44flt_EulerAngles(pA->v50[0], pA->v50[1], pA->v50[2], pA->mB4);
         LLMath_CopyMat34(pA->mB4, pA->pF4->obj.m0);
         UObject_ComposeRotation(pA->pF4->obj.m0);
         LLMath_CopyVec(pA->v30, pA->pF4->obj.m80[3]);

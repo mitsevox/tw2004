@@ -114,7 +114,9 @@ early in link order (0x80005628-0x80013720), between the LL rendering files.
 | LLFileIO_Gc.c | EA | disc file reads, from a queue run by a reader thread |
 | MathQuat.c | T7 | quaternion rotations (slerp, products, matrices, Euler angles); the float sin, cos, acos, asin and sqrt |
 | UCirc.c | T7 | the game's own heap (one ~20 MB block, sorted free spans, blocks from either end) |
-| UMemPool.c | EA | pools of fixed-size nodes; 4x4 matrix and paired-single math, atan2f, logarithm |
+| UMatFlt.c | T7 | 4x4 float matrices (copies, transposes, Euler angles, inverses, the projections) and four-float vector helpers; atan2f, fabsf, fabs |
+| UMath.c | T7 | the math module's start-up and shut-down (a log2 table nothing reads); logf |
+| UMemPool.c | EA | pools of fixed-size nodes carved from one block of the game's heap |
 | urandom.c | T6 | three random-number streams (lagged Fibonacci), uniform and normal floats |
 | URes.c | EA | the resource list: the stream objects kept once delivered, found by type and id |
 | FETextureMgr.c | EA | the front end's `'txf2'` texture banks, found by a texture's name; the loading bar's texture and the loading screen's picture (`'load'`); `GM_GetModeType`, `FEtm_PackName` |

@@ -41,8 +41,6 @@ void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, in
 void RC_ApplyCurrentViewport(void);
 void RC_UpdateCurrentScreenMatrices(void);
 void SW_vGetCurrentSpin(int nPlayer, f32* pfSide, f32* pfForward);   // Swing.c: the spin asked for
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                          // identity
-void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void UI_Obj_DrawSpinModel(void);
 void UI_Obj_DrawMesh(UObjMesh* pMesh);

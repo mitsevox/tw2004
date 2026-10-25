@@ -34,8 +34,6 @@ char gszCrAPBallLogoTex[] = "logoea";   // the texture FE_CrAPBall_SetLogo copie
 
 void FE_CrAPBall_LoadBALF(TStreamData* pObject);
 void FE_CrAPBall_LoadTEO(TStreamData* pObject);
-void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 

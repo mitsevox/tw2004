@@ -908,6 +908,8 @@ config.libs = [
             Object(Matching, "GoEntry.c"),
             Object(Matching, "MathQuat.c"),
             Object(Matching, "UCirc.c"),
+            Object(Matching, "UMatFlt.c"),
+            Object(Matching, "UMath.c"),
             Object(Matching, "UMemPool.c"),
             Object(Matching, "urandom.c"),
             Object(Matching, "URes.c"),
