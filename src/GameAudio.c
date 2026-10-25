@@ -280,7 +280,8 @@ void Aud_MicCycle(void) {
 void FirstFrameInit(void) {
     u8 nWind;
 
-    if (gSession.nGameType != 3 && gSession.nGameType != 1 && gSession.nGameType != 0) {
+    if (gSession.nGameType != GAMESTATE_FE_RUN && gSession.nGameType != GAMESTATE_STARTUP
+        && gSession.nGameType != GAMESTATE_BOOT) {
         Game_GetCurHoleNum();
         nWind = gSession.options.nWind;
         Gaud_InitCrowdReactionSound(0, 0);
@@ -392,7 +393,7 @@ void Gaud_SetStreamingContext(void) {
 
     nMode = GM_GetModeType();
     fVolume = 0.2f * (s8)gSession.options.a0[1];
-    bFixed = gSession.nGameType == 3 || gSession.nGameType == 10;
+    bFixed = gSession.nGameType == GAMESTATE_FE_RUN || gSession.nGameType == GAMESTATE_FE_SETUP;
     bNoBreaker = !bFixed && gSession.bDemo;
     nState = 0;
     bOn = fVolume > 0.0f;
@@ -1901,7 +1902,7 @@ u8 Gaud_GetAmbientStmStatus(void) {
 u8 Gaud_GetStreamingStatus(void) {
     int bResult;
 
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         return Gaud_GetMusicStatus();
     }
     bResult = 0;

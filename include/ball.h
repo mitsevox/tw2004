@@ -331,6 +331,7 @@ u8   Ter_PointInTriangleXZpY(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x
 void Ter_GetBarycentricCoords(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);
 f32  Ter_GetHighestGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
 f32  Ter_GetLowestGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos);   // ground height (GoTerrainCollision.c)
+f32  Ter_GetAmbientLight(TGD_TerrainInfo* pCourse, f32* pPos);   // the ground's light at a point, 0..1
 // Every ground height under and over pPos (up to nMax), with its surface; returns how many.
 u32  Ter_GetTerrainLayers(TGD_TerrainInfo* pCourse, f32* pPos, TGD_MaterialInfo** ppSurfaces, f32* pHeights,
                           u32 nMax);

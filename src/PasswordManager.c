@@ -285,7 +285,7 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
 
     memset(pProfile, 0, sizeof(SaveProfile));
     pProfile->bActive = 0;
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         sprintf(pProfile->szName, "User %d", gpFEProfile->nSlot + 1);
     } else {
         strcpy(pProfile->szName, "NoName");

@@ -65,13 +65,13 @@ void DynObjType6_Init(DynObj* pObj, DynObjSetup* pSetup) {
     } else {
         Object_Init(&pObj->obj,NULL, nFlags);
     }
-    LLMath_IdentifyMat(pObj->obj.m0);
-    LLMath_IdentifyMat(pObj->obj.m40);
-    UObject_ComposeRotation(pObj->obj.m0);
-    pObj->obj.m80[3][0] = pDef->aPos[0];
-    pObj->obj.m80[3][1] = pDef->aPos[1];
-    pObj->obj.m80[3][2] = pDef->aPos[2];
-    pObj->obj.m80[3][3] = 1.0f;
+    LLMath_IdentifyMat(pObj->obj.mRotation);
+    LLMath_IdentifyMat(pObj->obj.mScale);
+    UObject_ComposeRotation(pObj->obj.mRotation);
+    pObj->obj.mObjToWorld[3][0] = pDef->aPos[0];
+    pObj->obj.mObjToWorld[3][1] = pDef->aPos[1];
+    pObj->obj.mObjToWorld[3][2] = pDef->aPos[2];
+    pObj->obj.mObjToWorld[3][3] = 1.0f;
     pObj->aRot[0] = 0.0f;
     pObj->aRot[1] = 0.0f;
     pObj->aRot[2] = 0.0f;
@@ -139,13 +139,13 @@ void DynObjType9_Init(DynObj* pObj, DynObjSetup* pSetup) {
         pObj->uFlags |= 0x02000000;
     }
     Object_Init(&pObj->obj,NULL, 0);
-    LLMath_IdentifyMat(pObj->obj.m0);
-    LLMath_IdentifyMat(pObj->obj.m40);
-    UObject_ComposeRotation(pObj->obj.m0);
-    pObj->obj.m80[3][0] = pDef->aPos[0];
-    pObj->obj.m80[3][1] = pDef->aPos[1];
-    pObj->obj.m80[3][2] = pDef->aPos[2];
-    pObj->obj.m80[3][3] = 1.0f;
+    LLMath_IdentifyMat(pObj->obj.mRotation);
+    LLMath_IdentifyMat(pObj->obj.mScale);
+    UObject_ComposeRotation(pObj->obj.mRotation);
+    pObj->obj.mObjToWorld[3][0] = pDef->aPos[0];
+    pObj->obj.mObjToWorld[3][1] = pDef->aPos[1];
+    pObj->obj.mObjToWorld[3][2] = pDef->aPos[2];
+    pObj->obj.mObjToWorld[3][3] = 1.0f;
     pObj->aRot[0] = 0.0f;
     pObj->aRot[1] = 0.0f;
     pObj->aRot[2] = 0.0f;

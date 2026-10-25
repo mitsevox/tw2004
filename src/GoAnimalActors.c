@@ -104,32 +104,33 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
     }
     CamScript_SplineCamerasByPositionAndLook(aPos[0], aPos[1], aPos[2], aPos[3], aTan[0], aTan[1], aTan[2],
                                              aTan[3],
-                pAnimal->base.obj.m80[3], vDir, &fUnused, 0.0f, 0.0f, fT);
+                pAnimal->base.obj.mObjToWorld[3], vDir, &fUnused, 0.0f, 0.0f, fT);
     vDir[3] = 0.0f;
     if (pAnimal->b1BD && (pCourse = Ter_GetTGD()) != NULL) {
-        vGround[0] = pAnimal->base.obj.m80[3][0];
-        vGround[1] = 10.0f + pAnimal->base.obj.m80[3][1];
-        vGround[2] = pAnimal->base.obj.m80[3][2];
+        vGround[0] = pAnimal->base.obj.mObjToWorld[3][0];
+        vGround[1] = 10.0f + pAnimal->base.obj.mObjToWorld[3][1];
+        vGround[2] = pAnimal->base.obj.mObjToWorld[3][2];
         vGround[3] = 1.0f;
         fGround = Ter_GetSupportingGroundHeight(pCourse, vGround);
         if (-65536.125f != fGround) {
-            pAnimal->base.obj.m80[3][1] = fGround;
+            pAnimal->base.obj.mObjToWorld[3][1] = fGround;
         }
     }
-    pAnimal->base.obj.m80[3][1] = pAnimal->base.obj.m80[3][1] + pAnimal->f198;
+    pAnimal->base.obj.mObjToWorld[3][1] = pAnimal->base.obj.mObjToWorld[3][1] + pAnimal->f198;
 
     // face the heading: row 2 along it, row 0 level across it, row 1 up
     if (vDir[0] || vDir[1] || vDir[2]) {
-        LLMath_Normalize3(vDir, pAnimal->base.obj.m0[2]);
+        LLMath_Normalize3(vDir, pAnimal->base.obj.mRotation[2]);
     }
-    if (fabsf(pAnimal->base.obj.m0[2][1]) < 0.98f) {
-        pAnimal->base.obj.m0[0][0] = pAnimal->base.obj.m0[2][2];
-        pAnimal->base.obj.m0[0][1] = 0.0f;
-        pAnimal->base.obj.m0[0][2] = -pAnimal->base.obj.m0[2][0];
-        pAnimal->base.obj.m0[0][3] = 0.0f;
-        LLMath_Normalize3(pAnimal->base.obj.m0[0], pAnimal->base.obj.m0[0]);
+    if (fabsf(pAnimal->base.obj.mRotation[2][1]) < 0.98f) {
+        pAnimal->base.obj.mRotation[0][0] = pAnimal->base.obj.mRotation[2][2];
+        pAnimal->base.obj.mRotation[0][1] = 0.0f;
+        pAnimal->base.obj.mRotation[0][2] = -pAnimal->base.obj.mRotation[2][0];
+        pAnimal->base.obj.mRotation[0][3] = 0.0f;
+        LLMath_Normalize3(pAnimal->base.obj.mRotation[0], pAnimal->base.obj.mRotation[0]);
     }
-    vec4flt_CrossProduct(pAnimal->base.obj.m0[2], pAnimal->base.obj.m0[0], pAnimal->base.obj.m0[1]);
+    vec4flt_CrossProduct(pAnimal->base.obj.mRotation[2], pAnimal->base.obj.mRotation[0],
+                         pAnimal->base.obj.mRotation[1]);
 
     // the spin: f19C slows by a full turn a second each second, down to 72 degrees a second either
     // way, and stops once it is there and the angle f1A0 is near 0 or 180 degrees
@@ -159,14 +160,14 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
                 pAnimal->f19C = 0.0f;
             }
         }
-        mat44flt_ExtractEulerAngles(pAnimal->base.obj.m0, &fA, &fB, &fC);
+        mat44flt_ExtractEulerAngles(pAnimal->base.obj.mRotation, &fA, &fB, &fC);
         fA = pAnimal->f1A0;
         if (fA > 6.2831855f) {
             fA = fA - 6.2831855f;
         }
-        mat44flt_EulerAngles(fA, fB, fC, pAnimal->base.obj.m0);
+        mat44flt_EulerAngles(fA, fB, fC, pAnimal->base.obj.mRotation);
     }
-    UObject_ComposeRotation(pAnimal->base.obj.m0);
+    UObject_ComposeRotation(pAnimal->base.obj.mRotation);
 }
 
 // Divides f16C and f174 by the length of the animal's route (once round its points).
@@ -241,12 +242,12 @@ void ActAnimal_Init(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
         pMesh = ActAnimal_GetMeshAlternative(pMesh, 0);
         nBitsA = ActAnimal_GetMeshFlags(pMesh, 0);
         nBitsB = ActAnimal_GetMeshFlags(pMesh, 2);
-        if (nBitsA & 1) {
-            if (nBitsA & 2) {
+        if (nBitsA & UOBJMESH_F0_ANIMATED) {
+            if (nBitsA & UOBJMESH_F0_POSES) {
                 pAnimal->n1A4 = 2;
-            } else if (nBitsB & 1) {
+            } else if (nBitsB & UOBJMESH_F2_POSE_KIND0) {
                 pAnimal->n1A4 = 0;
-            } else if (nBitsB & 2) {
+            } else if (nBitsB & UOBJMESH_F2_POSE_KIND1) {
                 pAnimal->n1A4 = 1;
             } else {
                 pAnimal->n1A4 = 3;
@@ -289,15 +290,15 @@ void ActAnimal_Init(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
     pAnimal->f19C = 0.0f;
     pAnimal->f1A0 = 0.0f;
     mat44flt_EulerAngles(pDef->aAngles[1] * (PI / 180.0f), pDef->aAngles[0] * (PI / 180.0f),
-                         pDef->aAngles[2] * (PI / 180.0f), pAnimal->base.obj.m0);
-    LLMath_IdentifyMat(pAnimal->base.obj.m40);
-    UObject_ComposeRotation(pAnimal->base.obj.m0);
+                         pDef->aAngles[2] * (PI / 180.0f), pAnimal->base.obj.mRotation);
+    LLMath_IdentifyMat(pAnimal->base.obj.mScale);
+    UObject_ComposeRotation(pAnimal->base.obj.mRotation);
     if (pAnimal->pRoute != NULL) {
         ActAnimal_SetWorldMatrix(pAnimal, 0.0f);
     } else {
-        pAnimal->base.obj.m80[3][0] = pDef->base.aPos[0];
-        pAnimal->base.obj.m80[3][1] = pDef->base.aPos[1] + pAnimal->f198;
-        pAnimal->base.obj.m80[3][2] = pDef->base.aPos[2];
+        pAnimal->base.obj.mObjToWorld[3][0] = pDef->base.aPos[0];
+        pAnimal->base.obj.mObjToWorld[3][1] = pDef->base.aPos[1] + pAnimal->f198;
+        pAnimal->base.obj.mObjToWorld[3][2] = pDef->base.aPos[2];
     }
     ActAnimal_ScaleSpeedsByRouteLength(pAnimal);
 }
@@ -472,8 +473,8 @@ int ActAnimal_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
         return 0;
     case 3:
         if (pObj->obj.pModel != NULL) {
-            pObj->obj.n108 = ((DynObjAnimal*)pObj)->n1AC;
-            pObj->obj.f10C = ((DynObjAnimal*)pObj)->f1B4;
+            pObj->obj.nMeshChild = ((DynObjAnimal*)pObj)->n1AC;
+            pObj->obj.fShaderParam = ((DynObjAnimal*)pObj)->f1B4;
             Object_Draw(&pObj->obj);
         }
         return 0;
@@ -487,9 +488,9 @@ int ActAnimal_GetMeshFlags(UObjMesh* pMesh, int i) {
     return pMesh->pInfo->aFlags[i];
 }
 
-// The same as UObject.c's Object_GetMeshAlternative, compiled into this file too.
+// The same as UObject.c's Object_GetMeshChild, compiled into this file too.
 UObjMesh* ActAnimal_GetMeshAlternative(UObjMesh* pMesh, int i) {
-    return pMesh->p8[i];
+    return pMesh->ppChildren[i];
 }
 
 UObjMesh* ActAnimal_GetRootMesh(UObjModelRoot* pRoot) {

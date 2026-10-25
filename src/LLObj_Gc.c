@@ -63,12 +63,12 @@ void fn_80007524(UObjMesh* pMesh) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (pMesh->a1C[i]) {
-            fn_80008248(&pMesh->p18[i]);
+        if (pMesh->abPartUsed[i]) {
+            fn_80008248(&pMesh->pParts[i]);
         }
     }
-    if (pMesh->p18 != NULL) {
-        Circular_MemFreeFunc(pMesh->p18);
+    if (pMesh->pParts != NULL) {
+        Circular_MemFreeFunc(pMesh->pParts);
     }
     pChild = pMesh->p10;
     for (i = 0; i < pMesh->pInfo->n0; i++) {
@@ -104,10 +104,10 @@ void fn_80007658(UObjModelRoot* pRoot, UObjMesh* pMesh, u8* pData, int nCount, i
     if (nCount == 0) {
         return;
     }
-    pMesh->p18 = Circular_MemAllocFunc(pMesh->pInfo->n8C * sizeof(UObjMeshPart), MEMTYPE_LOW, 32,
+    pMesh->pParts = Circular_MemAllocFunc(pMesh->pInfo->n8C * sizeof(UObjMeshPart), MEMTYPE_LOW, 32,
                                        "LLObj_Gc.c", 398);
-    Mem_set(pMesh->p18, 0, pMesh->pInfo->n8C * sizeof(UObjMeshPart));
-    Mem_set(pMesh->a1C, 0, sizeof(pMesh->a1C));
+    Mem_set(pMesh->pParts, 0, pMesh->pInfo->n8C * sizeof(UObjMeshPart));
+    Mem_set(pMesh->abPartUsed, 0, sizeof(pMesh->abPartUsed));
     desc.n0 = pMesh->pInfo->n8C;
     desc.n4 = nCount;
     desc.u0A = 0;
@@ -116,20 +116,20 @@ void fn_80007658(UObjModelRoot* pRoot, UObjMesh* pMesh, u8* pData, int nCount, i
     if (pMesh->pInfo->b8B & 1) {
         desc.u0A |= 1;
     }
-    fn_8000827C(pMesh->p18, &pRoot->aSets[0], pMesh->pInfo->n88, &desc);
-    if (pMesh->p18->u8 != 0) {
-        pMesh->a1C[0] = 1;
-        pMesh->n20 = pMesh->p18->u8;
-        pMesh->n24 = pMesh->p18->n4;
+    fn_8000827C(pMesh->pParts, &pRoot->aSets[0], pMesh->pInfo->n88, &desc);
+    if (pMesh->pParts->u8 != 0) {
+        pMesh->abPartUsed[0] = 1;
+        pMesh->n20 = pMesh->pParts->u8;
+        pMesh->n24 = pMesh->pParts->n4;
     }
-    if (pMesh->a1C[0] != 0) {
+    if (pMesh->abPartUsed[0] != 0) {
         for (i = 1; i < desc.n0; i++) {
             if (pRoot->aSets[i].n30 == -1) {
                 fn_80007824(pRoot, i);
             }
-            pMesh->p18[i] = pMesh->p18[0];
-            pMesh->p18[i].pSet = &pRoot->aSets[i];
-            pMesh->a1C[i] = 1;
+            pMesh->pParts[i] = pMesh->pParts[0];
+            pMesh->pParts[i].pSet = &pRoot->aSets[i];
+            pMesh->abPartUsed[i] = 1;
         }
     }
 }
@@ -176,9 +176,9 @@ int fn_8000799C(UObjModelRoot* pRoot, UObjMesh* pMesh, int n, u8** ppData, u8** 
     pMesh->pInfo = (UObjMeshInfo*)pChunk;
     pMesh->n20 = 0;
     pMesh->n24 = 0;
-    pMesh->p18 = NULL;
-    pMesh->n28 = 0;
-    Mem_set(pMesh->a1C, 0, sizeof(pMesh->a1C));
+    pMesh->pParts = NULL;
+    pMesh->nDrawPart = 0;
+    Mem_set(pMesh->abPartUsed, 0, sizeof(pMesh->abPartUsed));
     if (pMesh->pInfo->n4 != 0) {
         pChunk = *ppData;
         *ppData += 8;
@@ -186,13 +186,13 @@ int fn_8000799C(UObjModelRoot* pRoot, UObjMesh* pMesh, int n, u8** ppData, u8** 
         fn_80007658(pRoot, pMesh, *ppData, pMesh->pInfo->n4 * 2, n);
         *ppData = &(*ppData)[((u32*)pChunk)[1] - 0x78];   // past the chunk (its size at [1])
     }
-    pMesh->p8 = NULL;
+    pMesh->ppChildren = NULL;
     if (pMesh->pInfo->n0 != 0) {
-        pMesh->p8 = (UObjMesh**)*ppNext;
+        pMesh->ppChildren = (UObjMesh**)*ppNext;
         *ppNext += pMesh->pInfo->n0 * sizeof(UObjMesh*);
         pChild = pMesh + 1;
         for (i = 0; i < pMesh->pInfo->n0; i++) {
-            pMesh->p8[pMesh->pInfo->n0 - i - 1] = pChild;
+            pMesh->ppChildren[pMesh->pInfo->n0 - i - 1] = pChild;
             if (i != 0) {
                 pChild->p14 = pMesh->p10;
             } else {
@@ -208,23 +208,24 @@ int fn_8000799C(UObjModelRoot* pRoot, UObjMesh* pMesh, int n, u8** ppData, u8** 
     return nCount;
 }
 
-// Culls a mesh by its bounding sphere scaled by fScale: 3 when it is out of view, 2 when it is
-// wholly in view (mode 0, then mode 1), else 0. fDist and fHalfFovTan are not used.
-int fn_80007B2C(UObjMesh* pMesh, void* pCamera, f32 fDist, f32 fHalfFovTan, f32 fScale) {
+// Culls a mesh by its bounding sphere scaled by fScale: DC_CLIP_OUT_OF_VIEW, DC_CLIP_IN_VIEW when
+// it is wholly in view (mode 0, then mode 1), else DC_CLIP_PARTLY_IN_VIEW. fDist and fHalfFovTan
+// are not used.
+int LLObj_GetMeshClipMethod(UObjMesh* pMesh, void* pCamera, f32 fDist, f32 fHalfFovTan, f32 fScale) {
     int nClip;
     int nRet;
 
     nClip = fn_80007BC4((RenderObj*)pMesh, pCamera, NULL, 0, fScale);
     if (nClip == 2) {
-        return 3;
+        return DC_CLIP_OUT_OF_VIEW;
     }
     if (nClip == 1) {
-        return 2;
+        return DC_CLIP_IN_VIEW;
     }
     nClip = fn_80007BC4((RenderObj*)pMesh, pCamera, NULL, 1, fScale);
-    nRet = 0;
+    nRet = DC_CLIP_PARTLY_IN_VIEW;
     if (nClip == 1) {
-        nRet = 2;
+        nRet = DC_CLIP_IN_VIEW;
     }
     return nRet;
 }

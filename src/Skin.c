@@ -24,9 +24,8 @@
 void  fn_80008380(void);                                  // wait for the GPU (fn_800070DC)
 void  fn_80016978(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);   // Code80016198.c: the viewport
 void  fn_8006E7A4(LightGroup* pGroup);                   // GoLighting.c: load the group's lights
-void  fn_8006EADC(UObject* pObj);                        // GoLighting.c: light the object
+void  fn_8006EADC(TObject* pObj);                        // GoLighting.c: light the object
 void  fn_8006ED70(void);                                 // GoLighting.c: lighting off
-f32   Ter_GetAmbientLight(TGD_TerrainInfo* pCourse, f32* pPos);   // GoTerrainCollision.c: the ground's light
 void  SD_SetShaderTypeParameters(int nRow, void* pData); // GoTerrain.c: calls row nRow's pfn8
 void  fn_801127A0(void* pDesc);                          // hwsMaterial_Gc.c
 HwsMemBlock* fn_801128C8(SkinDesc* pDesc, s32 nSize);         // hwsOverride_Gc.c
@@ -57,7 +56,7 @@ void  LI_LoadLightGroup(LightGroup* pGroup);
 void  SKN_GetCharPosition(Character* pChar, f32* pOut);
 int   SKN_GetLightCourse(void);
 void  LI_ResetLights(void);
-void  LI_SetObjectLights(UObject* pObj);
+void  LI_SetObjectLights(TObject* pObj);
 void  LF_SetCurrentBrightness(f32 f);
 void  SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);
 void  SKN_SetMeshMatrices(Skin* pSkin, int n);
@@ -210,13 +209,13 @@ void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
         LLMath_CopyVec(aShadowParams, aParams);
         switch (nMode) {
         case 2:
-            RenderState_SetClipMode(1);
+            RenderState_SetClipMode(GX_CLIP_DISABLE);
             break;
         case 1:
-            RenderState_SetClipMode(1);
+            RenderState_SetClipMode(GX_CLIP_DISABLE);
             break;
         default:
-            RenderState_SetClipMode(0);
+            RenderState_SetClipMode(GX_CLIP_ENABLE);
             break;
         }
         RenderState_Flush();
@@ -225,13 +224,13 @@ void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
     } else {
         switch (nMode) {
         case 2:
-            RenderState_SetClipMode(1);
+            RenderState_SetClipMode(GX_CLIP_DISABLE);
             break;
         case 1:
-            RenderState_SetClipMode(1);
+            RenderState_SetClipMode(GX_CLIP_DISABLE);
             break;
         default:
-            RenderState_SetClipMode(0);
+            RenderState_SetClipMode(GX_CLIP_ENABLE);
             break;
         }
         RenderState_Flush();
@@ -283,7 +282,7 @@ int SKN_GetLightCourse(void) {
 void SKN_PoseCharacter(Character* pChar, int n) {
     Skin* pClub;
 
-    if (gSession.nSplitScreen == 0 || gSession.nGameType == 3) {
+    if (gSession.nSplitScreen == 0 || gSession.nGameType == GAMESTATE_FE_RUN) {
         SkinMorph_Update(pChar->pSkin, pChar->nView);
     }
     SKN_BuildMatrices(pChar->pSkin, pChar->pModel, 0, 0, pChar->nView);
@@ -365,7 +364,7 @@ void SKN_DrawBoneTri(Character* pChar, int nView) {
     fill.pColour = gSkinBoneTris.aColor[nView];
     fill.pTexCoord = gSkinBoneTris.aUV[nView];
     RenderState_SetDrawFlags(0);
-    RenderState_SetClipMode(0);
+    RenderState_SetClipMode(GX_CLIP_ENABLE);
     RenderState_Flush();
     SD_FillShaderObject(&gSkinBoneTris.aMesh[nView], &fill, 1);
     SD_DrawShaderObject(&gSkinBoneTris.aMesh[nView]);
@@ -405,7 +404,7 @@ void LI_ResetLights(void) {
 }
 
 // Loads the lights for drawing pObj, in its space (NULL: in world space; fn_8006EADC).
-void LI_SetObjectLights(UObject* pObj) {
+void LI_SetObjectLights(TObject* pObj) {
     fn_8006EADC(pObj);
 }
 

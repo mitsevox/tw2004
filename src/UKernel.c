@@ -433,19 +433,19 @@ void Kernel_InitObjectFromDef(DynObj* pObj, DynObjSetup* pSetup) {
         nFlags |= 0x40;
     }
     if (pModel != NULL) {
-        pModel->p4->f5C = pModel->p4->apLod[0]->pInfo->f64;
+        pModel->p4->fRadius = pModel->p4->apLod[0]->pInfo->f64;
         Object_Init(&pObj->obj, pModel->p4, nFlags);
         Vec3Copy(pObj->obj.pModel->apLod[0]->pInfo->v58, pObj->obj.pModel->v2C);
     } else {
         Object_Init(&pObj->obj, NULL, nFlags);
     }
-    LLMath_IdentifyMat(pObj->obj.m0);
-    LLMath_IdentifyMat(pObj->obj.m40);
-    UObject_ComposeRotation(pObj->obj.m0);
-    pObj->obj.m80[3][0] = pDef->aPos[0];
-    pObj->obj.m80[3][1] = pDef->aPos[1];
-    pObj->obj.m80[3][2] = pDef->aPos[2];
-    pObj->obj.m80[3][3] = 1.0f;
+    LLMath_IdentifyMat(pObj->obj.mRotation);
+    LLMath_IdentifyMat(pObj->obj.mScale);
+    UObject_ComposeRotation(pObj->obj.mRotation);
+    pObj->obj.mObjToWorld[3][0] = pDef->aPos[0];
+    pObj->obj.mObjToWorld[3][1] = pDef->aPos[1];
+    pObj->obj.mObjToWorld[3][2] = pDef->aPos[2];
+    pObj->obj.mObjToWorld[3][3] = 1.0f;
     pObj->aRot[0] = 0.0f;
     pObj->aRot[1] = 0.0f;
     pObj->aRot[2] = 0.0f;

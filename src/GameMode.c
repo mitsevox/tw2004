@@ -816,7 +816,7 @@ void GM_FlyByMode_Init(void) {
 // the mode says so (b27E) and no scorecard is up, the next golfer is set up once everyone waits
 // (GM_SetupGolfer_IfAllWaiting). The frame count is kept in n12C.
 void GM_Update(void) {
-    if (gSession.nGameType == 6) {
+    if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
         gpGame->pfnUpdate();
         if ((GUI_IsEndGameUiShowing() && GUI_IsPauseMenuOpen()) || GUI_GetUIMessageQued()) {
             GUI_CheckMessageQue();

@@ -124,12 +124,12 @@ void UI_RelocateFile(FrontEnd* pFE) {
 // are not used.
 void UI_RunGameMessage(s32 nCmd, s32 nGroup, s32 nScreen, s32 nParams, s32 nArgsAddr, s32 nResultAddr) {
     // port: the studio passes the addresses of the command's values and answer as 32-bit words
-    if (gSession.nGameType == 1) {
+    if (gSession.nGameType == GAMESTATE_STARTUP) {
         Startup_RunGameMessage(nCmd, (MsgArg*)nArgsAddr, (MsgArg*)nResultAddr);
     }
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         FE_RunGameMessage(nCmd, (MsgArg*)nArgsAddr, (MsgArg*)nResultAddr);
-    } else if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
+    } else if (gSession.nGameType >= GAMESTATE_IG_SETUP && gSession.nGameType <= GAMESTATE_IG_SHUTDOWN) {
         IG_RunGameMessage(nCmd, (MsgArg*)nArgsAddr, (MsgArg*)nResultAddr);
     }
 }
@@ -172,7 +172,7 @@ void UI_DrawInterface(s32 nTicks) {
         DS_vEnableZBufferUpdate(0);
         DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
         RenderState_Flush();
-        if (gbUIFirstMenuDraw && gSession.nGameType == 3) {
+        if (gbUIFirstMenuDraw && gSession.nGameType == GAMESTATE_FE_RUN) {
             UI_ClearFirstMenuDraw();
         }
         RenderView_SetColor(NULL);
@@ -196,10 +196,10 @@ void UI_DrawInterface(s32 nTicks) {
             gUIDelayedHint.nFrames = -1;
             Mem_set(aArgs, 0, sizeof(aArgs));
             aArgs[0] = gUIDelayedHint.nValue;
-            if (gSession.nGameType == 3) {
+            if (gSession.nGameType == GAMESTATE_FE_RUN) {
                 UISProcessHint(gpFrontEnd->pHandler, 0x23, 1, aArgs);
             }
-            if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
+            if (gSession.nGameType >= GAMESTATE_IG_SETUP && gSession.nGameType <= GAMESTATE_IG_SHUTDOWN) {
                 UISProcessHint(gpFrontEnd->pHandler, 0x24, 1, aArgs);
             }
         }
@@ -245,13 +245,14 @@ void UI_ReadControllers(void) {
     u32* pButtons;
 
     fOne = 1.0f;
-    if (gSession.nGameType == 3 || gSession.nGameType == 1 ||
-        (gSession.nGameType == 6 && GUI_IsPauseMenuOpen())) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN || gSession.nGameType == GAMESTATE_STARTUP ||
+        (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE && GUI_IsPauseMenuOpen())) {
         Input_vEmulateDPad(1);
     } else {
         Input_vEmulateDPad(0);
     }
-    if (gSession.nGameType >= 4 && gSession.nGameType <= 8 && gSession.nPaused == 0) {
+    if (gSession.nGameType >= GAMESTATE_IG_SETUP && gSession.nGameType <= GAMESTATE_IG_SHUTDOWN
+        && gSession.nPaused == 0) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             pView = ViewController_GetCameraControl(gPlayers[i].nView[0]);
             if ((CameraController_IsFadeOn(pView) || pView->script.nFade == CAMFADE_HOLD)
@@ -307,7 +308,7 @@ void UI_ReadControllers(void) {
     if (gUIState.nNumPluggedIn == 0) {
         gUIState.nFramesNoPad++;
     }
-    if (gUIState.nNumPluggedIn > 0 && gSession.nGameType == 3 &&
+    if (gUIState.nNumPluggedIn > 0 && gSession.nGameType == GAMESTATE_FE_RUN &&
         ((GM_GetModeType() != GM_SpeedGolfPoints_mode && GM_GetModeType() != GM_LongDriveRace_mode)
          || gUIState.nNumPluggedIn >= 2 ||
          gFEState.aCPU[0] || gFEState.aCPU[1])) {
@@ -321,7 +322,7 @@ void UI_ReadControllers(void) {
     }
     if (((GM_GetModeType() == GM_SpeedGolfPoints_mode && !gFEState.aCPU[0] && !gFEState.aCPU[1]) ||
          GM_GetModeType() == GM_LongDriveRace_mode) &&
-        gUIState.nNumPluggedIn < 2 && gSession.nGameType == 3) {
+        gUIState.nNumPluggedIn < 2 && gSession.nGameType == GAMESTATE_FE_RUN) {
         if (gSavedCrAPHidden == -1) {
             gSavedCrAPHidden = gpCrAPState->bHidden;
         }
@@ -333,7 +334,8 @@ void UI_ReadControllers(void) {
     if (gUIState.bFadeToBlack == 0 && FE_movieIsQueueEmpty() && gUIState.bButtonsBlocked == 0) {
         for (k = 0; k < INPUT_NUM_PADS; k++) {
             if (gUIState.abPluggedIn[k] && gUIState.abInputEnabled[k]) {
-                if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
+                if (gSession.nGameType != GAMESTATE_IG_PLAY_HOLE
+                    || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
                     pEvent = gUIButtonEvents;
                     for (j = 0; j < UI_NUM_BUTTON_EVENTS; j++) {
                         if (pEvent->uMask & pPressed[k]) {
@@ -341,14 +343,14 @@ void UI_ReadControllers(void) {
                         }
                         pEvent++;
                     }
-                    if (pButtons[k] != 0 && gSession.nGameType == 3) {
+                    if (pButtons[k] != 0 && gSession.nGameType == GAMESTATE_FE_RUN) {
                         UISProcessHint(gpFrontEnd->pHandler, 0x22, 1, aArgs);
                     }
                 }
-                if (gSession.nGameType == 6) {
+                if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
                     GUI_OnControllerPresent(k);
                 }
-                if (gSession.nGameType == 6) {
+                if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
                     uMask = Input_uiMap(0x20, 1);
                     uButtons = Input_ReadControlPad(k);
                     if (uButtons & uMask) {
@@ -435,7 +437,7 @@ void UI_ResolveFileEntries(FrontEnd* pFE) {
             pEntry = pTable->apEntries[j];
             szName = pEntry->szC;
             if (pEntry->u0 == 1) {
-                if (gSession.nGameType != 3) {
+                if (gSession.nGameType != GAMESTATE_FE_RUN) {
                     uHash = FEtm_PackName(szName);
                     nBank = UI_GetTextureBankIndex(szName);
                     if (nBank != -1) {
@@ -460,7 +462,7 @@ void UI_ResolveFileEntries(FrontEnd* pFE) {
 // "tu" is in bank 1 while a lesson runs and in none (-1) otherwise; every other name, and every
 // name in start-up (game type 1), is in bank 0.
 int UI_GetTextureBankIndex(const char* szName) {
-    if (gSession.nGameType == 1) return 0;
+    if (gSession.nGameType == GAMESTATE_STARTUP) return 0;
     if (szName[0] == 't' && szName[1] == 'u') {
         if (Lessons_IsRunning()) return 1;
         return -1;
@@ -524,14 +526,14 @@ FrontEnd* UI_OpenInterface(char* szSet) {
             break;
         }
     }
-    if (gSession.nGameType != 1) {
+    if (gSession.nGameType != GAMESTATE_STARTUP) {
         UISLoadScreen(gpFrontEnd->pHandler, 0, 0, 0, NULL);
     } else {
         aArgs[0] = 0;
         aArgs[1] = 0;
         UISLoadScreen(gpFrontEnd->pHandler, 0, 0, 2, aArgs);
     }
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         FE_InitGolferTextures();
     }
     UISSetScreenActive(gpFrontEnd->pHandler, 0, 0);
@@ -551,9 +553,9 @@ void UI_CloseInterface(FrontEnd* pFE) {
     int i;
 
     UI_FreeAllEntryPictures();
-    if (gSession.nGameType == 1 && gSession.nC == 0) {
+    if (gSession.nGameType == GAMESTATE_STARTUP && gSession.nC == 0) {
         UI_PlayStartUpMovies();
-    } else if (gSession.nGameType == 3) {
+    } else if (gSession.nGameType == GAMESTATE_FE_RUN) {
         for (i = 0; i < FETM_NUM_BANKS; i++) {
             if (gUITxf2BankMarkOnExit[i] != 0) {
                 gUITxf2BankState[i].b0 = 1;
@@ -602,7 +604,7 @@ void UI_vInitModule(void) {
 // (GameMessages.c), the menus' own set in game type 3 (GameMsg_SendPendingMenus), else
 // GameMsg_SendPending.
 void UI_SendPendingMessages(void) {
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         GameMsg_SendPendingMenus();
     } else {
         GameMsg_SendPending();
@@ -639,10 +641,10 @@ void UI_ExitFade(void) {
     if (gUIState.fFade >= 1.0f) {
         gUIState.fFade = 1.0f;
         gSession.nPaused = 0;
-        if (gSession.nGameType == 1) {
+        if (gSession.nGameType == GAMESTATE_STARTUP) {
             gbUICloseRequested = 1;
             gSession.bEndLoop = 1;
-        } else if (gSession.nGameType == 3) {
+        } else if (gSession.nGameType == GAMESTATE_FE_RUN) {
             gbUICloseRequested = 1;
             if (gSession.bDemo != 0) {
                 DEMO_Start();

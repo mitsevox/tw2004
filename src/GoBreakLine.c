@@ -139,7 +139,7 @@ void BreakLine_Render(int nView) {
         DS_vEnableZBufferUpdate(0);
         RenderState_SetBankTexture(gpBreakLine->pBank, gpBreakLine->pTex);
         RenderState_SetDrawFlags(0x70);
-        RenderState_SetClipMode(0);
+        RenderState_SetClipMode(GX_CLIP_ENABLE);
         RenderState_Flush();
         fDist = LLMath_DistanceBetween3(gpBreakLine->aBall[nView].vPos, gpBreakLine->vPin);
         if (gpBreakLine->abA91C[nView]) {

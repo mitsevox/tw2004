@@ -923,7 +923,7 @@ void SkinPart_ApplyVariantLink(Skin* pSkin, int nPart, int nVariant, int nLink) 
 // hands it the description and the view's mesh overrides (a10A0[nView]).
 void SkinPart_BeginDraw(Skin* pSkin, int nView) {
     if (pSkin->pModel->pDesc != NULL && (pSkin->uFlags & 2)) {
-        RenderState_SetClipMode(1);
+        RenderState_SetClipMode(GX_CLIP_DISABLE);
         RenderState_SetCameraMatrices();
         RenderState_Flush();
         // port: EA passes an argument fn_8011387C ignores

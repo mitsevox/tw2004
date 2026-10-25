@@ -487,7 +487,7 @@ void Grass_DrawTopTextureDebug(void) {
 void Grass_BeginRender(void) {
     RC_UpdateCurrentScreenMatrices();
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
-    RenderState_SetClipMode(0);
+    RenderState_SetClipMode(GX_CLIP_ENABLE);
     RenderState_SetCameraMatrices();
     DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 128);
     DS_vEnableZBufferUpdate(0);
@@ -604,7 +604,7 @@ void Grass_DrawBuffers(void) {
             gpGrassMgr->f350 = pBuffer->f4;
             gpGrassMgr->n36C = nPass;
             SD_SetShaderTypeParameters(17, &gpGrassMgr->f348);
-            fn_800082CC((UObjMeshPart*)pBuffer->a14);
+            ObjPart_Draw((UObjMeshPart*)pBuffer->a14);
         }
     }
 }

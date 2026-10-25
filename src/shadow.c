@@ -420,7 +420,7 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     RenderState_SetDrawFlags(0x70);
     fn_8002A608(&p->tex);
     RenderState_SetCameraMatrices();
-    RenderState_SetClipMode(0);
+    RenderState_SetClipMode(GX_CLIP_ENABLE);
     DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     DS_vEnableZBufferUpdate(0);
@@ -515,7 +515,7 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_SetDrawFlags(0x70);
     RenderState_SetCameraMatrices();
-    RenderState_SetClipMode(0);
+    RenderState_SetClipMode(GX_CLIP_ENABLE);
     DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_SetBlendFactors(4, 5);
     DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);

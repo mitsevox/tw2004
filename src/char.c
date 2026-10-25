@@ -1048,7 +1048,7 @@ void Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace) {
 // half a turn more in game type 3 (a front-end type; TW07 asks GM_IsFrontEnd here).
 void Character_SetOrientation(Character* pChar, f32 fAngle) {
     if (pChar != NULL) {
-        if (gSession.nGameType == 3 && Character_IsLeftHanded(pChar)) {
+        if (gSession.nGameType == GAMESTATE_FE_RUN && Character_IsLeftHanded(pChar)) {
             fAngle += PI;
         }
         Quat_EulerAngles(0.0f, fAngle, 0.0f, pChar->pModel->pBones->q0C);
@@ -1145,7 +1145,7 @@ Character* Character_Create(void) {
     pChar->apDynTex[0] = NULL;
     pChar->aDynTexSlot[1] = -1;
     pChar->apDynTex[1] = NULL;
-    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_SETUP || gSession.nGameType == GAMESTATE_FE_RUN) {
         pChar->nDynTex = 2;
     } else {
         pChar->nDynTex = 1;
@@ -1244,7 +1244,7 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
     } else {
         pChar->n5C = 0;
     }
-    bAll = gSession.nGameType == 10 || gSession.nGameType == 3;
+    bAll = gSession.nGameType == GAMESTATE_FE_SETUP || gSession.nGameType == GAMESTATE_FE_RUN;
     nTex = nTexBytes / (int)sizeof(TexEntry);
     nPal = nPalBytes / (int)sizeof(TexPalette);
     if (bAll) {
@@ -1518,7 +1518,7 @@ void Character_EndLoadTexturesCallbackIG(Character* pChar) {
 void CharacterTex_Init(void) {
     int i;
 
-    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_SETUP || gSession.nGameType == GAMESTATE_FE_RUN) {
         gCharDynTexPool.nEntries = 2;
     } else {
         gCharDynTexPool.nEntries = 2;
@@ -1812,7 +1812,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     BYTESWAP_SWAPDATA(&pData, (u8*)&f13C, 4, 4);
     BYTESWAP_SWAPDATA(&pData, (u8*)&f12C, 4, 4);
     BYTESWAP_SWAPDATA(&pData, (u8*)&f130, 4, 4);
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         ClipBank_Restore(pChar->nSlot);
     }
     pData += 0xC;
@@ -1830,7 +1830,8 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
         pChar->pSkin = SKN_Create(pData, bLook);
         pChar->pSkin->f10D8 = fSkin;
         pChar->pSkin->f10DC = 1.0f;
-        if (gSession.nGameType != 10 && gSession.nGameType != 3 && Character_IsGolfer(pChar)) {
+        if (gSession.nGameType != GAMESTATE_FE_SETUP && gSession.nGameType != GAMESTATE_FE_RUN
+            && Character_IsGolfer(pChar)) {
             SKN_FreeRenderData(pChar->pSkin);
         }
     }
@@ -1855,7 +1856,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     // its model
     BYTESWAP_SWAPDATA(&pData, (u8*)&nSize, 4, 4);
     pData += 0xC;
-    if (bGolfer && gSession.nGameType != 10 && gSession.nGameType != 3) {
+    if (bGolfer && gSession.nGameType != GAMESTATE_FE_SETUP && gSession.nGameType != GAMESTATE_FE_RUN) {
         if (gSession.nSplitScreen) {
             pDefs = &gCharModelDefsSplit;
         } else {
@@ -2204,7 +2205,7 @@ void Character_RenderAll(u32 uFlags) {
 void Character_UpdateAll(f32 fTime) {
     int i;
 
-    if (gSession.nGameType != 6 || !GUI_IsPauseMenuOpen()) {
+    if (gSession.nGameType != GAMESTATE_IG_PLAY_HOLE || !GUI_IsPauseMenuOpen()) {
         for (i = 0; i < gNumCharacters; i++) {
             Character_UpdateAnimation(gCharacters[i], 0, fTime);
         }
@@ -2355,7 +2356,7 @@ void Character_Free(Character* pChar) {
             CharSlider_Free(pChar->pSliderDefs);
         }
         Circular_MemFreeFunc(pChar);
-        if (gSession.nGameType == 3) {
+        if (gSession.nGameType == GAMESTATE_FE_RUN) {
             ClipBank_Release(nSlot);
         }
     }
@@ -2944,7 +2945,7 @@ void SkeletalObject_UnregisterStreamClient(void) {
 void Character_SetClubsAndClothes(Character* pChar, int nSlot) {
     char szName[32];            // the size is not known
 
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         if (pChar->nGolferId == 7 || pChar->nGolferId == 29) {
             Character_SetClubStatesForCharacter(pChar, nSlot, &FE_GetCurrentProfile()->choices);
         } else {
@@ -3171,7 +3172,8 @@ void Character_ApplyCrAPSettings(Character* pChar, SkinChoices* pChoices) {
     CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                   pChoices->a9B4,
                 &pChar->morphBlend);
-    if (gSession.nGameType != 3 || gpCrAPState->nScreenKind == 1 || gpCrAPState->nScreenKind == 4) {
+    if (gSession.nGameType != GAMESTATE_FE_RUN || gpCrAPState->nScreenKind == 1 || gpCrAPState->nScreenKind
+        == 4) {
         if (pChoices->bLeftHanded == 0) {
             Character_SetLeftHanded(pChar, 0);
         } else {
@@ -3256,7 +3258,7 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
     u64 uVariant;
 
     if (pChar == NULL || pChar->pClubSet == NULL) return;
-    if (gSession.nGameType == 3 && !FE_GetClubStatesAllowed()) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN && !FE_GetClubStatesAllowed()) {
         FE_SetClubStatesAllowed(1);
         return;
     }

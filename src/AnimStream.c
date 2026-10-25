@@ -177,7 +177,7 @@ void AnimStream_Update(void) {
     int nPlayer;
     int nFirst;
 
-    if (gSession.nGameType != 6) return;
+    if (gSession.nGameType != GAMESTATE_IG_PLAY_HOLE) return;
     if (gpAnimStream == NULL) return;
     if (gpAnimStream->bOn == 0) return;
     if (gpAnimStream->nState == 2) {
@@ -239,7 +239,8 @@ void AnimStream_Update(void) {
 // ends it with AnimStream_EndRead(1), so its clip is stored even if the golfer is playing the old
 // one. Called on the way out of a hole.
 void AnimStream_WaitForRead(void) {
-    if (gSession.nGameType != 6 || gpAnimStream == NULL || gpAnimStream->bOn == 0) return;
+    if (gSession.nGameType != GAMESTATE_IG_PLAY_HOLE || gpAnimStream == NULL || gpAnimStream->bOn
+        == 0) return;
     while (gpAnimStream->nState == 1) {
         fn_8006C63C();
     }

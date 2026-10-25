@@ -34,7 +34,7 @@ void Session_Init(void) {
     int      i, j;
 
     pSession->uFlags      = 0;
-    pSession->nGameType   = 0;
+    pSession->nGameType   = GAMESTATE_BOOT;
     pSession->bDemo     = 0;
     pSession->nC          = 0;
     pSession->nSplitScreen = 0;

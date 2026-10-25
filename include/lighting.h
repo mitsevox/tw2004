@@ -114,8 +114,13 @@ void fn_8006EDC0(LightGroup* pGroup);               // the default lights
 void fn_8006F144(struct LF_SLightFogEnvironment* pEnv);
 void fn_8006F148(struct LF_SLightFogEnvironment* pEnv);
 
+struct TObjectS;
+
 // Skin.c
 void LF_LoadCurrentLights(void);
+void LF_SetCurrentBrightness(f32 f);            // what the current set's light colours are scaled by
+void LI_SetObjectLights(struct TObjectS* pObj); // loads the lights in pObj's space (NULL: world space)
+void LI_ResetLights(void);                      // lighting off after a lit draw
 
 LF_SLightFogEnvironment* LF_spGetCurrentLightFogEnvironment(void);
 void LF_vSetCurrentLightFogEnvironment(s32 nSet);

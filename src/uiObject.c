@@ -22,7 +22,7 @@ UIObjSettings gUIObjSettings[2];        // per view: the display's place, tilt, 
 f32        gUIObjBoostRingSize[8];      // per boost level: its ring's size now
 LightGroup gUIObjLights;                // the spin model's one directional light
 
-UObject*   gpUIObjModel;                // the spin model ('TEO ' object 10003)
+TObject*   gpUIObjModel;                // the spin model ('TEO ' object 10003)
 CamLens*   gpUIObjLens;                 // the display's own camera
 TexEntry*  gpUIObjBaseTexture;          // } "toball": the base quad
 TexEntry*  gpUIObjBoostTexture;         // } "toball" again: the quad grown by the boost level
@@ -45,7 +45,7 @@ void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void UI_Obj_DrawSpinModel(void);
 void UI_Obj_DrawMesh(UObjMesh* pMesh);
 void LI_LoadLightGroup(LightGroup* pGroup);   // Skin.c: load the group's lights (fn_8006E7A4)
-void fn_8006EADC(UObject* pObj);        // GoLighting.c: light the object
+void fn_8006EADC(TObject* pObj);        // GoLighting.c: light the object
 void fn_8006ED70(void);                 // GoLighting.c
 void RC_vUpdateCurrentRenderCtxTransformationMatrices(void); // GoTerrain.c
 
@@ -343,19 +343,19 @@ void UI_Obj_RenderBoostUI(int nObj) {
             LLMath_mat44fltMultiplyList33(mTilt, mRoll, mRot, 3);
 
             // draw it with the rotation, scale and position, then put its matrices back
-            LLMath_CopyMat44(gpUIObjModel->m0, mSave0);
-            LLMath_CopyMat44(gpUIObjModel->m40, mSave40);
-            LLMath_CopyMat44(gpUIObjModel->m80, mSave80);
-            LLMath_mat44fltMultiplyList33(mRot, gpUIObjModel->m0, gpUIObjModel->m0, 3);
-            LLMath_mat44fltMultiplyList33(mScale, gpUIObjModel->m40, gpUIObjModel->m40, 3);
-            UObject_ComposeRotation(gpUIObjModel->m0);
-            LLMath_CopyVec(vPos, gpUIObjModel->m80[3]);
-            gpUIObjModel->m80[3][3] = 1.0f;
+            LLMath_CopyMat44(gpUIObjModel->mRotation, mSave0);
+            LLMath_CopyMat44(gpUIObjModel->mScale, mSave40);
+            LLMath_CopyMat44(gpUIObjModel->mObjToWorld, mSave80);
+            LLMath_mat44fltMultiplyList33(mRot, gpUIObjModel->mRotation, gpUIObjModel->mRotation, 3);
+            LLMath_mat44fltMultiplyList33(mScale, gpUIObjModel->mScale, gpUIObjModel->mScale, 3);
+            UObject_ComposeRotation(gpUIObjModel->mRotation);
+            LLMath_CopyVec(vPos, gpUIObjModel->mObjToWorld[3]);
+            gpUIObjModel->mObjToWorld[3][3] = 1.0f;
             UI_Obj_DrawSpinModel();
-            // EA bug: m0's copy goes back into m40 and m40's into m0
-            LLMath_CopyMat44(mSave0, gpUIObjModel->m40);
-            LLMath_CopyMat44(mSave40, gpUIObjModel->m0);
-            LLMath_CopyMat44(mSave80, gpUIObjModel->m80);
+            // EA bug: mRotation's copy goes back into mScale and mScale's into mRotation
+            LLMath_CopyMat44(mSave0, gpUIObjModel->mScale);
+            LLMath_CopyMat44(mSave40, gpUIObjModel->mRotation);
+            LLMath_CopyMat44(mSave80, gpUIObjModel->mObjToWorld);
         }
     }
 
@@ -374,7 +374,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
 
 // Draw the spin display's model: its light in the display's colour (gUIObjLightRed,
 // gUIObjLightGreen, gUIObjLightBlue), constant alpha 255 times gUIObjAlpha, the model's own matrix
-// (m80) as the transform, then the mesh of its first level of detail (UI_Obj_DrawMesh).
+// (mObjToWorld) as the transform, then the mesh of its first level of detail (UI_Obj_DrawMesh).
 void UI_Obj_DrawSpinModel(void) {
     gUIObjLights.apLight[0]->u.dir.vColor[0] = gUIObjLightRed;
     gUIObjLights.apLight[0]->u.dir.vColor[1] = gUIObjLightGreen;
@@ -386,10 +386,10 @@ void UI_Obj_DrawSpinModel(void) {
     RenderState_SetConstantAlphaOn(1);
     RenderState_SetConstantAlpha(255.0f * gUIObjAlpha);
     RenderState_Flush();
-    RC_vSetCurrentRenderCtxTransformationMatrix(gpUIObjModel->m80);
+    RC_vSetCurrentRenderCtxTransformationMatrix(gpUIObjModel->mObjToWorld);
     RC_vUpdateCurrentRenderCtxTransformationMatrices();
     RenderState_SetCameraMatrices();
-    RenderState_SetClipMode(1);
+    RenderState_SetClipMode(GX_CLIP_DISABLE);
     RenderState_Flush();
     UI_Obj_DrawMesh(gpUIObjModel->pModel->apLod[0]);
     fn_8006ED70();
@@ -403,7 +403,7 @@ void UI_Obj_SetCurrentRenderCtxLens(CamLens* pLens) {
 
 // Draw the mesh's current part, if it is used (UObject.c's Object_DrawMesh again).
 void UI_Obj_DrawMesh(UObjMesh* pMesh) {
-    if (pMesh->a1C[pMesh->n28] != 0) {
-        fn_800082CC(&pMesh->p18[pMesh->n28]);
+    if (pMesh->abPartUsed[pMesh->nDrawPart] != 0) {
+        ObjPart_Draw(&pMesh->pParts[pMesh->nDrawPart]);
     }
 }

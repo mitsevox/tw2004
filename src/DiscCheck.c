@@ -101,7 +101,7 @@ int fn_80110180(void) {
 // through GM_vSetupPlayers). EA wrote it returning 0 (li r3, 0 before the blr) although the library's
 // callback type returns nothing; the callers cast it.
 int fn_80110234(s32 nResult, DVDCommandBlock* pBlock) {
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         GM_vSetupPlayers(NULL, NULL);
     }
     lbl_802824D0 = 1;
@@ -121,7 +121,7 @@ void fn_801102AC(void) {
     u8 nDisc;
     s32 nStatus;
 
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         FE_StreamStopAllStreaming();
         FE_PauseFECharStreaming(1);
         lbl_802824D8 = 1;
@@ -143,7 +143,7 @@ void fn_801102AC(void) {
     do {
         nStatus = DVDGetDriveStatus();
         fn_80006EDC();
-        if (gSession.nGameType == 6) {
+        if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
             GUI_ShowToggleFullScreenUI(0);
         }
         fn_8006DBD4();

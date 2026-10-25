@@ -131,7 +131,7 @@ void RC_UpdateCurrentScreenMatrices(void);
 void SKN_DrawCharacterParts(Character* pChar);
 void SKN_DrawClubParts(Character* pChar);
 void LI_ResetLights(void);
-void LI_SetObjectLights(UObject* pObj);
+void LI_SetObjectLights(TObject* pObj);
 void SKN_BeginFrame(void);
 void Character_ExecuteTextureSwapFE(Character* pChar);
 char* DynObj_GetGolfBallLogoTextureName(int i);
@@ -1056,7 +1056,7 @@ void FE_RenderGolfer(u8 bFull) {
         RC_UpdateCurrentScreenMatrices();
         RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
         RenderState_SetCameraMatrices();
-        RenderState_SetClipMode(1);
+        RenderState_SetClipMode(GX_CLIP_DISABLE);
         DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
         if (bFull) {
             RenderState_SetRenderSurface(1, 384, 528, 0, 1, 1);

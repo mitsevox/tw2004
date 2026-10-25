@@ -107,7 +107,7 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
         lbl_801D94D8[nPlayer][6] = 1.0f;
         lbl_801D94D8[nPlayer][7] = 1.0f;
         RenderState_SetDrawFlags(0x70);
-        RenderState_SetClipMode(0);
+        RenderState_SetClipMode(GX_CLIP_ENABLE);
         RenderState_Flush();
         desc.n0 = 4;
         desc.nVerts = 4;

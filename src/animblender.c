@@ -41,7 +41,7 @@ MemPoolPtr gMorphPosePool;       // format 1 pose buffers (SkelPose1: morph weig
 void AnimBlender_InitModule(void) {
     int nNumEntries;
 
-    if (gSession.nGameType == 3 || gSession.nGameType == 10) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN || gSession.nGameType == GAMESTATE_FE_SETUP) {
         nNumEntries = 10;
     } else {
         nNumEntries = 50;
