@@ -411,8 +411,8 @@ void PGASponsor_GetItemBonus(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // FE message 697: draws the sponsor a new profile starts with from gPgaSponsorChoices and switches
-// lbl_80281DF0 on with it (FE_SetStartingSponsor; a new profile's first sponsorship slot is copied from it
-// and its start cash paid, PasswordManager.c). Gives the sponsor in *pArgs[0], and sponsorship slot
+// gStartingSponsor on with it (FE_SetStartingSponsor; a new profile's first sponsorship slot is copied
+// from it and its start cash paid, PasswordManager.c). Gives the sponsor in *pArgs[0], and sponsorship slot
 // 0's start cash in *pArgs[1] and bonus cash in *pArgs[2].
 void PGASponsor_PickStartingSponsor(MsgArg* pArgs, MsgArg* pResult) {
     s32* pSponsor = (s32*)pArgs[0].p;
