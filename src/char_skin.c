@@ -1,10 +1,32 @@
 // char_skin.c: in a single view, one golfer at a time has its body skin's render data (what
 // SKN_AllocRenderData gives a skin for posing and drawing): the player readied for its turn
 // (Character_PrepareForRendering). When a hole ends (Character_ExitHole), every golfer's is freed.
+//
+// The first six functions are empty: the skin's steps in the characters' life, each called beside
+// the matching step of the character textures (CharacterTex_*) or of the characters' set-up, do
+// nothing in this game.
 
 #include "golfer.h"
 #include "character.h"
 #include "charstate.h"
+
+void CharacterSkin_PostExitHole(void) {
+}
+
+void CharacterSkin_Update(void) {
+}
+
+void CharacterSkin_PreHoleInit(void) {
+}
+
+void CharacterSkin_PostInit(void) {
+}
+
+void CharacterSkin_Init(void) {
+}
+
+void CharacterSkin_Close(void) {
+}
 
 // In a single view (no split screen), frees the render data of every player's golfer's body skin
 // and takes the skinning matrices back from the golfer's model.

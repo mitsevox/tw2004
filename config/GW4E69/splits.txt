@@ -679,11 +679,8 @@ LLTime.c:
 	.bss        start:0x801D97F8 end:0x801D9908
 	.sdata      start:0x802813B0 end:0x802813B8
 
-unsorted/sweep_8009554C.c:
-	.text       start:0x8009554C end:0x80095564
-
 char_skin.c:
-	.text       start:0x80095564 end:0x80095744
+	.text       start:0x8009554C end:0x80095744
 
 CharAnim.c:
 	.text       start:0x80095744 end:0x80097208

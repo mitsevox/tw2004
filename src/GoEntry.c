@@ -44,7 +44,6 @@ void fn_80112DA0(void);
 void Gaud_ExitHole(void);
 void Character_ExitHole(void);
 void Luck_TightenOdds(void);
-void fn_8009554C(void);
 void CharacterTex_WaitEndOfTextureLoader(void);
 u8   fn_8009A1EC(void);
 void DEMO_Start(void);
@@ -171,7 +170,7 @@ void fn_800083A4(void) {
                     UI_ShowLoadingScreen();
                 }
             }
-            fn_8009554C();
+            CharacterSkin_PostExitHole();
             CharacterTex_WaitEndOfTextureLoader();
             Aud_ExitSession(1);
             break;

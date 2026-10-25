@@ -161,7 +161,6 @@ void fn_80093AD4(void);
 void fn_80093D14(void);
 void BS_vInit(void);
 void BS_vClose(void);
-void fn_80095550(void);
 void fn_80098A98(void);
 void fn_80098B5C(void);
 void fn_80099344(f32 fFrameTime);
@@ -1038,7 +1037,7 @@ void fn_8006D8E8(void) {
         fn_800080D0();
         Gaud_Cycle();
         if (gSession.nGameType != GAMESTATE_STARTUP) {
-            fn_80095550();
+            CharacterSkin_Update();
         }
         if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
             CharacterTex_TextureLoader();

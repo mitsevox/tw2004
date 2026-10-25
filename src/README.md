@@ -184,7 +184,6 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | GoShaderObjectCommon_ShaderObjectsData_Gc.c | EA | builds the display lists that draw shader objects |
 | GoShaderObjectCommon_TexAnimManager_Gc.c | EA | scrolling-texture matrices |
 | GoShaderObject_Particle_Gc.c | EA | the particle shader; also the main-memory heap made from the OS arena |
-| unsorted/sweep_8009554C.c | ph | six empty functions (GoEntry.c, gomainloop.c and char.c call them) |
 | GoShaderObjectCommon_MorphAnimManager_Gc.c | EA | the list of morph animations *(last function's file unverified)* |
 | GoShaderObject_Glows_Gc.c | EA | the glows' shapes and drawing |
 | UFstPart.c | EA | particle emitters |
@@ -285,7 +284,7 @@ choice, and the golfer's streamed textures and clothes.
 | Code80037AB8.c | ph | split off Skin.c: bone inverse matrices, morph weights from a pose, frees description bits |
 | animblender.c | T6 *(name unproven)* | blend trees (`SKABlendNode`) and the animation player (`TSKATime`) |
 | CharAnim.c | ours (TW06: `char_state.c`) | the golfer's animation state: clip-group blends, idle and emotion updates, queued state changes |
-| char_skin.c | T03 | in a single view, which golfer's body skin has its render data |
+| char_skin.c | T03 | in a single view, which golfer's body skin has its render data; six empty hooks *(where the file starts is unverified)* |
 | AnimStream.c | EA | clip streaming for groups 1 and 5 (turned off in every case); base-40 name codes |
 | SkinPart.c | EA | a skin's parts (e.g. the glove), variants, options and sets |
 | CharSliders.c | EA | body sliders: definitions, bone and morph-target blending |

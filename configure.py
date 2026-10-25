@@ -1186,7 +1186,6 @@ config.libs = [
             Object(Matching, "LLInput_Gc.c"),
             Object(Matching, "event.c"),
             Object(Matching, "SitDev.c"),
-            Object(Matching, "unsorted/sweep_8009554C.c"),
             Object(Matching, "char_skin.c"),
             Object(Matching, "Code8009B340.c"),
         ],
