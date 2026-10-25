@@ -190,8 +190,7 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | GoShaderObjectCommon_TexAnimManager_Gc.c | EA | scrolling-texture matrices |
 | GoShaderObject_Particle_Gc.c | EA | the particle shader; also the main-memory heap made from the OS arena |
 | unsorted/sweep_8009554C.c | ph | six empty functions (GoEntry.c, gomainloop.c and char.c call them) |
-| GoShaderObjectCommon_MorphAnimManager_Gc.c | EA | the list of morph animations |
-| unsorted/sweep_800977CC.c | ph | frees a buffer at +0xC0 *(unverified which file)* |
+| GoShaderObjectCommon_MorphAnimManager_Gc.c | EA | the list of morph animations *(last function's file unverified)* |
 | GoShaderObject_Glows_Gc.c | EA | the glows' shapes and drawing |
 | UFstPart.c | EA | particle emitters |
 | PsMgr.c | EA | weather particle effects (only the rain on GameCube) |
