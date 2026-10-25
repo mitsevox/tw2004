@@ -166,7 +166,6 @@ void BootSound_Play(u8 nSound);
 
 u8   Voc_InitModule(void);                   // hlaudvoice.c
 u8   Rvb_InitModule(void);                      // AudReverb.c; always 1
-void AudMem_Init(void);                   // UAudMem.c
 void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck);
 
 u8   Aud_MicInitOnce(void);

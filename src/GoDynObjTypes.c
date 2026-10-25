@@ -1,67 +1,66 @@
-// GoDynObjTypes.c (our name; TW06's and TW07's file lists name no file for it): two more types of
-// the course's dynamic objects (dynobj.h): type 6 (DynObjType6_MessageHandler), a model that is
-// drawn and does nothing else, and type 9 (DynObjType9_MessageHandler), which has no model to
-// draw. Both set up their object the way type 0 does (Kernel_InitObjectFromDef), without the definition's
-// flags. Its constant block is 0x80283280-0x80283288.
+// GoDynObjTypes.c: the message handlers of two types of the course's dynamic objects (dynobj.h):
+// pins, a model that is only drawn, and sounds, which have no model. No object of either type is
+// ever made: UKernel.c's Kernel_DownloadActors hands both kinds of actor to other code (DynObjType).
 
 #include "dynobj.h"
 
-// Type 6's message 2: sets the object up from its definition as type 0 does, but with no flags (so
-// the flag tests below never hold), n14E at -1, and the model of the setup's first entry (or none).
-void DynObjType6_Init(DynObj* pObj, DynObjSetup* pSetup) {
-    int nFlags = 0;
-    DynObjNames* pNames;
+// A pin's DYNOBJ_MSG_INIT: sets the object up as Kernel_InitObjectFromDef does, but with no flags
+// and no group (so the flag tests below never hold), nUnread2 at -1, and the setup's first stream
+// object as its model (or none), whose sizes are not copied in.
+static void DynObjPin_Init(DynObj* pObj, DynObjSetup* pSetup) {
+    int nObjFlags = 0;
+    DynObjScripts* pScripts;
     DynObjDef* pDef;
-    DynObjModelRef* pModel;
+    DynObjModelRef* pRef;
 
-    pObj->n168 = 0;
-    pObj->a138[0].b0 = 0;
-    pObj->a138[1].b0 = 0;
-    pObj->a138[2].b0 = 0;
-    pObj->a138[3].b0 = 0;
-    pNames = pSetup->pC;
+    pObj->nUnread4 = 0;
+    pObj->aPairs[0].nFirst = 0;
+    pObj->aPairs[1].nFirst = 0;
+    pObj->aPairs[2].nFirst = 0;
+    pObj->aPairs[3].nFirst = 0;
+    pScripts = pSetup->pScripts;
     pDef = pSetup->pDef;
-    if (pNames != NULL) {
-        pObj->p15C = pNames->p28;
-        pObj->p160 = pNames->p2C;
-        pObj->p164 = pNames->p30;
+    if (pScripts != NULL) {
+        pObj->pHitScript = pScripts->pHitScript;
+        pObj->pReleaseScript = pScripts->pReleaseScript;
+        pObj->pUnreadScript = pScripts->pUnreadScript;
     } else {
-        pObj->p160 = NULL;
-        pObj->p15C = NULL;
-        pObj->p164 = NULL;
+        pObj->pReleaseScript = NULL;
+        pObj->pHitScript = NULL;
+        pObj->pUnreadScript = NULL;
     }
-    pObj->n148 = 0;
-    pObj->n140 = pDef->n0;
-    pObj->n147 = 0;
-    pObj->n146 = pDef->n4;
-    pObj->n150 = 0;
-    pObj->n14C = 0;
-    pObj->n14E = -1;
-    pObj->n144 = 0;
-    pObj->n142 = 0;
+    pObj->nKey = 0;
+    pObj->nActorId = pDef->nActorId;
+    pObj->nGroup = 0;
+    pObj->nType = pDef->nType;
+    pObj->nUnread3 = 0;
+    pObj->nUnread1 = 0;
+    pObj->nUnread2 = -1;
+    pObj->nPoints = 0;
+    pObj->nHitAmount = 0;
     pObj->uFlags = 0;
-    pObj->uFlags &= ~0x01000000;
-    if (pObj->uFlags & 4) {
-        pObj->uFlags |= 0x04000000;
+    pObj->uFlags &= ~DYNOBJ_UNREAD_1000000;
+    if (pObj->uFlags & DYNOBJ_INACTIVE) {
+        pObj->uFlags |= DYNOBJ_REMOVED;
     }
-    if (pObj->uFlags & 0x400) {
-        pObj->uFlags |= 0x02000000;
+    if (pObj->uFlags & DYNOBJ_NO_ZWRITE) {
+        pObj->uFlags |= DYNOBJ_UNREAD_2000000;
     }
     if (pSetup->pModel != NULL) {
-        pModel = pSetup->pModel->aEntries[0].u.pRef;
+        pRef = pSetup->pModel->aEntries[0].u.pRef;
     } else {
-        pModel = NULL;
+        pRef = NULL;
     }
-    if (pObj->uFlags & 0x80) {
-        nFlags |= 0x11;
+    if (pObj->uFlags & DYNOBJ_TOBJECT_FLAGS) {
+        nObjFlags |= TOBJECT_UNREAD_1 | TOBJECT_UNREAD_10;
     }
-    if (pObj->uFlags & 0x200) {
-        nFlags |= 0x40;
+    if (pObj->uFlags & DYNOBJ_HIDE_WITH_FLAG_OUT) {
+        nObjFlags |= TOBJECT_UNREAD_40;
     }
-    if (pModel != NULL) {
-        Object_Init(&pObj->obj,pModel->p4, nFlags);
+    if (pRef != NULL) {
+        Object_Init(&pObj->obj, pRef->pModel, nObjFlags);
     } else {
-        Object_Init(&pObj->obj,NULL, nFlags);
+        Object_Init(&pObj->obj, NULL, nObjFlags);
     }
     LLMath_IdentifyMat(pObj->obj.mRotation);
     LLMath_IdentifyMat(pObj->obj.mScale);
@@ -74,21 +73,21 @@ void DynObjType6_Init(DynObj* pObj, DynObjSetup* pSetup) {
     pObj->aRot[1] = 0.0f;
     pObj->aRot[2] = 0.0f;
     pObj->aRot[3] = 1.0f;
-    pObj->f158 = 0.0f;
+    pObj->fValue = 0.0f;
 }
 
-// Type 6's message handler: 1 its size, 2 DynObjType6_Init, 3 draws its model (if any); 6 and every
-// other message answer 0.
-int DynObjType6_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
+// The handler of DYNOBJ_TYPE_PIN: its size, its setup (DynObjPin_Init) and drawing its model (if
+// it has one); DYNOBJ_MSG_UPDATE and every other message answer 0.
+int DynObjPin_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     switch (nMsg) {
-    case 1:
+    case DYNOBJ_MSG_SIZE:
         return sizeof(DynObj);
-    case 2:
-        DynObjType6_Init(pObj, pArg);
+    case DYNOBJ_MSG_INIT:
+        DynObjPin_Init(pObj, pArg);
         return 0;
-    case 6:
+    case DYNOBJ_MSG_UPDATE:
         return 0;
-    case 3:
+    case DYNOBJ_MSG_DRAW:
         if (pObj->obj.pModel != NULL) {
             Object_Draw(&pObj->obj);
         }
@@ -98,45 +97,45 @@ int DynObjType6_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) 
     }
 }
 
-// Type 9's message 2: as type 6's, but with no model and n14E from the definition.
-void DynObjType9_Init(DynObj* pObj, DynObjSetup* pSetup) {
-    DynObjNames* pNames;
+// A sound's DYNOBJ_MSG_INIT: as a pin's, but with no model and nUnread2 from the definition.
+static void DynObjSound_Init(DynObj* pObj, DynObjSetup* pSetup) {
+    DynObjScripts* pScripts;
     DynObjDef* pDef;
 
-    pObj->n168 = 0;
-    pObj->a138[0].b0 = 0;
-    pObj->a138[1].b0 = 0;
-    pObj->a138[2].b0 = 0;
-    pObj->a138[3].b0 = 0;
-    pNames = pSetup->pC;
+    pObj->nUnread4 = 0;
+    pObj->aPairs[0].nFirst = 0;
+    pObj->aPairs[1].nFirst = 0;
+    pObj->aPairs[2].nFirst = 0;
+    pObj->aPairs[3].nFirst = 0;
+    pScripts = pSetup->pScripts;
     pDef = pSetup->pDef;
-    if (pNames != NULL) {
-        pObj->p15C = pNames->p28;
-        pObj->p160 = pNames->p2C;
-        pObj->p164 = pNames->p30;
+    if (pScripts != NULL) {
+        pObj->pHitScript = pScripts->pHitScript;
+        pObj->pReleaseScript = pScripts->pReleaseScript;
+        pObj->pUnreadScript = pScripts->pUnreadScript;
     } else {
-        pObj->p160 = NULL;
-        pObj->p15C = NULL;
-        pObj->p164 = NULL;
+        pObj->pReleaseScript = NULL;
+        pObj->pHitScript = NULL;
+        pObj->pUnreadScript = NULL;
     }
-    pObj->n148 = 0;
-    pObj->n140 = pDef->n0;
-    pObj->n147 = 0;
-    pObj->n146 = pDef->n4;
-    pObj->n150 = 0;
-    pObj->n14C = 0;
-    pObj->n14E = pDef->n1A;
-    pObj->n144 = 0;
-    pObj->n142 = 0;
+    pObj->nKey = 0;
+    pObj->nActorId = pDef->nActorId;
+    pObj->nGroup = 0;
+    pObj->nType = pDef->nType;
+    pObj->nUnread3 = 0;
+    pObj->nUnread1 = 0;
+    pObj->nUnread2 = pDef->nUnread;
+    pObj->nPoints = 0;
+    pObj->nHitAmount = 0;
     pObj->uFlags = 0;
-    pObj->uFlags &= ~0x01000000;
-    if (pObj->uFlags & 4) {
-        pObj->uFlags |= 0x04000000;
+    pObj->uFlags &= ~DYNOBJ_UNREAD_1000000;
+    if (pObj->uFlags & DYNOBJ_INACTIVE) {
+        pObj->uFlags |= DYNOBJ_REMOVED;
     }
-    if (pObj->uFlags & 0x400) {
-        pObj->uFlags |= 0x02000000;
+    if (pObj->uFlags & DYNOBJ_NO_ZWRITE) {
+        pObj->uFlags |= DYNOBJ_UNREAD_2000000;
     }
-    Object_Init(&pObj->obj,NULL, 0);
+    Object_Init(&pObj->obj, NULL, 0);
     LLMath_IdentifyMat(pObj->obj.mRotation);
     LLMath_IdentifyMat(pObj->obj.mScale);
     Object_UpdateO2WComposed33(&pObj->obj);
@@ -148,24 +147,24 @@ void DynObjType9_Init(DynObj* pObj, DynObjSetup* pSetup) {
     pObj->aRot[1] = 0.0f;
     pObj->aRot[2] = 0.0f;
     pObj->aRot[3] = 1.0f;
-    pObj->f158 = 0.0f;
+    pObj->fValue = 0.0f;
 }
 
-// Type 9's message 6, the per-frame update: nothing to do.
-void DynObjType9_Update(DynObj* pObj, void* pArg) {
+// A sound's DYNOBJ_MSG_UPDATE (pArg holds the frame time's bits): nothing to do.
+static void DynObjSound_Update(DynObj* pObj, void* pArg) {
 }
 
-// Type 9's message handler (an object with no model, never drawn): 1 its size, 2 DynObjType9_Init,
-// 6 DynObjType9_Update; any other -1.
-int DynObjType9_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
+// The handler of DYNOBJ_TYPE_SOUND (no model, so nothing to draw): its size, its setup
+// (DynObjSound_Init) and its update (DynObjSound_Update); any other message answers -1.
+int DynObjSound_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     switch (nMsg) {
-    case 1:
+    case DYNOBJ_MSG_SIZE:
         return sizeof(DynObj);
-    case 2:
-        DynObjType9_Init(pObj, pArg);
+    case DYNOBJ_MSG_INIT:
+        DynObjSound_Init(pObj, pArg);
         return 0;
-    case 6:
-        DynObjType9_Update(pObj, pArg);
+    case DYNOBJ_MSG_UPDATE:
+        DynObjSound_Update(pObj, pArg);
         return 0;
     default:
         return -1;

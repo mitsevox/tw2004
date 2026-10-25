@@ -512,11 +512,11 @@ void EVENT_EstimatedBallFirstBounce(int nPlayer, int nEvent, void* pData, int nA
 }
 
 // Event 39 (Ball.c: the ball hit a world object), for the real and the simulated ball alike: when
-// ball.pHitActor is set, the game mode's hook gets the object's n140 (gpGame->pfnCollisionActor;
+// ball.pHitActor is set, the game mode's hook gets the object's nActorId (gpGame->pfnCollisionActor;
 // GameMode16's bonuses) and Gaud_BallHitMetalTarget plays.
 void EVENT_CollisionActor(int nPlayer, int nEvent, void* pData, int nArg) {
     if (gPlayers[nPlayer].ball.pHitActor != NULL) {
-        gpGame->pfnCollisionActor(nPlayer, gPlayers[nPlayer].ball.pHitActor->n140);
+        gpGame->pfnCollisionActor(nPlayer, gPlayers[nPlayer].ball.pHitActor->nActorId);
         Gaud_BallHitMetalTarget(nPlayer);
     }
 }

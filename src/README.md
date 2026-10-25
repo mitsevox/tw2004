@@ -234,7 +234,7 @@ all arriving as stream chunks when a hole loads.
 | UKernel.c | EA | the kernel's list of the course's dynamic objects |
 | GoDynObjBase.c | ours | dynamic object type 0 and the types' table; type 2 turns at a steady speed |
 | GoAnimalActors.c | T6 | the animals on the course |
-| GoDynObjTypes.c | ours | dynamic object types 6 and 9 |
+| GoDynObjTypes.c | ours | the handlers of dynamic object types 6 (pin) and 9 (sound), which no object reaches |
 | GoTerrainCollision.c | T6 | the ground as collision data: drops, heights, normals, surfaces; the ball against ground, pin and objects |
 | TerrainGround.c | ours | the ground strips under the golfer's shadow; the supporting triangle, its height and surface under a point |
 | CourseInfo.c | EA | the course table (`'CRI '`: 18 holes' par, wind, tees) and the compilation courses (`'CMPS'`) |

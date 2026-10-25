@@ -16,6 +16,7 @@
 
 #include "core/startup.h"
 #include "core/goaram.h"
+#include "core/audcontainers.h"
 #include "core/memcard.h"
 #include "core/gameaudio.h"
 #include "game/frontend.h"
@@ -59,7 +60,6 @@ void   AXSetMode(u32 uMode);
 u32    OSGetSoundMode(void);
 void   MIXSetSoundMode(u32 uMode);      // the output mode (mono, stereo, surround)
 void   AXRegisterCallback(void (*pfn)(void));  // the callback run after each audio frame
-void*  AudMem_Alloc(u32 uSize);
 void   AXSetVoiceSrcRatio(AXVPB* pVpb, f32 fRatio);     // the playback rate
 void   AXSetVoiceAdpcm(AXVPB* pVpb, u32* pCoefs);
 void   AXSetVoiceAdpcmLoop(AXVPB* pVpb, u16* pLoop);
