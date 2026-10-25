@@ -161,7 +161,7 @@ memory, 7 tag not found, 8 busy, 9 bad map checksum, 0xA bad payload checksum, 0
 | 0x54C2 | | the created golfer kept in this slot: its names at 0x54C8, outfit 0x54F8, ball 0x54F9 |
 | 0xB634 | `tour` | the PGA TOUR season (TW06's `PGATourSeason_t`: 31 tournaments of 0x24 bytes) |
 
-A second block with the same layout, `lbl_80281DF4`, holds unlocks that apply to every profile.
+A second block with the same layout, `gpPasswordUnlocks`, holds unlocks that apply to every profile.
 Two cheat codes fill it: `"THEKITCHENSINK"` unlocks all 30 golfers, 23 courses and 18 rewards and
 sets TOUR card level 1; `"ALLTHETRACKS"` unlocks the courses.
 
