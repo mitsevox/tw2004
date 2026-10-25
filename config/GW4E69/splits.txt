@@ -352,12 +352,13 @@ GoDynObjTypes.c:
 	.sdata2     start:0x80283280 end:0x80283288
 
 GoTerrainCollision.c:
-	.text       start:0x8004AFA0 end:0x80050C2C
+	.text       start:0x8004AFA0 end:0x80050BEC
 	.bss        start:0x801D53A8 end:0x801D5888
 	.sbss       start:0x80281DC0 end:0x80281DD0
 	.sdata2     start:0x80283288 end:0x80283300
 
 MaterialTypes.c:
+	.text       start:0x80050BEC end:0x80050C2C
 	.rodata     start:0x8017E9B8 end:0x80181328
 	.sdata2     start:0x80283300 end:0x80283308
 

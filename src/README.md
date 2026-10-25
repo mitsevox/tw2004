@@ -239,7 +239,7 @@ The ball's flight, bounce and roll, in yards and seconds, against the surface ta
 
 | File | Name | What it is |
 |---|---|---|
-| MaterialTypes.c | T6/T7 | data only: the surface table `gSurfaceTypes` |
+| MaterialTypes.c | T6/T7 | the surface table `gSurfaceTypes` and a surface's row in it (`MaterialTypes_getMaterialID`) |
 | Ball.c | ours | flight, roll, collision, the cup, simulation (`Physics_*`, `Ball_*`) |
 | Wind.c | T7 | the wind |
 | Code800B1AA8.c | ph | the ball against the dynamic objects' bounding spheres (`DynObj_FindBallHit`, for Ball.c) |

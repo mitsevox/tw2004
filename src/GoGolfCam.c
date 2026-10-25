@@ -59,8 +59,6 @@ u8       GolfCamera_ChooseImpactMatrixCam(View* pView, int nPlayer);
 u8       GolfCamera_ChooseSuperZoomCam(View* pView, int nPlayer);
 void     GolfCamera_CreateMatrixCamera(View* pView, f32* pFrom, f32* pTo, int nPlayer);
 void     GolfCamera_CreateSuperZoomCamera(View* pView, f32* pFrom, f32* pTo, int nPlayer);
-u8       Ter_CheckForGroundCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                                     TGD_MaterialInfo** ppSurface, TGD_ObjectInstanceInfo** ppObj);
 
 // .bss and .sbss (one object each, so the reverse-order rule does not come into it).
 f32 gSteepSlopeCamLastTarget[4];    // the target the steep-slope camera last worked for

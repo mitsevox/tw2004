@@ -1,5 +1,6 @@
 // MaterialTypes.c (EA's name: TW06 has golf/physics/materialtypes.c and TW07 Golf/Physics/
-// MaterialTypes.c, whose TGD_MaterialInfo table this is): data only, the surface table. Its
+// MaterialTypes.c, whose TGD_MaterialInfo table this is): the surface table and a surface's row in
+// it (MaterialTypes_getMaterialID). Its
 // .rodata lies between GoTerrainCollision.c's code and Ball.c's .rodata, where TW06's
 // golf/physics files come in link order (materialtypes, physics, wind). The table is const
 // (.rodata) while every user reads it through ball.h's non-const extern, so this file includes
@@ -169,3 +170,13 @@ const TGD_MaterialInfo gSurfaceTypes[NUM_SURFACE_TYPES] = {
 // This file's .sdata2 (ball.h).
 const f32 gRealBallRadiusIn = 0.84f;
 const f32 lbl_80283304 = 0.7056f;
+
+// A surface's row in gSurfaceTypes; -1 for NULL or a pointer outside the table.
+s32 MaterialTypes_getMaterialID(const TGD_MaterialInfo* material) {
+    s32 nMaterialID;
+
+    if (material == NULL) return -1;
+    nMaterialID = ((const u8*)material - (const u8*)gSurfaceTypes) / sizeof(TGD_MaterialInfo);
+    if (nMaterialID < 0 || nMaterialID >= NUM_SURFACE_TYPES) return -1;
+    return nMaterialID;
+}

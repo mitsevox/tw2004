@@ -71,8 +71,6 @@ f32  CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
 void CamScript_PickArcDirection(CameraScriptSettings_t* pScript, f32* pSub, int nPlayer, f32* pPrev,
                                 f32 fTime);
 u8   GameEffects_SimulateBall(int nPlayer);          // GameEffects.c: the ball is simulated from its position
-u8   Ter_CheckForGroundCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                                 TGD_MaterialInfo** ppSurface, TGD_ObjectInstanceInfo** ppObj);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x802830A8), before the constants CamScript_RunScript uses first; its body is unknown.
