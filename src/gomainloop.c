@@ -8,6 +8,7 @@
 #include "lighting.h"
 #include "core/memcard.h"
 #include "core/gbacable.h"
+#include "core/goaram.h"
 #include "game/frontend.h"
 #include "frontend/fe.h"
 #include "llpict.h"
@@ -207,8 +208,6 @@ void ComicCam_InitComicCam(void);
 void ComicCam_CloseComicCam(void);
 void AudMem_InitModule(void);
 void AudMem_CloseModule(void);
-void fn_800B655C(void);
-void fn_800B6560(void);
 void UI_EATraxDraw(void);
 void fn_800BA940(void);
 void fn_800BAA4C(void);
@@ -404,7 +403,7 @@ void fn_8006C7A8(void) {
     fn_800080D4();
     Resources_InitModule();
     UStream_Init();
-    fn_800B655C();
+    GoARAM_InitModule();
     fn_8000F060();
     fn_8006DC44();
     fn_80016198();
@@ -458,7 +457,7 @@ void fn_8006C854(void) {
     fn_800162A0();
     fn_8006DC48();
     fn_8000F0E8();
-    fn_800B6560();
+    GoARAM_CloseModule();
     UStream_CloseAll();
     Resources_CloseModule();
     fn_80071890();
@@ -1023,7 +1022,7 @@ void fn_8006D8E8(void) {
     TI_sReadCounter(TI_COUNTER_REALTIME);
     while (!GO_bMainLoopDone()) {
         fn_80110390();
-        fn_800B7490();
+        DiscError_WaitForDrive();
         if (gSession.nGameType == 6) {
             Character_ResetTimeScalesOnCombo();
         }

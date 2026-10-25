@@ -202,7 +202,7 @@ u8 Aud_InitOnce(u8 nRate) {
 }
 
 // Pauses (b 1) or resumes (b 0) all sound. b2 is TW07's spinupDelay: the disc-error check
-// (Code800B7210.c's fn_800B7490) passes 1, this file 0; with it, resuming leaves the streamed
+// (Code800B7210.c's DiscError_WaitForDrive) passes 1, this file 0; with it, resuming leaves the streamed
 // voices paused for Stm_Tick to resume once the drive is fine (Voc_PauseAll).
 void Aud_Pause(u8 b, u8 b2) {
     Ses_Pause(b, b2);

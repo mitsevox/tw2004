@@ -237,8 +237,8 @@ void UI_EATraxShowSong(int bShow, s8 nTrack) {
 }
 
 // data-order note: defined after the functions, so this .sdata pointer follows the file's string
-// literal "\"%s\"" (0x80281508), as in the original. They are LLDisp_Gc.c's (its fn_80007368 and
-// fn_80007328 count how deep interrupts are turned off through the pointer), but lie in this file's
-// .sbss / .sdata.
+// literal "\"%s\"" (0x80281508), as in the original. They are LLDisp_Gc.c's (its
+// Displ_DisableInterrupts and Displ_RestoreInterrupts count how deep interrupts are turned off
+// through the pointer), but lie in this file's .sbss / .sdata.
 s32 gInterruptsOffDepth;
 s32* gpInterruptsOffDepth = &gInterruptsOffDepth;

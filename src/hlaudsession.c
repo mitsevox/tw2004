@@ -274,7 +274,7 @@ void Ses_ProcessStreamFileHdr(void) {
     u32 i;
 
     if (gSesStreamFile == -1) {
-        hFile = fn_800060E0("/AudioStm_GC.sab");
+        hFile = File_Open("/AudioStm_GC.sab");
         pLists = (u8*)gSesStreamFileHdr->apLists + gSesStreamFileHdr->nPlayLists * sizeof(AudPlayList*);
         for (i = 0; i < gSesStreamFileHdr->nPlayLists; i++) {
             // port: the offsets are stored in the pointer fields
@@ -311,7 +311,7 @@ AudStream* Ses_GetStreamFromPlayList(AudPlayList* pList, u16 nStream, u32* puLen
         } else if (pList->nIndex < gSesStreamFileHdr->nPlayLists - 1) {
             uEnd = Ses_GetStreamPlayList(pList->nIndex + 1)->aStreams[0].uOffset;
         } else {
-            uEnd = fn_800065B0(gSesStreamFile);
+            uEnd = File_GetLength(gSesStreamFile);
         }
         *puLength = uEnd - pStream->uOffset;
     }

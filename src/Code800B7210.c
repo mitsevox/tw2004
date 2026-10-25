@@ -1,7 +1,7 @@
 // Code800B7210.c (our name): split from DiscError.c at 0x800B7210. Its .data (the messages),
 // .sdata (lbl_802814D8) and .sbss (lbl_802821A0) each start at the next 8-aligned address after
 // DiscError.c's, 4 bytes past its end, as a new object's sections do; its globals are used only
-// by fn_800B7210 and fn_800B7490, DiscError.c's only by the functions before them.
+// by fn_800B7210 and DiscError_WaitForDrive, DiscError.c's only by the functions before them.
 
 #include "game_types.h"
 #include "engine.h"
@@ -100,7 +100,7 @@ void fn_800B7210(s32 nStatus) {
 // Check the drive (and the controllers, for a reset); while it reports a problem, redraw the
 // message every frame, with the audio paused unless the drive reports no disc, the wrong disc or
 // a retry. Returns 1 when the screen was shown.
-u8 fn_800B7490(void) {
+u8 DiscError_WaitForDrive(void) {
     u8 bShown;
     s32 nStatus;
     s32 nLast;

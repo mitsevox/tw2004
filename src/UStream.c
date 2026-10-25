@@ -103,7 +103,7 @@ static void UStream_StartRead(void) {
     gpReadBuffer = pBuffer;
     gpReadBuffer->nFileOffset = pStream->nFilePos;
     gbReadPending = 1;
-    if (fn_80006444(pStream->hFile, pBuffer->data, USTREAM_BUFFER_SIZE, pStream->nFilePos,
+    if (File_ReadAsync(pStream->hFile, pBuffer->data, USTREAM_BUFFER_SIZE, pStream->nFilePos,
                     UStream_ReadDone) < 0) {
         gbReadPending = 0;
         gnReadErrors++;
@@ -636,8 +636,8 @@ static void fn_8000D9A4(void) {
 // Open the stream's current file and tell the owner.
 static void UStream_OpenFile(UStream* pStream) {
     int i;
-    pStream->hFile = fn_800060E0(pStream->params.aszName[pStream->nFileIndex]);
-    pStream->nFileSize = fn_800065B0(pStream->hFile);
+    pStream->hFile = File_Open(pStream->params.aszName[pStream->nFileIndex]);
+    pStream->nFileSize = File_GetLength(pStream->hFile);
     pStream->nFilePos = 0;
     pStream->bEOF = 0;
     pStream->bWaitingForSWVR = 1;
@@ -650,7 +650,7 @@ static void UStream_OpenFile(UStream* pStream) {
 // Close the current file, tell the owner, and open the next one.
 static void UStream_NextFile(UStream* pStream) {
     int i;
-    fn_8000633C(pStream->hFile);
+    File_Close(pStream->hFile);
     i = pStream->nFileIndex;
     if (pStream->params.apfnClosed[i] != NULL) {
         pStream->params.apfnClosed[i](pStream->params.apClosedArg[i]);
@@ -694,7 +694,7 @@ u8 UStream_Update(void) {
     int i;
     UStreamObject* pNext;
     UStream* pStream;
-    fn_800B7490();
+    DiscError_WaitForDrive();
     for (pObject = UStream_NextObject(1); pObject != NULL; pObject = UStream_NextObject(0)) {
         pObject->pPrev = NULL;
         pObject->pNext = NULL;
@@ -827,7 +827,7 @@ void UStream_CloseAll(void) {
         pStream->nFileSize = 0;
         pStream->nFilePos = 0;
         while (gbReadPending) {
-            fn_800B7490();
+            DiscError_WaitForDrive();
         }
         pStream->hFile = hFile;
         UStream_Close(gnCurStream);
@@ -849,7 +849,7 @@ int UStream_Close(int nStream) {
     if (gbReadPending) return -1;
     if (gpCurList != NULL && nStream > 0) return -1;
     if (gpUsedList != NULL && nStream > 0) return -1;
-    if (fn_8000633C(gStreams[(u32)nStream].hFile) != 0) return -1;
+    if (File_Close(gStreams[(u32)nStream].hFile) != 0) return -1;
     if (gFill.pObject != NULL) {
         Circular_MemFreeFunc(gFill.pObject);
         gFill.pObject = NULL;

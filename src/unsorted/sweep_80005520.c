@@ -1,17 +1,16 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
 #include "engine.h"
+#include "core/goaram.h"
 
 void Session_Init();
 void UStream_AllocBuffers();
 void fn_80005580();
-void fn_80005EC0();
 void fn_800071BC();
 void StreamManager_InitOnce();
 void fn_8002F1D4();
 void Gaud_InitOnce();
 void AudMem_InitOnce();
-void GoARAM_Init();
 
 void fn_80005520(void);
 void fn_80005520(void) {
@@ -20,11 +19,11 @@ void fn_80005520(void) {
     fn_800071BC();
     fn_80095108();
     AudMem_InitOnce();
-    GoARAM_Init();
+    GoARAM_InitOnce();
     Math_InitLog2Table();
     fn_8000B984();
     Circular_CreateBuffer();
-    fn_80005EC0();
+    File_InitOnce();
     Input_vInitOnce();
     UStream_AllocBuffers();
     Session_Init();

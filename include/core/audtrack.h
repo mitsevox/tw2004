@@ -458,7 +458,7 @@ typedef struct AudStreamRead {
     void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId);  // 0x10
     AudTrack* pTrack;           // 0x14
     u8   nId;                   // 0x18
-    u8   n19;                   // 0x19
+    u8   bLegacy;               // 0x19  File_ReadAsyncEx's legacy: always 0 (the callback takes 4 arguments)
     u8   bSilence;              // 0x1A
 } AudStreamRead;
 LAYOUT_ASSERT(AudStreamRead, 0x1C);

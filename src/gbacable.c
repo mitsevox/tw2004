@@ -662,7 +662,7 @@ void Gba_StepPorts(s32 nCmd, s32 nArg) {
                 pStatus = &pCh->uStatus;
                 do {
                     Gaud_Cycle();
-                    fn_800B7490();
+                    DiscError_WaitForDrive();
                     nErr = GBAGetStatus(nChan, pStatus);
                 } while (nErr != 0 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
                 if (nErr == 0) {
@@ -741,7 +741,7 @@ void Gba_ReadPads(void) {
                     pType = fn_80123E34_Read(pCh);
                     do {
                         Gaud_Cycle();
-                        fn_800B7490();
+                        DiscError_WaitForDrive();
                         *pType = SIProbe(nChan);
                     } while (*pType != 0x40000 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
                 } else if (nChan != gGbaPortInUse) {
