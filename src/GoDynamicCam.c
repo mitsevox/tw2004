@@ -107,8 +107,8 @@ static void DynamicCam_LoadFilesFromDiskFE(void) {
 // The 'CAMS' handler, the sequence file: two counts (the sequences, then the shot choices of all of
 // them), then the sequences, each followed by its choices (DynamicCam_CopySequenceData). The
 // sequences' follow-ons become pointers (DynamicCam_ParseNextSeqs); the choices' shots do once the
-// shot file is in too (DynamicCam_ParseCameraSeqs). Each 'CAMS' or 'CAMV' load counts nFilesLoaded
-// on. Frees the object; a second sequence file is dropped.
+// shot file is in too (DynamicCam_ParseCameraSeqs). This and the round's 'CAMV' load count
+// nFilesLoaded on. Frees the object; a second sequence file is dropped.
 static void DynamicCam_LoadCAMSfromStream(UStreamObject* pStreamData) {
     s32 numSeqsToLoad;
     s32 numTriggersToLoad;
@@ -223,7 +223,7 @@ static void DynamicCam_CopySequenceData(u8* src, u8* dest, int numSeqs) {
 static void DynamicCam_CopyScriptData(u8* src, CamShot* dest, u32 numScripts) {
     SwapField viewElmDef[] = {
         { 32, 1 },                                          // szName
-        { 16, 4 }, { 16, 4 },                               // v20, v30
+        { 16, 4 }, { 16, 4 },                               // vPos, vLook
         { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
         { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
         { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
@@ -1123,7 +1123,7 @@ static void DynamicCam_GetLocation(CameraTracking_e tracking, int ePlayerID, f32
         Vec3Copy(gPlayers[ePlayerID].vTarget2, position);
         break;
     case CAMPOINT_LANDING:
-        Vec3Copy(settings->v50, position);
+        Vec3Copy(settings->vLandingEstimate, position);
         break;
     case CAMPOINT_PIN:
         nPin = Game_CurrentPinSet();
@@ -1136,17 +1136,18 @@ static void DynamicCam_GetLocation(CameraTracking_e tracking, int ePlayerID, f32
         Vec3Copy(&pCourse->tee[nTee].x, position);
         break;
     case CAMPOINT_SHOT_POINT:
-        Vec3Copy(link->v20, position);
+        Vec3Copy(link->vPos, position);
         break;
     case CAMPOINT_FAIRWAY_CAM:
         if (CameraScript_SnapToScript(settings, link)) {
             if (link == settings->pShot) {
-                CamScript_GetCameraOnFairwayPos(settings, position, lookAt, ePlayerID, settings->pB4,
+                CamScript_GetCameraOnFairwayPos(settings, position, lookAt, ePlayerID, settings->pRecordShot,
                                                 origCamPos, NULL);
                 Vec3Copy(position, settings->vCamPos);
                 settings->bFairwayFix = 1;
             } else if (link == settings->pNextShot) {
-                CamScript_PutBackOnFairway(settings, position, lookAt, ePlayerID, settings->pB4, origCamPos);
+                CamScript_PutBackOnFairway(settings, position, lookAt, ePlayerID, settings->pRecordShot,
+                                           origCamPos);
                 Vec3Copy(position, settings->vNextCamPos);
             }
         } else if (link == settings->pShot) {

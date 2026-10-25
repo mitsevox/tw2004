@@ -214,7 +214,7 @@ void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
         pView->shot19C.fDist = 0.0f;
         pView->shot19C.fSideOffset = 0.0f;
     }
-    Vec3Copy(pCam, pView->shot19C.v30);
+    Vec3Copy(pCam, pView->shot19C.vLook);
     pView->script.pShot = NULL;
     pView->script.f108 = -1.0f;
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SHOT_SETUP) {
@@ -277,7 +277,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     GolfCam_Vec3Sub(vGoal, vAim, vAimMove);
     vAimMove[1] = 0.0f;
     fTotal = Math_Sqrt(LLMath_LengthSquared3(vAimMove));
-    GolfCam_Vec3Sub(vGoal, pView->shot19C.v30, vStart);
+    GolfCam_Vec3Sub(vGoal, pView->shot19C.vLook, vStart);
     vStart[1] = 0.0f;
     f = Math_Sqrt(LLMath_LengthSquared3(vStart));
     if (fTotal < f) {
@@ -478,7 +478,7 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
             fTop = fGround;
         }
         pView->shot19C.fMinHeight = gpCamTuning->fGroundClearance + fTop;
-        Vec3Copy(pCam, pView->shot19C.v30);
+        Vec3Copy(pCam, pView->shot19C.vLook);
         pView->script.pShot = NULL;
         pView->script.f108 = -1.0f;
         pView->script.f10C = 100000000.0f;
@@ -545,7 +545,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
         GolfCam_Vec3Sub(vGoal, vAim, vAimMove);
         vAimMove[1] = 0.0f;
         fTotal = Math_Sqrt(LLMath_LengthSquared3(vAimMove));
-        GolfCam_Vec3Sub(vGoal, pView->shot19C.v30, vStart);
+        GolfCam_Vec3Sub(vGoal, pView->shot19C.vLook, vStart);
         vStart[1] = 0.0f;
         f = Math_Sqrt(LLMath_LengthSquared3(vStart));
         if (fTotal < f) {
@@ -634,9 +634,9 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
             } else {
                 pView->script.f108 = 1.0f - fDist / fTotal;
             }
-            f = fHeight + (pView->shot19C.fMinHeight - pView->shot19C.v30[1]);
+            f = fHeight + (pView->shot19C.fMinHeight - pView->shot19C.vLook[1]);
             f *= 1.0f - fDist / fTotal;
-            pCam[1] = pView->shot19C.v30[1] + f;
+            pCam[1] = pView->shot19C.vLook[1] + f;
         } else {
             EVENT_Trigger(nPlayer, 0x31, NULL, -1);
             pView->script.f108 = 1.0f;
@@ -703,7 +703,7 @@ void GolfCamera_InitElevatorCamera(View* pView, int nPlayer) {
     if (pView->script.pShot != NULL) {
         CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
         strcpy(pView->shot19C.szName, "ELEVATOR CAM");
-        pView->shot19C.v20[1] += gGolfCamState->fElevatorHeight[Game_GetCourse()];
+        pView->shot19C.vPos[1] += gGolfCamState->fElevatorHeight[Game_GetCourse()];
         pView->shot19C.nLookAtKind = CAMPOINT_AIM;
         CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pCam, pSub, 1,
                                        gpCamTuning->fElevatorBlendTime, 100.0f, CAMEVENT_NONE, 0.0f);
@@ -1969,7 +1969,7 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
         GolfCam_Vec3Sub(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vAim);
         LLMath_Normalize3(vAim, vAim);
         Vec3_Scale(fDist, vAim, vAim);
-        GolfCam_Vec3Add(vAim, gPlayers[nPlayer].vBall, pView->script.v50);
+        GolfCam_Vec3Add(vAim, gPlayers[nPlayer].vBall, pView->script.vLandingEstimate);
     }
     if (pView->p74 != NULL && pView->p74->nStateType == CAMSTATE_SWING && pView->p74->pNext != pView->p74
         && pView->p74->pNext
@@ -2313,9 +2313,9 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
         fDist = 0.01f * (fDist - pView->script.pShot->fLookUpOffset);
         pView->script.pShot->fLookUpOffset += fDist;
     } else if (pView->script.nRequestedEvent == 10) {
-        if (pView->script.pShot->v20[1]
+        if (pView->script.pShot->vPos[1]
             - Ter_GetSupportingGroundHeight(Ter_GetTGD(), gPlayers[nPlayer].vBall) < 1.0f) {
-            pView->script.pShot->v20[1] += 0.01f;
+            pView->script.pShot->vPos[1] += 0.01f;
         }
     }
     if ((fn_80062C1C(gPlayers[nPlayer].pChar) || fn_80062C10(gPlayers[nPlayer].pChar))
@@ -2643,8 +2643,8 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
     }
     if (pShot != NULL && pShot != pView->script.pShot && pShot != pView->script.pNextShot) {
         if (bBlend) {
-            CameraScript_RecordCurrentCam(pView->script.pB4, pCam, pSub, 0, &pView->script, 0);
-            pView->script.pShot = pView->script.pB4;
+            CameraScript_RecordCurrentCam(pView->script.pRecordShot, pCam, pSub, 0, &pView->script, 0);
+            pView->script.pShot = pView->script.pRecordShot;
             pView->script.pNextShot = NULL;
             CameraScript_InterpToNewScript(&pView->script, pShot, 0, pCam, pSub, 0, pShot->fInterpTime,
                                            1000.0f, CAMEVENT_NONE, 0.0f);
@@ -2687,10 +2687,11 @@ void GolfCamera_ProcessGolferBoneCamera(View* pView, int nPlayer) {
 }
 
 // The zoom-to-aim camera's positions. pAim: out from the ball towards the target by the shot's
-// fDist, then across by fSideOffset, at height v30[1]. pCam: back from the target through pAim, by the
-// tuning's distance (fZoomToAimBack, or fZoomToAimPuttBack on a putt) scaled for the lens, closer
-// in when the ball is near the target (fZoomToAimNearRange). When pCam is out of bounds it is
-// pulled in to the boundary, or mirrored through the ball (returns 1). pCam never ends up past pAim.
+// fDist, then across by fSideOffset, at shot19C's vLook height. pCam: back from the target
+// through pAim, by the tuning's distance (fZoomToAimBack, or fZoomToAimPuttBack on a putt) scaled
+// for the lens, closer in when the ball is near the target (fZoomToAimNearRange). When pCam is out
+// of bounds it is pulled in to the boundary, or mirrored through the ball (returns 1). pCam never
+// ends up past pAim.
 u8 GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     f32 vTarget[4];
     f32 vDir[4];
@@ -2718,7 +2719,7 @@ u8 GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32
     GolfCam_Vec3Add(pBall, vOff, pAim);
     pAim[0] += pView->shot19C.fSideOffset * -Vec3_Dot(vDir, gGolfCamAxisZ);
     pAim[2] += pView->shot19C.fSideOffset * Vec3_Dot(vDir, gGolfCamAxisX);
-    pAim[1] = pView->shot19C.v30[1];
+    pAim[1] = pView->shot19C.vLook[1];
     GolfCam_Vec3Sub(vTarget, pAim, vBack);
     vBack[1] = 0.0f;
     if (vBack[0] != 0.0f || vBack[1] != 0.0f || vBack[2] != 0.0f) {
@@ -3162,8 +3163,8 @@ void GolfCamera_CreateMatrixCamera(View* pView, f32* pFrom, f32* pTo, int nPlaye
     v[1] = vFrom[1];
     Mem_set(&gGolfCamState->shot6C, 0, sizeof(CamShot) * 2);
     strcpy(gGolfCamState->shot6C.szName, szName);
-    Vec3Copy(vFrom, gGolfCamState->shot6C.v20);
-    Vec3Copy(pTo, gGolfCamState->shot6C.v30);
+    Vec3Copy(vFrom, gGolfCamState->shot6C.vPos);
+    Vec3Copy(pTo, gGolfCamState->shot6C.vLook);
     gGolfCamState->shot6C.pNext = NULL;
     gGolfCamState->shot6C.fDist = 0.0f;
     gGolfCamState->shot6C.fSideOffset = 0.0f;
@@ -3200,8 +3201,8 @@ void GolfCamera_CreateMatrixCamera(View* pView, f32* pFrom, f32* pTo, int nPlaye
         gGolfCamState->shot12C.fLength = 1.0f;
     } else {
         strcpy(gGolfCamState->shot12C.szName, szName);
-        Vec3Copy(v, gGolfCamState->shot12C.v20);
-        Vec3Copy(pTo, gGolfCamState->shot12C.v30);
+        Vec3Copy(v, gGolfCamState->shot12C.vPos);
+        Vec3Copy(pTo, gGolfCamState->shot12C.vLook);
         gGolfCamState->shot12C.pNext = NULL;
         gGolfCamState->shot12C.fDist = 0.0f;
         gGolfCamState->shot12C.fSideOffset = 0.0f;
@@ -3345,11 +3346,11 @@ void GolfCamera_CreateSuperZoomCamera(View* pView, f32* pFrom, f32* pTo, int nPl
     v[1] = vFrom[1];
     strcpy(gGolfCamState->shot6C.szName, szName);
     if (pView->nSpecialSwingType == 13) {
-        Vec3Copy(pFrom, gGolfCamState->shot6C.v20);
+        Vec3Copy(pFrom, gGolfCamState->shot6C.vPos);
     } else {
-        Vec3Copy(v, gGolfCamState->shot6C.v20);
+        Vec3Copy(v, gGolfCamState->shot6C.vPos);
     }
-    Vec3Copy(pTo, gGolfCamState->shot6C.v30);
+    Vec3Copy(pTo, gGolfCamState->shot6C.vLook);
     gGolfCamState->shot6C.pNext = NULL;
     gGolfCamState->shot6C.fDist = 0.0f;
     gGolfCamState->shot6C.fSideOffset = 0.0f;
@@ -3371,8 +3372,8 @@ void GolfCamera_CreateSuperZoomCamera(View* pView, f32* pFrom, f32* pTo, int nPl
     gGolfCamState->shot6C.nStateType = CAMSTATE_SWING;
     gGolfCamState->shot6C.pPrev = pView->script.pShot;
     strcpy(gGolfCamState->shot12C.szName, szName);
-    Vec3Copy(gGolfCamState->shot6C.v20, gGolfCamState->shot12C.v20);
-    Vec3Copy(pTo, gGolfCamState->shot12C.v30);
+    Vec3Copy(gGolfCamState->shot6C.vPos, gGolfCamState->shot12C.vPos);
+    Vec3Copy(pTo, gGolfCamState->shot12C.vLook);
     gGolfCamState->shot12C.pNext = NULL;
     gGolfCamState->shot12C.fDist = 0.0f;
     gGolfCamState->shot12C.fSideOffset = 0.0f;

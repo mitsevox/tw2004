@@ -600,17 +600,17 @@ f32 CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime) {
     CamShot* pNext = pShot->pNext;
 
     if (pNext == NULL) return 0.0f;
-    Vec3Copy(pShot->v20, vFrom);
-    Vec3Copy(pShot->pNext->v20, vTo);
+    Vec3Copy(pShot->vPos, vFrom);
+    Vec3Copy(pShot->pNext->vPos, vTo);
     if (pShot->pPrev == NULL) {
-        Vec3Copy(pShot->v20, vPrev);
+        Vec3Copy(pShot->vPos, vPrev);
     } else {
-        Vec3Copy(pShot->pPrev->v20, vPrev);
+        Vec3Copy(pShot->pPrev->vPos, vPrev);
     }
     if (pNext->pNext == NULL) {
-        Vec3Copy(pShot->pNext->v20, vNext);
+        Vec3Copy(pShot->pNext->vPos, vNext);
     } else {
-        Vec3Copy(pNext->pNext->v20, vNext);
+        Vec3Copy(pNext->pNext->vPos, vNext);
     }
     CamScript_SplineCamerasByPosition(vPrev, vFrom, vTo, vNext, vA, fA);
     CamScript_SplineCamerasByPosition(vPrev, vFrom, vTo, vNext, vB, fB);
@@ -1023,12 +1023,12 @@ void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CameraScriptSett
     if (pShot->pPrev == NULL) {
         Vec3Copy(pScript->vCamPos, vPrevPos);
     } else {
-        Vec3Copy(pShot->pPrev->v20, vPrevPos);
+        Vec3Copy(pShot->pPrev->vPos, vPrevPos);
     }
     if (pNext->pNext == NULL) {
         Vec3Copy(pScript->vNextCamPos, vNextPos);
     } else {
-        Vec3Copy(pNext->pNext->v20, vNextPos);
+        Vec3Copy(pNext->pNext->vPos, vNextPos);
     }
     Vec3Copy(pSub, vLook0);
     CamScript_GetLookAtPoint(pShot, nPlayer, vLook0, pScript->vCamPos, pScript, pPrev, fTime);
@@ -1251,7 +1251,7 @@ void CamScript_PickArcDirection(CameraScriptSettings_t* pScript, f32* pSub, int 
 // ball (13 the ground under it, its height eased), 14 the ball at the camera's height, 1
 // Player.vBall, 2 and 3 halfway between the golfer's bones 0x39 and 0x47, 4 and 5 bone 1, 6 and 7
 // bone 10 (3, 5 and 7 lagged by CameraScript_LagTargetPoint), 9 the aim (Player.vTargetCopy, lagged
-// by CameraScript_LagAimMarker), 10 the pin, 11 the player's tee, 22 and 24 the shot's v30. Most
+// by CameraScript_LagAimMarker), 10 the pin, 11 the player's tee, 22 and 24 the shot's vLook. Most
 // points are raised by the shot's fLookUpOffset and moved fLookSideOffset sideways
 // (CameraScript_OffsetLookVector; the other way for a lefty where CameraScript_FlipCameraForLefty
 // says so). The shoulder shake (CameraScript_CalculateShoulderShake) at the script's time
@@ -1453,7 +1453,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         break;
     case CAMPOINT_SHOT_TARGET:
     case CAMPOINT_SHOT_POINT:
-        Vec3Copy(pShot->v30, pOut);
+        Vec3Copy(pShot->vLook, pOut);
         CameraScript_OffsetLookVector(pOut, pCam, pShot->fLookUpOffset, pShot->fLookSideOffset);
         break;
     }
@@ -1780,7 +1780,7 @@ void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPl
 
     strcpy(pShot->szName, szName);
     pShot->bDynamic = 0;
-    Vec3Copy(pCam, pShot->v20);
+    Vec3Copy(pCam, pShot->vPos);
     pShot->pNext = NULL;
     pScript->pNextShot = NULL;
     pScript->fInterpTime = 0.0f;
@@ -1788,7 +1788,7 @@ void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPl
     pScript->nInterpType = 0;
     pShot->nStateType = CAMSTATE_BALL_FLIGHT;
     pShot->nLookAtKind = CAMPOINT_SHOT_POINT;
-    Vec3Copy(pSub, pShot->v30);
+    Vec3Copy(pSub, pShot->vLook);
     pShot->fLookSideOffset = 0.0f;
     pShot->fLookUpOffset = 0.0f;
     pShot->bShowGolfer = 1;
@@ -1830,11 +1830,11 @@ void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPl
     pShot->fShakeSpeed = 0.0f;
 }
 
-// Where the ball-flight camera expects the ball to land, into the script's v50: the ball as it lay
-// before the shot while it has not been hit (single view), the target without a club (25); in
-// flight, where the line of its velocity (lifted while rising, bent down by its height) meets the
-// ground, pulled back to the club's reach; at rest, 5 x Physics_GetLiePowerPercentage along its
-// velocity, on the ground.
+// Where the ball-flight camera expects the ball to land, into the script's vLandingEstimate: the
+// ball as it lay before the shot while it has not been hit (single view), the target without a
+// club (25); in flight, where the line of its velocity (lifted while rising, bent down by its
+// height) meets the ground, pulled back to the club's reach; at rest, 5 x
+// Physics_GetLiePowerPercentage along its velocity, on the ground.
 void CameraScript_UpdateLandingEstimate(CameraScriptSettings_t* pScript, int nPlayer) {
     f32 vHit[4];
     f32 vNormal[4];
@@ -1857,11 +1857,11 @@ void CameraScript_UpdateLandingEstimate(CameraScriptSettings_t* pScript, int nPl
     if (gSession.nSplitScreen == 0
         && (gPlayers[nPlayer].ballBefore.nState == 0 || gPlayers[nPlayer].ballBefore.nState == 1
             || gPlayers[nPlayer].ballBefore.nState == 5)) {
-        Vec3Copy(gPlayers[nPlayer].ballBefore.vPos, pScript->v50);
+        Vec3Copy(gPlayers[nPlayer].ballBefore.vPos, pScript->vLandingEstimate);
         return;
     }
     if (gPlayers[nPlayer].nClub == 25) {
-        Vec3Copy(vTarget, pScript->v50);
+        Vec3Copy(vTarget, pScript->vLandingEstimate);
         return;
     }
     if (gSession.nSplitScreen != 0) {
@@ -1900,13 +1900,13 @@ void CameraScript_UpdateLandingEstimate(CameraScriptSettings_t* pScript, int nPl
                     fHeight = CamScript_GuessBestPlayableHeight(vLand, NULL);
                     if (!(fHeight < -60000.0f)) {
                         vLand[1] = fHeight;
-                        Vec3Copy(vLand, pScript->v50);
+                        Vec3Copy(vLand, pScript->vLandingEstimate);
                         return;
                     }
-                    Vec3Copy(vHit, pScript->v50);
+                    Vec3Copy(vHit, pScript->vLandingEstimate);
                     return;
                 }
-                Vec3Copy(vHit, pScript->v50);
+                Vec3Copy(vHit, pScript->vLandingEstimate);
             }
         }
     } else {
@@ -1916,7 +1916,7 @@ void CameraScript_UpdateLandingEstimate(CameraScriptSettings_t* pScript, int nPl
         fHeight = CamScript_GuessBestPlayableHeight(vStep, NULL);
         if (!(fHeight < -60000.0f)) {
             vStep[1] = fHeight;
-            Vec3Copy(vStep, pScript->v50);
+            Vec3Copy(vStep, pScript->vLandingEstimate);
         }
     }
 }
@@ -2015,7 +2015,7 @@ void CameraScript_GoToNewScript(CameraScriptSettings_t* pScript, CamShot* pShot,
 // at most (TW07's parameter names). Kind 4 (the swing camera's cut) takes it outright unless the
 // current shot is a kind-3 shot that is not the default swing camera; a blend with a time makes
 // pShot the next shot (when a blend is already running, the current camera is first recorded into
-// pB4 and the blend starts from there), its length fInterpTime at least the move's distance over
+// pRecordShot and the blend starts from there), its length fInterpTime at least the move's distance over
 // fMaxSpeed; otherwise pShot and its follow-on start at once. The camera event nTimeTrigger and its
 // time fTimeTriggerTime go to nTriggerKind and fTriggerTime; in single-view play the shot's nTimeMode
 // sets half time (0), double time (2) or neither, and camera matrix mode for 3.
@@ -2073,10 +2073,10 @@ void CameraScript_InterpToNewScript(CameraScriptSettings_t* pScript, CamShot* pS
             pScript->fInterpTime = fInterpTime;
         }
     } else if (fInterpTime > 0.0f && pScript->pShot != NULL) {
-        if (pScript->pNextShot != NULL && pScript->pShot != pScript->pB4 && pScript->pNextShot != pScript->pB4
-            && pShot != pScript->pB4) {
-            CameraScript_RecordCurrentCam(pScript->pB4, pCam, pSub, nPlayer, pScript, 0);
-            pScript->pShot = pScript->pB4;
+        if (pScript->pNextShot != NULL && pScript->pShot != pScript->pRecordShot
+            && pScript->pNextShot != pScript->pRecordShot && pShot != pScript->pRecordShot) {
+            CameraScript_RecordCurrentCam(pScript->pRecordShot, pCam, pSub, nPlayer, pScript, 0);
+            pScript->pShot = pScript->pRecordShot;
         }
         pScript->pNextShot = pShot;
         pScript->fCamTime = 0.0f;
@@ -2646,13 +2646,13 @@ void CamScript_UpdateFairwayCam(CameraScriptSettings_t* pScript, f32* pCam, f32*
         if (fDot > gpCamTuning->fFairwayCamMaxDot) return;
         fHeight = CamScript_GuessBestPlayableHeight(vSpot, NULL);
         if (!(fHeight < -60000.0f) && pScript->pShot != NULL) {
-            Vec3Copy(vSpot, pScript->pShot->v20);
-            pScript->pShot->v20[1] = fHeight + gpCamTuning->fFairwayCamHeight;
+            Vec3Copy(vSpot, pScript->pShot->vPos);
+            pScript->pShot->vPos[1] = fHeight + gpCamTuning->fFairwayCamHeight;
             pScript->pShot->fFovStart = fFov;
             pScript->pShot->fFovEnd = pScript->pShot->fFovStart;
             CameraScript_InterpToNewScript(pScript, pScript->pShot, nPlayer, pCam, pSub, CAMINTERP_CUT, 0.0f,
                                            100.0f, CAMEVENT_NONE, 0.0f);
-            Vec3Copy(pScript->pShot->v20, pCam);
+            Vec3Copy(pScript->pShot->vPos, pCam);
             CamScript_GetLookAtPoint(pScript->pShot, nPlayer, pSub, pCam, pScript, pCam, 0.0f);
         }
     }
@@ -2918,16 +2918,16 @@ u8 CamScript_IsSecondViewShot(CamShot* pShot) {
 }
 
 // How much of its flight the ball has covered: 1 less its distance to the landing estimate (the
-// script's v50) over the distance from the shot's start to it (0 at the start, 1 at the estimate);
-// 1 when the start is on it.
+// script's vLandingEstimate) over the distance from the shot's start to it (0 at the start, 1 at
+// the estimate); 1 when the start is on it.
 f32 CamScript_EstimateBallFlightPercent(int nPlayer, CameraScriptSettings_t* pScript) {
     f32 vStart[4];
     f32 vBall[4];
     f32 fStart;
     f32 fBall;
 
-    Vec3_Sub(pScript->v50, gPlayers[nPlayer].ball.vStart, vStart);
-    Vec3_Sub(pScript->v50, gPlayers[nPlayer].ball.vPos, vBall);
+    Vec3_Sub(pScript->vLandingEstimate, gPlayers[nPlayer].ball.vStart, vStart);
+    Vec3_Sub(pScript->vLandingEstimate, gPlayers[nPlayer].ball.vPos, vBall);
     fStart = Math_Sqrt(LLMath_LengthSquared3(vStart));
     fBall = Math_Sqrt(LLMath_LengthSquared3(vBall));
     if (fStart > 0.0f) {
