@@ -473,7 +473,7 @@ void GR_DrawGreenGrid(int nView) {
     } else {
         RenderState_SetDrawFlags(0x60);
     }
-    RenderState_SetClipMode(0);
+    RenderState_SetClipMode(GX_CLIP_ENABLE);
     pLens = ((Camera*)*gppCurrentRenderCtx)->unk10;
     fAC = CA_fGetCameraFarZ((u8*)pLens);
     Camera_SetLensFarClip((u8*)pLens, 500.0f + fAC);

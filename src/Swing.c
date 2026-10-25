@@ -1059,7 +1059,7 @@ void SW_vUIRender3D(int nPlayer) {
                     128.0f * pSw->fAlpha * (1.0f - (f32)i / pSw->nNumInBlurQueue);
                 idx[i + 1] = i + 1;
             }
-            RenderState_SetClipMode(0);
+            RenderState_SetClipMode(GX_CLIP_ENABLE);
             RenderState_SetCameraMatrices();
             RenderState_SetViewport(RC_spGetCurrentRenderCtx());
             RenderState_SetDrawFlags(0x50);

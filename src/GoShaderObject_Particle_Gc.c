@@ -286,7 +286,7 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
         } else {
             RenderState_SetBlendFactors(4, 5);
         }
-        RenderState_SetClipMode(0);
+        RenderState_SetClipMode(GX_CLIP_ENABLE);
         RenderState_Flush();
         pCamera = RC_spGetCurrentRenderCtx();
         GXClearVtxDesc();

@@ -26,7 +26,7 @@ extern TexEntry*  gpUIObjRingTexture; // "ring"
 extern TexEntry*  gpUIObjBoostTexture; // } "toball", both
 extern TexEntry*  gpUIObjBaseTexture; // }
 extern f32        gUIObjBoostRingSize[8];
-extern UObject*   gpUIObjModel; // made from the 'TEO ' object 10003
+extern TObject*   gpUIObjModel; // made from the 'TEO ' object 10003
 extern CamLens*   gpUIObjLens; // the objects' lens (CA_spCreateCamera)
 extern LightGroup gUIObjLights; // their lights
 extern f32        gUIObjLightRed; // } the light's colour (red, green, blue: UI_Obj_DrawSpinModel)

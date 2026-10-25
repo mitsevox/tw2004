@@ -106,7 +106,7 @@ int fn_80045F50(UObjMesh* pMesh) {
 }
 
 UObjMesh* fn_80045F5C(UObjMesh* pMesh, int i) {
-    return pMesh->p8[i];
+    return pMesh->ppChildren[i];
 }
 
 UObjMesh* fn_80045F6C(UObjModelRoot* pRoot) {

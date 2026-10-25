@@ -14,9 +14,9 @@
 #include "llpict.h"
 
 // Defined here, last address first (CodeWarrior lays out .sbss in reverse).
-UObject* gpCrAPBallTeo10000;    // the menu ball's objects, made from the 'TEO ' objects 10000
-UObject* gpCrAPBallTeo10030;    // (always drawn), 10030 and 10040 (drawn only while a logo is on
-UObject* gpCrAPBallTeo10040;    // the ball) by FE_CrAPBall_MakeObjects
+TObject* gpCrAPBallTeo10000;    // the menu ball's objects, made from the 'TEO ' objects 10000
+TObject* gpCrAPBallTeo10030;    // (always drawn), 10030 and 10040 (drawn only while a logo is on
+TObject* gpCrAPBallTeo10040;    // the ball) by FE_CrAPBall_MakeObjects
 TexBank* gpCrAPBallLogoBank;    // the 'BALF' texture bank of ball logos (FE_CrAPBall_LoadBALF)
 void* gpCrAPBallUnusedMem;      // freed by FE_CrAPBall_Free when set; nothing here sets it
 f32 gfCrAPBallOffsetY;          // } the held ball's offset in bone 0x54 (x, y); never set, so 0
@@ -149,25 +149,25 @@ void FE_CrAPBall_MakeObjects(void) {
 
 // Draw pObj turned by mBone and scaled by mScale, at pPos in the create-a-player view; its
 // matrices are put back after.
-void FE_CrAPBall_DrawObject(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f32* pPos) {
+void FE_CrAPBall_DrawObject(TObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f32* pPos) {
     f32 m0[4][4];
     f32 m40[4][4];
     f32 m80[4][4];
 
-    LLMath_CopyMat44(pObj->m0, m0);
-    LLMath_CopyMat44(pObj->m40, m40);
-    LLMath_CopyMat44(pObj->m80, m80);
-    LLMath_mat44fltMultiplyList33(mBone, pObj->m0, pObj->m0, 3);
-    LLMath_mat44fltMultiplyList33(mScale, pObj->m40, pObj->m40, 3);
-    UObject_ComposeRotation(pObj->m0);
-    LLMath_CopyVec(pPos, pObj->m80[3]);
-    pObj->m80[3][3] = 1.0f;
-    LLMath_mat44fltMultiplyList(gpCrAPState->mC0, pObj->m80, pObj->m80, 4);
-    LLMath_IdentifyMat(pObj->m0);
+    LLMath_CopyMat44(pObj->mRotation, m0);
+    LLMath_CopyMat44(pObj->mScale, m40);
+    LLMath_CopyMat44(pObj->mObjToWorld, m80);
+    LLMath_mat44fltMultiplyList33(mBone, pObj->mRotation, pObj->mRotation, 3);
+    LLMath_mat44fltMultiplyList33(mScale, pObj->mScale, pObj->mScale, 3);
+    UObject_ComposeRotation(pObj->mRotation);
+    LLMath_CopyVec(pPos, pObj->mObjToWorld[3]);
+    pObj->mObjToWorld[3][3] = 1.0f;
+    LLMath_mat44fltMultiplyList(gpCrAPState->mC0, pObj->mObjToWorld, pObj->mObjToWorld, 4);
+    LLMath_IdentifyMat(pObj->mRotation);
     Object_Draw(pObj);
-    LLMath_CopyMat44(m0, pObj->m0);
-    LLMath_CopyMat44(m40, pObj->m40);
-    LLMath_CopyMat44(m80, pObj->m80);
+    LLMath_CopyMat44(m0, pObj->mRotation);
+    LLMath_CopyMat44(m40, pObj->mScale);
+    LLMath_CopyMat44(m80, pObj->mObjToWorld);
 }
 
 // Draws the ball in the Create-A-Player menu golfer's hand (bone 0x54) when he holds it, into the

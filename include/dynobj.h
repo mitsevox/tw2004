@@ -91,17 +91,19 @@ typedef struct DynObjPair {
 
 // The header of a UObjMesh's data (UObjMesh.pInfo).
 typedef struct UObjMeshInfo {
-    s16  n0;                    // 0x00  how many meshes UObjMesh.p8 holds (GoTerrain.c Ter_GetMeshChildCount)
+    s16  n0;                    // 0x00  how many meshes UObjMesh.ppChildren holds (GoTerrain.c
+                                //       Ter_GetMeshChildCount)
     u8   unk2[0x4 - 0x2];
     s32  n4;                    // 0x04  not 0: a chunk follows; fn_8000799C passes n4 * 2 to fn_80007658
     u8   unk8[0x24 - 0x8];
-    s8   aFlags[0x54 - 0x24];   // 0x24  Object_GetMeshFlags, GoTerrain.c Ter_GetMeshFlags (length unknown, at
-                                //       most this)
+    s8   aFlags[0x54 - 0x24];   // 0x24  the mesh's flag bytes, read one at a time (Object_GetMeshFlags,
+                                //       GoTerrain.c Ter_GetMeshFlags); length unknown, at most this.
+                                //       Bytes 0 and 2 of an object's mesh: UOBJMESH_F0_*, UOBJMESH_F2_*
     f32  f54;                   // 0x54  scales a terrain object's mipmap bias (GoTerrain.c
                                 //       Ter_GetMeshMipmapBiasScale)
     f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
                                 //       bounding sphere GoTerrain.c's Ter_GetMeshBoundingSphere returns
-    f32  f64;                   // 0x64  copied to UObjModel.f5C by type 0's setup
+    f32  f64;                   // 0x64  copied to UObjModel.fRadius by type 0's setup
     f32  a68[8];                // 0x68  a terrain object's bounds (GoTerrain.c Ter_GetMeshBounds,
                                 //       Ter_AddPatchObjects): its centre [0..2], a radius [3] and a height
                                 //       [7]
@@ -110,11 +112,21 @@ typedef struct UObjMeshInfo {
     u8   b8B;                   // 0x8B  bit 1: a terrain object drawn without z writes (GoTerrain.c
                                 //       Ter_GetMeshDrawFlags, Ter_SetObjectRenderState); passed on
                                 //       in UObjPartDesc.u0A
-    s16  n8C;                   // 0x8C  how many parts UObjMesh.p18 holds (fn_80007658)
+    s16  n8C;                   // 0x8C  how many parts UObjMesh.pParts holds (fn_80007658)
     u16  u8E;                   // 0x8E  (fn_80007658)
 } UObjMeshInfo;
 
-// An entry of UObjMesh.p18 (0x2C bytes; what fn_800082CC takes).
+// UObjMeshInfo.aFlags[0] of an object's mesh.
+#define UOBJMESH_F0_ANIMATED   0x01 // it animates: a value goes to its shader each draw (a tree's
+                                    // sway, a crowd's or an animal's pose blend)
+#define UOBJMESH_F0_POSES      0x02 // with UOBJMESH_F0_ANIMATED, by poses: a child mesh is drawn in
+                                    // its place (the crowd)
+// UObjMeshInfo.aFlags[2] of an object's mesh (a terrain patch's ground uses the byte otherwise).
+#define UOBJMESH_F2_POSE_KIND0 0x01 // } with UOBJMESH_F0_ANIMATED, the other two kinds of poses
+#define UOBJMESH_F2_POSE_KIND1 0x02 // }   (an animal's kinds 0 and 1): a child mesh is drawn too
+#define UOBJMESH_F2_LIT        0x04 // lit by the light set (Object_Render)
+
+// An entry of UObjMesh.pParts (0x2C bytes; what ObjPart_Draw takes).
 typedef struct UObjMeshPart {
     s32  n0;                    // 0x00  its type (fn_8000827C); copied to
                                 //       Ter_ObjectDrawData.eShaderObjectType (Ter_AddObjectDraw)
@@ -136,26 +148,28 @@ typedef struct UObjPartDesc {
 } UObjPartDesc;
 
 // One level of detail of a UObjModel. The terrain's hole data is a tree of them (GoTerrain.c,
-// Ter_GetMeshNext..Ter_GetHoleModelRoot): the root holds a mesh per patch in its p8[1], a patch's
-// p8[0] is its ground and its p8[1] holds its object lists, whose meshes are the objects'
-// (Ter_GetObjectListModel).
+// Ter_GetMeshNext..Ter_GetHoleModelRoot): the root holds a mesh per patch in its ppChildren[1], a
+// patch's ppChildren[0] is its ground and its ppChildren[1] holds its object lists, whose meshes are
+// the objects' (Ter_GetObjectListModel).
 typedef struct UObjMesh {
     UObjMeshInfo* pInfo;        // 0x00
     u8   unk4[4];
-    struct UObjMesh** p8;       // 0x08  alternatives, by UObject.n108 (Object_GetMeshAlternative); a terrain
-                                //       mesh's children (Ter_GetMeshChild)
+    struct UObjMesh** ppChildren; // 0x08  its child meshes (pInfo->n0 of them): a terrain mesh's
+                                //       children (Ter_GetMeshChild); an object's mesh draws child
+                                //       TObject.nMeshChild instead of itself (Object_GetMeshChild)
     struct UObjMesh* pC;        // 0x0C  in a terrain patch's ground: the mesh drawn for it
                                 //       (Ter_GetGroundDrawMesh)
     struct UObjMesh* p10;       // 0x10  its first child, the rest by p14 (pInfo->n0 of them; LLObj_Gc.c
                                 //       fn_80007524)
     struct UObjMesh* p14;       // 0x14  the next terrain mesh of a list (Ter_GetMeshNext); a patch's
                                 //       ground's is its objects (Ter_PatchReference.pObjects)
-    struct UObjMeshPart* p18;   // 0x18  Object_DrawMesh passes entry n28 to fn_800082CC
-    u8   a1C[0x20 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used
+    struct UObjMeshPart* pParts; // 0x18  its parts (pInfo->n8C of them; LLObj_Gc.c fn_80007658)
+    u8   abPartUsed[4];         // 0x1C  nonzero: part i is in use and can be drawn
     u32  n20;                   // 0x20  a word: GoTerrain.c Ter_DrawPatchGround draws a ground's extra meshes
                                 //       only when it is not 0
     s32  n24;                   // 0x24  0 when built (LLObj_Gc.c fn_8000799C)
-    s32  n28;                   // 0x28
+    s32  nDrawPart;             // 0x28  the part drawn (Object_DrawMesh); 0 when built (LLObj_Gc.c
+                                //       fn_8000799C), and nothing changes it
 } UObjMesh;
 
 // What UObjModel.p10 points to (our view): a mesh tree at 0xEC (GoAnimalActors.c ActAnimal_GetRootMesh).
@@ -192,7 +206,7 @@ typedef struct UObjModelRoot {
 } UObjModelRoot;
 LAYOUT_ASSERT(UObjModelRoot, 0xF0); // fn_800073B4 puts the meshes at 0xF0
 
-// A UObject's model (UObject.pModel).
+// A TObject's model (TObject.pModel).
 typedef struct UObjModel {
     u8   unk0[0x10];
     UObjModelRoot* p10;         // 0x10  (GoAnimalActors.c ActAnimal_Init)
@@ -201,15 +215,16 @@ typedef struct UObjModel {
                                 //       its mesh group and clears the last three
     f32  v2C[3];                // 0x2C
     u8   unk38[0x5C - 0x38];
-    f32  f5C;                   // 0x5C  a size: the level-of-detail scale is 0.5 / f5C
+    f32  fRadius;               // 0x5C  its bounding radius: type 0's setup copies its first level of
+                                //       detail's (UObjMeshInfo.f64) here
     u8   unk60[0x7C - 0x60];
 } UObjModel;
 LAYOUT_ASSERT(UObjModel, 0x7C);     // UObject3D.c fn_80045D80 allocates 0x7C bytes
 
 // UObject3D.c: a model made from its stream data, and the mesh-tree readers it uses.
 UObjModel* fn_80045D80(u8* pData);
-int        fn_80045F50(UObjMesh* pMesh);            // how many meshes pMesh->p8 holds
-UObjMesh*  fn_80045F5C(UObjMesh* pMesh, int i);     // pMesh->p8[i]
+int        fn_80045F50(UObjMesh* pMesh);            // how many child meshes pMesh has
+UObjMesh*  fn_80045F5C(UObjMesh* pMesh, int i);     // pMesh's child mesh i
 UObjMesh*  fn_80045F6C(UObjModelRoot* pRoot);       // pRoot->pMesh
 UObjModelRoot* fn_800073B4(u8* pData, int n);       // builds a model's mesh tree from stream data
 
@@ -218,38 +233,46 @@ void fn_800081C8(UObjArraySet* pSet, int nMode, void* pArg);
 void fn_80008214(UObjArraySet* pSet);
 void fn_80008248(UObjMeshPart* pPart);
 void fn_8000827C(UObjMeshPart* pPart, UObjArraySet* pSet, int nType, void* pArg);
-void fn_800082CC(UObjMeshPart* pPart);
+void ObjPart_Draw(UObjMeshPart* pPart);
 
-// UObject.c's object (0x118 bytes, Object_Create allocates one; a DynObj holds one at +0x10): three
-// matrices and a model drawn with them.
-typedef struct UObject {
-    f32  m0[4][4];              // 0x000  identity at setup
-    f32  m40[4][4];             // 0x040  identity at setup
-    f32  m80[4][4];             // 0x080  identity at setup; m80[3] is the position (x, y, z, 1)
-    u8   unkC0[0xDC - 0xC0];
-    s32  nDC;                   // 0x0DC  (GoAnimalActors.c ActAnimal_GetRootMesh)
-    u8   unkE0[4];
-    f32  fE4;                   // 0x0E4  the model's f5C
+// UObject.c's object (0x118 bytes, Object_Create allocates one; a DynObj holds one at +0x10): a
+// model and the matrices that place it. Its mObjToWorld's rotation rows are mScale times mRotation
+// (TerrainData.c UObject_ComposeRotation); row 3 is the position.
+typedef struct TObjectS {
+    f32  mRotation[4][4];       // 0x000  identity at setup
+    f32  mScale[4][4];          // 0x040  identity at setup; a scale on its diagonal
+    f32  mObjToWorld[4][4];     // 0x080  identity at setup; what it is drawn with, [3] the position
+                                //        (x, y, z, 1)
+    u8   unkC0[0xE4 - 0xC0];
+    f32  fRadius;               // 0x0E4  the model's fRadius at setup; nothing reads it
     u8   unkE8[0xF0 - 0xE8];
     UObjModel* pModel;          // 0x0F0  NULL: nothing to draw
     u8   unkF4[4];
-    u32  uFlags;                // 0x0F8  bit 2: the model has levels of detail
-    f32  fFC;                   // 0x0FC  0.5 / the model's f5C, kept to 0.1..2.5
-    f32  f100;                  // 0x100
-    s8   n104;                  // 0x104  the level of detail drawn (Object_GetLod)
+    u32  uFlags;                // 0x0F8  TOBJECT_HAS_LODS; the other bits its setup is given are
+                                //        never read
+    f32  fLodScale;             // 0x0FC  0.5 / the model's fRadius, kept to 0.1..2.5 (0.1 for radius
+                                //        0); nothing reads it
+    f32  fUnread;               // 0x100  0 at setup; nothing reads it
+    s8   nLod;                  // 0x104  the level of detail drawn: an index into pModel->apLod
+                                //        (Object_SetLod sets it)
     u8   unk105;
-    s16  n106;                  // 0x106
-    s32  n108;                  // 0x108  goes to Object_GetMeshAlternative when drawn; the animals set it
-                                //        each frame
-    f32  f10C;                  // 0x10C  0.5 at setup; the animals set it each frame
+    s16  nUnread;               // 0x106  0 at setup; nothing reads it
+    s32  nMeshChild;            // 0x108  0 at setup; the child of its mesh drawn in the mesh's place
+                                //        when the mesh's flags ask for one (Object_Render); an
+                                //        animal puts its pose here before it is drawn
+    f32  fShaderParam;          // 0x10C  0.5 at setup; handed to shader type 3 for a mesh with 0x1
+                                //        in flag byte 0 (Object_Render); an animal sets it before it
+                                //        is drawn (DynObjAnimal.f1B4)
     u8   unk110[0x118 - 0x110];
-} UObject;
-LAYOUT_ASSERT(UObject, 0x118);
+} TObject;
+LAYOUT_ASSERT(TObject, 0x118);
+
+#define TOBJECT_HAS_LODS 0x4    // TObject.uFlags: the model's four levels of detail are not all the same
 
 // A dynamic object (0x16C bytes for type 0; a type may add fields after it).
 typedef struct DynObj {
     f32  aRot[4];               // 0x000  a rotation, set to (0, 0, 0, 1)
-    UObject obj;                // 0x010  what is drawn (Object_Init sets it up)
+    TObject obj;                // 0x010  what is drawn (Object_Init sets it up)
     struct DynObj* pNext;       // 0x128  the next object in UKernel.c's list
     u8   unk12C[0x130 - 0x12C];
     DynObjHandler pfnHandler;   // 0x130  its type's message handler
@@ -314,8 +337,9 @@ typedef struct DynObjAnimal {
     f32  f1A0;                  // 0x1A0
     s32  n1A4;                  // 0x1A4  0..4, from its model's mesh bits (4: no model)
     AnimalRoute* pRoute;        // 0x1A8  NULL: it stands at its definition's position
-    u32  n1AC;                  // 0x1AC  } its pose, copied to its UObject's n108 and f10C before it
-    u32  n1B0;                  // 0x1B0  }   is drawn; n1B0 the pose it is heading for (ActAnimal_Update)
+    u32  n1AC;                  // 0x1AC  } its pose, copied to its TObject's nMeshChild and fShaderParam
+    u32  n1B0;                  // 0x1B0  }   before it is drawn; n1B0 the pose it is heading for
+                                //            (ActAnimal_Update)
     f32  f1B4;                  // 0x1B4  }
     u32  n1B8;                  // 0x1B8  frames counted (ActAnimal_Update)
     u8   b1BC;                  // 0x1BC
@@ -401,11 +425,11 @@ typedef struct GoDynObjMgr {
     DynObj* apPitchMark[10];    // 0xA28  the pitch marks, 'TEO ' 10005 (DynObj_PitchMarkAdd), used
                                 //       in turn ...
     s32  nNextPitchMark;        // 0xA50  ... the next one
-    UObject* pTeo10000;         // 0xA54  'TEO ' 10000
-    UObject* apTeo10030[4];     // 0xA58  'TEO ' 10030..10033
-    UObject* apTeo10040[4];     // 0xA68  'TEO ' 10040..10043
-    UObject* apTeo10020[3];     // 0xA78  'TEO ' 10020..10022, only with GM_Currently_SkillZoneMode
-    UObject* apTeo10006[4];     // 0xA84  'TEO ' 10006..10009, only with GM_Currently_SkillZoneMode
+    TObject* pTeo10000;         // 0xA54  'TEO ' 10000
+    TObject* apTeo10030[4];     // 0xA58  'TEO ' 10030..10033
+    TObject* apTeo10040[4];     // 0xA68  'TEO ' 10040..10043
+    TObject* apTeo10020[3];     // 0xA78  'TEO ' 10020..10022, only with GM_Currently_SkillZoneMode
+    TObject* apTeo10006[4];     // 0xA84  'TEO ' 10006..10009, only with GM_Currently_SkillZoneMode
     // the tee's and the divot's flight when struck (DynObj_InitModule sets them)
     f32  fTeeSpeed;             // 0xA94  7: the tee's top launch speed (times a random 0..1)
     f32  fDivotSpeed;           // 0xA98  10.5: the divot's (times a random 0.5..1)
@@ -448,8 +472,8 @@ void DynObj_TeeStruck(int nPlayer);             // knock the player's tee ('TEO 
 int  DynObj_GetGolfBallLogoIndex(const char* szName);   // the index of the name among
                                                         // gGolfBallLogoTextureNames's 27 (-1: none)
 
-// UKernel.c, UObject.c. The UObject functions take the object part (&DynObj.obj).
-DynObj* Kernel_GetFirstObject(void);                                  // the first object
+// UKernel.c
+DynObj* Kernel_GetFirstObject(void);                                 // the first object
 DynObj* Kernel_FindObjectById(int nId);                               // the object with this id, or NULL
 void Kernel_AppendObject(DynObj* pObj);                             // adds it at the end of the list
 s32  Kernel_CreateObjectId(DynObjSetup* pSetup);                      // a new object's id, -2 when none
@@ -460,13 +484,14 @@ void Kernel_PostPairByActorId(int nKey, int a, int b);   // records (a, b) on ev
 void Kernel_PostPairByKey147(int nKey, int a, int b);   // ... whose n147 is nKey
 void Kernel_PostPairByKey148(int nKey, int a, int b);   // ... whose n148 is nKey
 int  Kernel_QueryActorById(int nKey, uptr nWhat);     // asks the first object whose n140 is nKey (message 9)
-void Object_Init(UObject* pObj, UObjModel* pModel, u32 uFlags);
-UObject* Object_Create(UObjModel* pModel);
-void Object_Free(UObject* pObj);
-void Object_Destroy(UObject* pObj);
-void Object_Draw(UObject* pObj);
-
 void Kernel_BroadcastMessage(int nMsg, void* pArg, void* pArg2);     // sends nMsg to every object with id > 0
+
+// UObject.c. A dynamic object passes its object part (&DynObj.obj).
+void Object_Init(TObject* pObject, UObjModel* pModel, u32 Flags);
+TObject* Object_Create(UObjModel* pModel);
+void Object_Free(TObject* pObj);
+void Object_Destroy(TObject* xpObject_p);
+void Object_Draw(TObject* pObj);
 
 // GoDynObjBase.c
 // type 0's handler, types 2/11's default
@@ -480,8 +505,18 @@ int  DynObjType9_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2)
 // GoAnimalActors.c: type 11's handler (the animals).
 int  ActAnimal_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
-// LLObj_Gc.c: how a mesh is clipped against the camera (3: off screen, not drawn).
-int  fn_80007B2C(UObjMesh* pMesh, void* pCamera, f32 a, f32 fSize, f32 c);
+// How a mesh, a terrain patch or an object is drawn against the view (LLObj_GetMeshClipMethod
+// answers 0, 2 or 3). The drawing code turns GX clipping on only for DC_CLIP_PARTLY_IN_VIEW.
+typedef enum DC_EClippingMethod {
+    DC_CLIP_PARTLY_IN_VIEW = 0, // crosses the view's edge: drawn with GX clipping
+    DC_CLIP_UNTESTED = 1,       // never culled, drawn without GX clipping: GoTerrain.c's patch in
+                                // object-test mode
+    DC_CLIP_IN_VIEW = 2,        // wholly in view: drawn without GX clipping
+    DC_CLIP_OUT_OF_VIEW = 3     // not drawn
+} DC_EClippingMethod;
+
+// LLObj_Gc.c: how a mesh is clipped against the camera (DC_EClippingMethod).
+int  LLObj_GetMeshClipMethod(UObjMesh* pMesh, void* pCamera, f32 fDist, f32 fHalfFovTan, f32 fScale);
 
 void DynObj_InitForHole(void);
 void DynObj_DeInitForHole(void);

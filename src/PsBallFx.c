@@ -622,7 +622,7 @@ void fn_800A3A84(void) {
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RC_vSetCurrentRenderCtxTransformationMatrix(0);
     RenderState_SetCameraMatrices();
-    RenderState_SetClipMode(0);
+    RenderState_SetClipMode(GX_CLIP_ENABLE);
     DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_SetBlendFactors(1, 1);

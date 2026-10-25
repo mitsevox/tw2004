@@ -121,6 +121,10 @@ void GXResetWriteGatherPipe(void);
 
 void GXLoadPosMtxImm(f32 (*pMtx)[4], int nId);
 void GXLoadNrmMtxImm(f32 (*pMtx)[4], int nId);
+// GXSetClipMode's modes (the SDK's GXClipMode): clipping against the view, or none for geometry
+// wholly in view.
+#define GX_CLIP_ENABLE  0
+#define GX_CLIP_DISABLE 1
 void GXSetClipMode(int eMode);
 void GXSetArray(int eAttr, void* pBase, u8 nStride);
 void GXClearVtxDesc(void);

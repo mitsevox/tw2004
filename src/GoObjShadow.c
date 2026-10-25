@@ -59,7 +59,7 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
         RenderState_SetBlendFactors(4, 5);
         RenderState_SetCameraMatrices();
         RenderState_SetDrawFlags(0x70);
-        RenderState_SetClipMode(0);
+        RenderState_SetClipMode(GX_CLIP_ENABLE);
         RenderState_Flush();
         vAway[0] = pBall->vPos[0] - gSession.f5B3C;
         vAway[1] = 0.0f;

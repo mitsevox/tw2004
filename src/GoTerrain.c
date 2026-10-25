@@ -69,7 +69,7 @@ void  SF_vSetFlareType(s32 v);
 void  SF_vSetSunPosition(f32* p0);
 void  SF_vSetSunColor(f32* p0);
 void  Ter_SetCourseMipmapBias(int n);
-void  Ter_DrawMeshCurrentPart(u8* pObject);
+void  Ter_DrawMeshCurrentPart(UObjMesh* pMesh);
 void  Ter_ResetObjectRenderState(void);
 u8    Ter_SetManageZUpdate(u8 b);
 f32*  Ter_GetMeshBounds(UObjMesh* pMesh);
@@ -445,7 +445,7 @@ void Ter_BuildPatchLists(void* pHoleData) {
         pPatch = &gTerRenderer.pPatchList[gTerRenderer.iTotalPatches++];
         pPatch->fDistance = 0.0f;
         pPatch->fBoundingRadius = 0.0f;
-        pPatch->eClipMethod = 1;
+        pPatch->eClipMethod = DC_CLIP_UNTESTED;
         pPatch->pGround = NULL;
         pPatch->pObjects = pRoot;
         Ter_AddPatchObjects(pPatch, 0);
@@ -473,10 +473,11 @@ void Ter_BuildPatchLists(void* pHoleData) {
                 if (fDist < 0.0f) {
                     fDist = 0.0f;
                 }
-                eClipMethod = fn_80007B2C(pMesh, pCamera, fDist, gTerRenderer.fCameraMinHalfFieldOfViewTan,
-                                          ViewController_GetCameraControl(
-                                                  gTerRenderer.iCurrentViewContext)->vViewScale[1]);
-                if (eClipMethod != 3) {
+                eClipMethod = LLObj_GetMeshClipMethod(pMesh, pCamera, fDist,
+                                                      gTerRenderer.fCameraMinHalfFieldOfViewTan,
+                                                      ViewController_GetCameraControl(
+                                                          gTerRenderer.iCurrentViewContext)->vViewScale[1]);
+                if (eClipMethod != DC_CLIP_OUT_OF_VIEW) {
                     pPatch = &gTerRenderer.pPatchList[gTerRenderer.iTotalPatches++];
                     Ter_FillPatchReference(pMesh, eClipMethod, iRenderPass, pPatch, fDist);
                     if (pPatch->pObjects != NULL) {
@@ -669,15 +670,17 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 }
             }
             if (bHide) {
-                eClipMethod = 3;
-            } else if (pPatch->eClipMethod == 2) {
-                eClipMethod = 2;
+                eClipMethod = DC_CLIP_OUT_OF_VIEW;
+            } else if (pPatch->eClipMethod == DC_CLIP_IN_VIEW) {
+                eClipMethod = DC_CLIP_IN_VIEW;
             } else {
                 pView = ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext);
-                eClipMethod = fn_80007B2C(pLOD0, RC_spGetCurrentRenderCtx(), Math_Sqrt(fDistanceSquared),
-                                          gTerRenderer.fCameraMinHalfFieldOfViewTan, pView->vViewScale[1]);
+                eClipMethod = LLObj_GetMeshClipMethod(pLOD0, RC_spGetCurrentRenderCtx(),
+                                                      Math_Sqrt(fDistanceSquared),
+                                                      gTerRenderer.fCameraMinHalfFieldOfViewTan,
+                                                      pView->vViewScale[1]);
             }
-            if (eClipMethod != 3) {
+            if (eClipMethod != DC_CLIP_OUT_OF_VIEW) {
                 pRef = &gTerRenderer.pObjectSortList[gTerRenderer.iTotalSortObjects];
                 pRef->fDistanceSquared = fDistanceSquared;
                 pRef->f14 = LLMath_LengthSquared3(v48);
@@ -1030,16 +1033,16 @@ void Ter_AddObjectDraw(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObj
     pDraw->bSetsPrimField = bSetsPrimField;
     uFlags0 = Ter_GetMeshFlags(pModel, 0);
     uFlags3 = Ter_GetMeshFlags(pModel, 3);
-    if (uFlags0 & 1) {
-        if (uFlags0 & 2) {
+    if (uFlags0 & UOBJMESH_F0_ANIMATED) {
+        if (uFlags0 & UOBJMESH_F0_POSES) {
             if (GM_IsSpeedGolfMode()) return;
             pDraw->pObject = Ter_GetMeshChild(pModel, gTerRenderer.pObjectStateList[iObject].n18);
         }
     } else if ((uFlags3 & 4) || (uFlags3 & 0x10) || (uFlags3 & 0x20)) {
         if (GM_IsSpeedGolfMode()) return;
     }
-    if (pDraw->pObject->p18 != NULL) {
-        pDraw->eShaderObjectType = pDraw->pObject->p18->n0;
+    if (pDraw->pObject->pParts != NULL) {
+        pDraw->eShaderObjectType = pDraw->pObject->pParts->n0;
     }
     (*pCount)++;
 }
@@ -1057,7 +1060,7 @@ void Ter_DrawPatchPass(int nRenderPass) {
 
     bAny = 0;
     for (nList = 0; nList < 3; nList++) {
-        for (nClip = 0; nClip < 3; nClip++) {
+        for (nClip = 0; nClip < DC_CLIP_OUT_OF_VIEW; nClip++) {
             if (gTerRenderer.pSortedPatchList[nRenderPass][nList][(u32)nClip] != NULL) {
                 bAny = 1;
                 break;
@@ -1079,17 +1082,17 @@ void Ter_DrawPatchPass(int nRenderPass) {
                     Ter_SetZWrite(0);
                 }
             }
-            for (nClip = 0; nClip <= 2; nClip++) {
+            for (nClip = 0; nClip <= DC_CLIP_IN_VIEW; nClip++) {
                 if (gTerRenderer.pSortedPatchList[nRenderPass][nList][(u32)nClip] != NULL) {
                     switch (nClip) {
-                    case 2:
-                        RenderState_SetClipMode(1);
+                    case DC_CLIP_IN_VIEW:
+                        RenderState_SetClipMode(GX_CLIP_DISABLE);
                         break;
-                    case 1:
-                        RenderState_SetClipMode(1);
+                    case DC_CLIP_UNTESTED:
+                        RenderState_SetClipMode(GX_CLIP_DISABLE);
                         break;
                     default:
-                        RenderState_SetClipMode(0);
+                        RenderState_SetClipMode(GX_CLIP_ENABLE);
                         break;
                     }
                     RenderState_Flush();
@@ -1136,7 +1139,7 @@ void Ter_DrawFarClipPatches(void) {
     f32 fAC;
 
     bAny = 0;
-    for (nClip = 0; nClip < 3; nClip++) {
+    for (nClip = 0; nClip < DC_CLIP_OUT_OF_VIEW; nClip++) {
         if (gTerRenderer.pSortedPatchList[0][3][(u32)nClip] != NULL) {
             bAny = 1;
             break;
@@ -1155,17 +1158,17 @@ void Ter_DrawFarClipPatches(void) {
         Camera_SetLensFarClip((u8*)pLens, fAC);
         RenderState_Flush();
         RenderState_SetDrawFlags(0x70);
-        for (nClip = 0; nClip <= 2; nClip++) {
+        for (nClip = 0; nClip <= DC_CLIP_IN_VIEW; nClip++) {
             if (gTerRenderer.pSortedPatchList[0][3][(u32)nClip] != NULL) {
                 switch (nClip) {
-                case 2:
-                    RenderState_SetClipMode(1);
+                case DC_CLIP_IN_VIEW:
+                    RenderState_SetClipMode(GX_CLIP_DISABLE);
                     break;
-                case 1:
-                    RenderState_SetClipMode(1);
+                case DC_CLIP_UNTESTED:
+                    RenderState_SetClipMode(GX_CLIP_DISABLE);
                     break;
                 default:
-                    RenderState_SetClipMode(0);
+                    RenderState_SetClipMode(GX_CLIP_ENABLE);
                     break;
                 }
                 RenderState_Flush();
@@ -1213,14 +1216,14 @@ void Ter_DrawPostDrawPatches(void) {
     RenderState_SetDrawFlags(0x70);
     for (i = 0; i < gTerRenderer.iTotalPostDrawTerrainPatches; i++) {
         switch (gTerRenderer.pPostDrawTerrainList[i].eClipMethod) {
-        case 2:
-            RenderState_SetClipMode(1);
+        case DC_CLIP_IN_VIEW:
+            RenderState_SetClipMode(GX_CLIP_DISABLE);
             break;
-        case 1:
-            RenderState_SetClipMode(1);
+        case DC_CLIP_UNTESTED:
+            RenderState_SetClipMode(GX_CLIP_DISABLE);
             break;
         default:
-            RenderState_SetClipMode(0);
+            RenderState_SetClipMode(GX_CLIP_ENABLE);
             break;
         }
         RenderState_Flush();
@@ -1325,7 +1328,7 @@ void Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32
         RenderState_Flush();
     }
     if (uFlags2 & 8) {
-        Ter_DrawMeshCurrentPart((u8*)pMesh);
+        Ter_DrawMeshCurrentPart(pMesh);
         pMesh = Ter_GetMeshNext(pMesh);
     }
     if (bLake) {
@@ -1355,7 +1358,7 @@ void Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32
             RenderState_SetCameraMatrices();
             DS_vEnableZBufferUpdate(0);
             RenderState_Flush();
-            Ter_DrawMeshCurrentPart((u8*)pMesh);
+            Ter_DrawMeshCurrentPart(pMesh);
             DS_vEnableZBufferUpdate(1);
             RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
             RenderState_SetCameraMatrices();
@@ -1387,7 +1390,7 @@ void Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s
     Ter_ObjectDrawData* pDraw;
     s32 iObject;
     f32 fBias = 100.0f;
-    s32 eClipMethod = 3;
+    s32 eClipMethod = DC_CLIP_OUT_OF_VIEW;
     u8 bUseFog = 1;
     u8 bBit5 = 0;
     u8 bShaded = 1;
@@ -1405,14 +1408,14 @@ void Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s
         if (eClipMethod != pDraw->eClipMethod) {
             eClipMethod = pDraw->eClipMethod;
             switch (eClipMethod) {
-            case 2:
-                RenderState_SetClipMode(1);
+            case DC_CLIP_IN_VIEW:
+                RenderState_SetClipMode(GX_CLIP_DISABLE);
                 break;
-            case 1:
-                RenderState_SetClipMode(1);
+            case DC_CLIP_UNTESTED:
+                RenderState_SetClipMode(GX_CLIP_DISABLE);
                 break;
             default:
-                RenderState_SetClipMode(0);
+                RenderState_SetClipMode(GX_CLIP_ENABLE);
                 break;
             }
             bDirty = 1;
@@ -1435,8 +1438,8 @@ void Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s
         if (Ter_SetObjectRenderState(pDraw, 0)) {
             bDirty = 1;
         }
-        if ((gTerRenderer.pObjectStateList[iObject].a20[0] & 1)
-            && !(gTerRenderer.pObjectStateList[iObject].a20[0] & 2)) {
+        if ((gTerRenderer.pObjectStateList[iObject].a20[0] & UOBJMESH_F0_ANIMATED)
+            && !(gTerRenderer.pObjectStateList[iObject].a20[0] & UOBJMESH_F0_POSES)) {
             fDamp = 1.0f;
             if (gTerRenderer.fTreeDampingMaxForce) {
                 fDamp = gTerRenderer.fTreeDampingMaxForce
@@ -1457,8 +1460,8 @@ void Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s
                 fWave3 = fDamp * (gTerRenderer.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
                 SD_SetShaderTypeParameters(3, &fWave3);
             }
-        } else if ((gTerRenderer.pObjectStateList[iObject].a20[0] & 1)
-                   && (gTerRenderer.pObjectStateList[iObject].a20[0] & 2)) {
+        } else if ((gTerRenderer.pObjectStateList[iObject].a20[0] & UOBJMESH_F0_ANIMATED)
+                   && (gTerRenderer.pObjectStateList[iObject].a20[0] & UOBJMESH_F0_POSES)) {
             if (bDirty) {
                 RenderState_Flush();
                 bDirty = 0;
@@ -1474,7 +1477,7 @@ void Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s
             RenderState_Flush();
             bDirty = 0;
         }
-        Ter_DrawMeshCurrentPart((u8*)pDraw->pObject);
+        Ter_DrawMeshCurrentPart(pDraw->pObject);
         if (pDraw->bSetsPrimField) {
             bForce = 1;
         }
@@ -1547,8 +1550,8 @@ void Ter_StartCrowdAnimation(f32 fPercentage, f32 fDuration, f32 fDelay) {
         s32 nFlags = gTerRenderer.pObjectStateList[i].a20[0];
         s32 nFlags3 = gTerRenderer.pObjectStateList[i].a20[3];
 
-        if (nFlags & 1) {
-            if ((nFlags & 2) && !(nFlags3 & 0x40)) {
+        if (nFlags & UOBJMESH_F0_ANIMATED) {
+            if ((nFlags & UOBJMESH_F0_POSES) && !(nFlags3 & 0x40)) {
                 if (fPercentage >= fRand) {
                     gTerRenderer.pObjectStateList[i].n1C = 3;
                     gTerRenderer.pObjectStateList[i].f14 = gTerRenderer.pObjectStateList[i].f10;
@@ -1556,7 +1559,7 @@ void Ter_StartCrowdAnimation(f32 fPercentage, f32 fDuration, f32 fDelay) {
                 fRand *= 131.2934f;
                 fRand += 82.459f;
                 fRand -= Math_Floor(fRand);
-            } else if ((nFlags & 2) && (nFlags3 & 0x40)) {
+            } else if ((nFlags & UOBJMESH_F0_POSES) && (nFlags3 & 0x40)) {
                 if (fPercentage >= fRand) {
                     gTerRenderer.pObjectStateList[i].n1C = 1;
                     gTerRenderer.pObjectStateList[i].f14 = gTerRenderer.pObjectStateList[i].f10;
@@ -1580,8 +1583,8 @@ void Ter_StopCrowdAnimation(u8 bReset) {
         s32 nFlags = gTerRenderer.pObjectStateList[i].a20[0];
         s32 nFlags3 = gTerRenderer.pObjectStateList[i].a20[3];
 
-        if (nFlags & 1) {
-            if ((nFlags & 2) && !(nFlags3 & 0x40)) {
+        if (nFlags & UOBJMESH_F0_ANIMATED) {
+            if ((nFlags & UOBJMESH_F0_POSES) && !(nFlags3 & 0x40)) {
                 gTerRenderer.pObjectStateList[i].n1C = 0;
                 if (bReset) {
                     gTerRenderer.pObjectStateList[i].f14 = 0.0f;
@@ -1589,7 +1592,7 @@ void Ter_StopCrowdAnimation(u8 bReset) {
                 } else {
                     gTerRenderer.pObjectStateList[i].f14 = gTerRenderer.pObjectStateList[i].f10;
                 }
-            } else if ((nFlags & 2) && (nFlags3 & 0x40)) {
+            } else if ((nFlags & UOBJMESH_F0_POSES) && (nFlags3 & 0x40)) {
                 gTerRenderer.pObjectStateList[i].n1C = 0;
                 if (bReset) {
                     gTerRenderer.pObjectStateList[i].f14 = 0.0f;
@@ -1695,10 +1698,10 @@ void Ter_AnimateObjects(void) {
         }
         uFlags0 = gTerRenderer.pObjectStateList[i].a20[0];
         uFlags3 = gTerRenderer.pObjectStateList[i].a20[3];
-        if (!(uFlags0 & 1)) {
+        if (!(uFlags0 & UOBJMESH_F0_ANIMATED)) {
             continue;
         }
-        if ((uFlags0 & 2) && gTerRenderer.iCrowdPose != 0) {
+        if ((uFlags0 & UOBJMESH_F0_POSES) && gTerRenderer.iCrowdPose != 0) {
             if (gTerRenderer.iCrowdPose == 1) {
                 gTerRenderer.pObjectStateList[i].n18 = 0;
                 gTerRenderer.pObjectStateList[i].n1C = 0;
@@ -1707,7 +1710,7 @@ void Ter_AnimateObjects(void) {
                 gTerRenderer.pObjectStateList[i].n1C = 3;
             }
             gTerRenderer.pObjectStateList[i].f4 = gTerRenderer.fCrowdInterpValue;
-        } else if ((uFlags0 & 2) && !(uFlags3 & 0x40)) {
+        } else if ((uFlags0 & UOBJMESH_F0_POSES) && !(uFlags3 & 0x40)) {
             gTerRenderer.pObjectStateList[i].nC += (u32)(FRAME_RATE * fTime);
             if (gTerRenderer.pObjectStateList[i].n18 == gTerRenderer.pObjectStateList[i].n1C
                 || gTerRenderer.pObjectStateList[i].f14 > 0.0f) {
@@ -1761,7 +1764,7 @@ void Ter_AnimateObjects(void) {
                     }
                 }
             }
-        } else if ((uFlags0 & 2) && (uFlags3 & 0x40)) {
+        } else if ((uFlags0 & UOBJMESH_F0_POSES) && (uFlags3 & 0x40)) {
             gTerRenderer.pObjectStateList[i].nC += (u32)(FRAME_RATE * fTime);
             if (gTerRenderer.pObjectStateList[i].n18 == gTerRenderer.pObjectStateList[i].n1C
                 || gTerRenderer.pObjectStateList[i].f14 > 0.0f) {
@@ -1898,10 +1901,10 @@ void Ter_DrawPanoramaList(void* pHoleData, u32 nList) {
                 uFlags = Ter_GetMeshFlags(pMesh, 2);
                 if (!gSession.nSplitScreen || !(uFlags & 8)) {
                     pView = ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext);
-                    nClip = fn_80007B2C(pMesh, RC_spGetCurrentRenderCtx(), 0.0f,
-                                        gTerRenderer.fCameraMinHalfFieldOfViewTan,
-                                        pView->vViewScale[1]);
-                    if (nClip != 3) {
+                    nClip = LLObj_GetMeshClipMethod(pMesh, RC_spGetCurrentRenderCtx(), 0.0f,
+                                                    gTerRenderer.fCameraMinHalfFieldOfViewTan,
+                                                    pView->vViewScale[1]);
+                    if (nClip != DC_CLIP_OUT_OF_VIEW) {
                         // fake match: uFlags is reused for bUseFog (fog unless flag 0x20); a new local
                         // is computed after the call to Ter_GetMeshMipmapBiasScale, the original before it
                         uFlags = ((uFlags & 0x20) >> 5) ^ 1;
@@ -2243,16 +2246,16 @@ void Ter_DrawGrassPatches(int nRenderPass) {
     RenderState_Flush();
     RenderState_SetDrawFlags(0x70);
     for (nPass = 0, nPassBit = 1; nPass < 1; nPass++, nPassBit <<= 1) {
-        for (nClip = 0; nClip <= 2; nClip++) {
+        for (nClip = 0; nClip <= DC_CLIP_IN_VIEW; nClip++) {
             switch (nClip) {
-            case 2:
-                RenderState_SetClipMode(1);
+            case DC_CLIP_IN_VIEW:
+                RenderState_SetClipMode(GX_CLIP_DISABLE);
                 break;
-            case 1:
-                RenderState_SetClipMode(1);
+            case DC_CLIP_UNTESTED:
+                RenderState_SetClipMode(GX_CLIP_DISABLE);
                 break;
             default:
-                RenderState_SetClipMode(0);
+                RenderState_SetClipMode(GX_CLIP_ENABLE);
                 break;
             }
             RenderState_Flush();
@@ -2285,16 +2288,16 @@ void Ter_DrawGrassPatchesPass3(void) {
     Ter_SetZWrite(0);
     RenderState_Flush();
     RenderState_SetDrawFlags(0x70);
-    for (nClip = 0; nClip <= 2; nClip++) {
+    for (nClip = 0; nClip <= DC_CLIP_IN_VIEW; nClip++) {
         switch (nClip) {
-        case 2:
-            RenderState_SetClipMode(1);
+        case DC_CLIP_IN_VIEW:
+            RenderState_SetClipMode(GX_CLIP_DISABLE);
             break;
-        case 1:
-            RenderState_SetClipMode(1);
+        case DC_CLIP_UNTESTED:
+            RenderState_SetClipMode(GX_CLIP_DISABLE);
             break;
         default:
-            RenderState_SetClipMode(0);
+            RenderState_SetClipMode(GX_CLIP_ENABLE);
             break;
         }
         RenderState_Flush();
@@ -2343,9 +2346,9 @@ void Ter_BuildGrassPatchList(void* pUnused) {
                 fDist = 0.0f;
             }
             pView = ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext);
-            nClip = fn_80007B2C(Ter_GetGroundDrawMesh(pPatch->pGround), pCamera, fDist,
-                                gTerRenderer.fCameraMinHalfFieldOfViewTan, pView->vViewScale[1]);
-            if (nClip != 3) {
+            nClip = LLObj_GetMeshClipMethod(Ter_GetGroundDrawMesh(pPatch->pGround), pCamera, fDist,
+                                            gTerRenderer.fCameraMinHalfFieldOfViewTan, pView->vViewScale[1]);
+            if (nClip != DC_CLIP_OUT_OF_VIEW) {
                 Mem_cpy(pGrass, pPatch, sizeof(Ter_PatchReference));
                 pGrass->eClipMethod = nClip;
                 pGrass->fDistance = fDist;
@@ -2594,7 +2597,7 @@ s32 Ter_GetMeshFlags(UObjMesh* pNode, s32 n) {
 }
 
 UObjMesh* Ter_GetMeshChild(UObjMesh* pNode, s32 n) {
-    return pNode->p8[n];
+    return pNode->ppChildren[n];
 }
 
 // How many nodes the node holds.
@@ -2603,7 +2606,7 @@ s32 Ter_GetMeshChildCount(UObjMesh* pNode) {
 }
 
 // The root of the hole data's model tree (the pointer at offset 0xEC of the hole data, whose layout
-// is not described): its p8[1] holds a mesh per patch.
+// is not described): its ppChildren[1] holds a mesh per patch.
 UObjMesh* Ter_GetHoleModelRoot(u8* pHoleData) {
     return *(UObjMesh**)(pHoleData + 0xEC);
 }
@@ -2613,14 +2616,11 @@ f32* Ter_GetMeshBounds(UObjMesh* pMesh) {
     return pMesh->pInfo->a68;
 }
 
-// Draws the mesh's current part: if part n28 is switched on (byte 0x1C + n28), hands its 0x2C-byte
-// UObjMeshPart (p18[n28]) to LLObj_Gc.c's fn_800082CC, as Object_DrawMesh does. Raw offsets: the
-// mesh comes in as bytes.
-void Ter_DrawMeshCurrentPart(u8* pObject) {
-    s32 n = *(s32*)(pObject + 0x28);
-
-    if (pObject[n + 0x1C] != 0) {
-        fn_800082CC((UObjMeshPart*)(*(u8**)(pObject + 0x18) + n * 0x2C));
+// Draws the mesh's part nDrawPart, when that part is in use (ObjPart_Draw), as Object_DrawMesh
+// does.
+void Ter_DrawMeshCurrentPart(UObjMesh* pMesh) {
+    if (pMesh->abPartUsed[pMesh->nDrawPart] != 0) {
+        ObjPart_Draw(&pMesh->pParts[pMesh->nDrawPart]);
     }
 }
 

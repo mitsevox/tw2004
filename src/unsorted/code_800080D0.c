@@ -60,6 +60,7 @@ void fn_8000827C(UObjMeshPart* pPart, UObjArraySet* pSet, int nType, void* pArg)
     pPart->pFuncs->p0(pPart, pArg);
 }
 
-void fn_800082CC(UObjMeshPart* pPart) {
+// Draws a mesh part through its type's draw function (UObjPartFuncs.p8).
+void ObjPart_Draw(UObjMeshPart* pPart) {
     pPart->pFuncs->p8(pPart);
 }
