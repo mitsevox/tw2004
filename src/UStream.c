@@ -38,7 +38,7 @@ static CDBuf* gpUsedList;         // parsed buffers the movie player still holds
 static ParseInProg gFill;         // the object being filled and how far
 static MemPoolPtr gpNodePool;     // the TStreamQueue nodes of gpDoneList
 static TStreamQueue* gpDoneList;  // objects the parser finished, oldest first
-static void* gpBufferMemory;      // the USTREAM_NUM_BUFFERS buffers (UStream_AllocBuffers)
+static void* gpBufferMemory;      // the USTREAM_NUM_BUFFERS buffers (Stream_InitOnce)
 static int  gnCurStream;          // the stream being read; -1: none
 static int  gnNumStreams;         // streams open
 static volatile s8 gbReadPending; // a read is in flight
@@ -48,15 +48,15 @@ static int  gnReadErrors;         // failed reads in a row; nothing tests it
 static u8   gbAutoRead;           // each completed read starts the next (UStream_SetAutoRead)
 static s8   gbPaused;             // no read starts while set; nothing sets it
 
-static int gnNumHandlers = -1;    // entries of gHandlers in use; -1 before UStream_Init and after
-                                  // UStream_CloseAll
+static int gnNumHandlers = -1;    // entries of gHandlers in use; -1 before Stream_InitModule and after
+                                  // Stream_CloseModule
 
 static void myAsyncReadCallback(int bytesRead, int error);
 static void _readBufAsync(void);
 static u8* UStream_Fill(u8* pDst, u32 value, u32 uCount);
 static u8* UStream_Copy(u8* pDst, const u8* pSrc, u32 uCount);
 static void UStream_Decompress(const void* pSrc, void* pDst, u32 uSize);
-static void fn_8000E708(StreamFileList* p);
+static void Stream_ClearFileCallbacks(StreamFileList* streamFileList);
 
 // ---- buffers ------------------------------------------------------------------------------
 
@@ -193,9 +193,9 @@ static int loadStreamChunk(ParseInProg* curParseInfo, StreamChunk* cp) {
         u8* pNext = pCode + cp->nScriptLen;
 
         uExtra = 0;
-        MustLoad = fn_8000EA1C(pCode, 0, -1, NULL);
+        MustLoad = RPN_RunScript(pCode, 0, -1, NULL);
         if (MustLoad) {
-            fn_8000EA1C(pNext, 0, -1, NULL);
+            RPN_RunScript(pNext, 0, -1, NULL);
         }
     }
     if (MustLoad) {
@@ -633,7 +633,7 @@ static void Stream_ParseBufs(void) {
 
 // ---- files ------------------------------------------------------------------------------
 
-// Empty in this build: UStream_CloseAll calls it when it shuts the loader down, once it has marked
+// Empty in this build: Stream_CloseModule calls it when it shuts the loader down, once it has marked
 // the current stream's file closed.
 static void UStream_OnShutdown(void) {
 }
@@ -791,61 +791,70 @@ u8 Stream_Progress(void) {
     return 1;
 }
 
-// An object is done with its source buffer: drop the reference and recycle drained buffers.
-void UStream_ReleaseObjectBuffer(CDBuf** ppBuffer) {
-    CDBuf* p;
-    CDBuf* pPrev;
+// The movie player is done with a chunk of buffer *ppBuffer (a VideoChunk's pBuffer): one
+// reference fewer. Every buffer on the used list that no chunk holds any more goes back to the
+// released list.
+void UStream_ReleaseBufferRef(CDBuf** ppBuffer) {
+    CDBuf* cdp;
+    CDBuf* walkp;
     if (gnCurStream == -1) return;
     (*ppBuffer)->nRefs--;
-    pPrev = gpUsedList;
-    if (pPrev == NULL) return;
-    while ((p = pPrev->pNext) != NULL) {
-        if (p->nRefs == 0) {
-            pPrev->pNext = p->pNext;
-            p->pNext = NULL;
-            addToFreeList(p);
+    walkp = gpUsedList;
+    if (walkp == NULL) return;
+    while ((cdp = walkp->pNext) != NULL) {
+        if (cdp->nRefs == 0) {
+            walkp->pNext = cdp->pNext;
+            cdp->pNext = NULL;
+            addToFreeList(cdp);
         } else {
-            pPrev = p;
+            walkp = cdp;
         }
     }
     if (gpUsedList->nRefs == 0) {
-        p = gpUsedList;
-        gpUsedList = p->pNext;
-        p->pNext = NULL;
-        addToFreeList(p);
+        cdp = gpUsedList;
+        gpUsedList = cdp->pNext;
+        cdp->pNext = NULL;
+        addToFreeList(cdp);
     }
 }
 
-// Stop the current stream at the end of what has been read. Returns whether a read is still
-// pending (0 when no stream is open).
-int UStream_Stop(void) {
-    StrmCB* pStream;
+// Marks the current stream's file read to its end (bEOF): no read of it starts after the one in
+// flight, and once what was read is parsed the stream moves on to its next file, if it has one.
+// The movie player calls it when a movie ends or is stopped, the front end when the menu golfer's
+// load is interrupted (FE_StreamFunc_SkinInterrupt). Returns 1 while a read is still in flight,
+// else 0 (also with no current stream).
+int Stream_StopLoading(void) {
+    StrmCB* gs;
     if (gnCurStream < 0) return 0;
-    pStream = &gStreams[gnCurStream];
-    pStream->bEOF = 1;
+    gs = &gStreams[gnCurStream];
+    gs->bEOF = 1;
     return gbReadPending ? 1 : 0;
 }
 
-// Shut the loader down: no handlers, the current stream closed once no read is pending, the node
-// pool deleted.
-void UStream_CloseAll(void) {
-    StrmCB* pStream;
-    int hFile;
+// The main loop's shut-down: the handler table is emptied (gnNumHandlers -1, until
+// Stream_InitModule). With a stream open, the current stream's file is marked closed, so that a
+// read still in flight is dropped when it finishes; once none is, the stream is closed through
+// Stream_CloseStreamFile (with its file handle back for the File_Close), which can refuse, and
+// its file is marked closed again. Then the node pool is
+// deleted (not when streams are counted open with none current: it returns first).
+void Stream_CloseModule(void) {
+    StrmCB* gs;
+    int saveFD;
     gnNumHandlers = -1;
     if (gnNumStreams > 0) {
         if (gnCurStream == -1) return;
-        pStream = &gStreams[gnCurStream];
-        hFile = pStream->hFile;
-        pStream->hFile = -1;
+        gs = &gStreams[gnCurStream];
+        saveFD = gs->hFile;
+        gs->hFile = -1;
         UStream_OnShutdown();
-        pStream->nFileSize = 0;
-        pStream->nFilePos = 0;
+        gs->nFileSize = 0;
+        gs->nFilePos = 0;
         while (gbReadPending) {
             DiscError_WaitForDrive();
         }
-        pStream->hFile = hFile;
-        UStream_Close(gnCurStream);
-        pStream->hFile = -1;
+        gs->hFile = saveFD;
+        Stream_CloseStreamFile(gnCurStream);
+        gs->hFile = -1;
     }
     if (gpNodePool != NULL) {
         DeleteMemPool(gpNodePool);
@@ -853,94 +862,104 @@ void UStream_CloseAll(void) {
     }
 }
 
-// Close stream nStream. Only the most recently opened stream can be closed, and only when
-// nothing is in flight. Returns nStream or -1.
-int UStream_Close(int nStream) {
+// Closes stream whichFile (an index Stream_OpenStreamFiles returned): its file closed, the object
+// being filled freed, the stream before it made current, and its current file's apfnClosed
+// called. Refused (-1) with no current stream, for an index below the current stream's or above
+// the number open, while a read is in flight, when the File_Close fails, and, for any stream but
+// the first, while buffers are being parsed or the movie player holds some. Returns whichFile.
+int Stream_CloseStreamFile(int whichFile) {
     int i;
     if (gnCurStream == -1) return -1;
-    if (nStream > gnNumStreams || nStream < 0) return -1;
-    if (nStream < gnCurStream) return -1;
+    if (whichFile > gnNumStreams || whichFile < 0) return -1;
+    if (whichFile < gnCurStream) return -1;
     if (gbReadPending) return -1;
-    if (gpCurList != NULL && nStream > 0) return -1;
-    if (gpUsedList != NULL && nStream > 0) return -1;
-    if (File_Close(gStreams[(u32)nStream].hFile) != 0) return -1;
+    if (gpCurList != NULL && whichFile > 0) return -1;
+    if (gpUsedList != NULL && whichFile > 0) return -1;
+    if (File_Close(gStreams[(u32)whichFile].hFile) != 0) return -1;
     if (gFill.pObject != NULL) {
         Circular_MemFreeFunc(gFill.pObject);
         gFill.pObject = NULL;
     }
     gnCurStream--;
     gnNumStreams--;
-    i = gStreams[(u32)nStream].nFileIndex;
-    if (gStreams[(u32)nStream].params.apfnClosed[i] != NULL) {
-        gStreams[(u32)nStream].params.apfnClosed[i](gStreams[(u32)nStream].params.apClosedArg[i]);
+    i = gStreams[(u32)whichFile].nFileIndex;
+    if (gStreams[(u32)whichFile].params.apfnClosed[i] != NULL) {
+        gStreams[(u32)whichFile].params.apfnClosed[i](gStreams[(u32)whichFile].params.apClosedArg[i]);
     }
-    return nStream;
+    return whichFile;
 }
 
-// Open a stream from a parameter block. Returns the stream index or a negative error.
-int Stream_OpenStreamFiles(const StreamFileList* pParams) {
-    int nStream;
-    StrmCB* pStream;
-    if (gbReadPending) return -0x68;
-    if (gReadyRing[gReadyRingTail] != NULL) return -0x69;
-    if (gpCurList != NULL) return -0x67;
-    if (gpUsedList != NULL) return -0x66;
+// Opens a stream on a copy of the file list streamFileList, with no read limit, opens its first
+// file (Stream_OpenFileForStreaming) and makes it the current stream. Returns its index, or a
+// USTREAM_ERR_ value while a read is in flight, a read buffer waits to be parsed, buffers are
+// being parsed or the movie player holds some, or when USTREAM_MAX_STREAMS are open.
+int Stream_OpenStreamFiles(const StreamFileList* streamFileList) {
+    int ourIndex;
+    StrmCB* gs;
+    if (gbReadPending) return USTREAM_ERR_READ_PENDING;
+    if (gReadyRing[gReadyRingTail] != NULL) return USTREAM_ERR_READ_WAITING;
+    if (gpCurList != NULL) return USTREAM_ERR_PARSING;
+    if (gpUsedList != NULL) return USTREAM_ERR_BUFFERS_HELD;
     if (gnNumStreams > 0) {
-        if (gnNumStreams >= USTREAM_MAX_STREAMS) return -0x65;
-        nStream = gnNumStreams;
+        if (gnNumStreams >= USTREAM_MAX_STREAMS) return USTREAM_ERR_TOO_MANY_STREAMS;
+        ourIndex = gnNumStreams;
     } else {
-        nStream = 0;
+        ourIndex = 0;
     }
-    pStream = &gStreams[nStream];
-    pStream->nReadBudget = -1;
-    pStream->nUnkC = -2;
-    pStream->nFileIndex = 0;
-    Mem_cpy(&pStream->params, pParams, sizeof(StreamFileList));
-    Stream_OpenFileForStreaming(pStream);
-    gnCurStream = nStream;
+    gs = &gStreams[ourIndex];
+    gs->nReadBudget = -1;
+    gs->nReserved = -2;
+    gs->nFileIndex = 0;
+    Mem_cpy(&gs->params, streamFileList, sizeof(StreamFileList));
+    Stream_OpenFileForStreaming(gs);
+    gnCurStream = ourIndex;
     gnNumStreams++;
-    return nStream;
+    return ourIndex;
 }
 
-// Open a single file by name.
-int Stream_OpenStreamFile(const char* pName) {
-    StreamFileList params;
-    memset(&params, 0, sizeof(params));
-    fn_8000E708(&params);
-    params.nNumFiles = 1;
-    strcpy(params.aszName[0], pName);
-    return Stream_OpenStreamFiles(&params);
+// Opens a stream on the one file streamFileName, with no callbacks (Stream_OpenStreamFiles): the
+// movie player's.
+int Stream_OpenStreamFile(const char* streamFileName) {
+    StreamFileList streamFileList;
+    memset(&streamFileList, 0, sizeof(streamFileList));
+    Stream_ClearFileCallbacks(&streamFileList);
+    streamFileList.nNumFiles = 1;
+    strcpy(streamFileList.aszName[0], streamFileName);
+    return Stream_OpenStreamFiles(&streamFileList);
 }
 
-// Register (or reference again) the handler for an object type.
-int Stream_RegisterLoadChunkCallback(int nType, void (*pfnHandler)(TStreamData*)) {
+// Makes callbackPtr the handler of the objects of type chunkType (a 4-character tag), which
+// Stream_Progress hands each one to; the same pair registered again counts one more reference.
+// Returns 0 when the table is full (USTREAM_MAX_HANDLERS), else 1.
+int Stream_RegisterLoadChunkCallback(int chunkType, LoadChunkCallbackPtr callbackPtr) {
     int i;
-    int n = gnNumHandlers;
-    if (n >= USTREAM_MAX_HANDLERS) return 0;
-    for (i = 0; i < n; i++) {
-        if (gHandlers[i].nType == nType && gHandlers[i].pfnHandler == pfnHandler) {
+    int nHandlers = gnNumHandlers;
+    if (nHandlers >= USTREAM_MAX_HANDLERS) return 0;
+    for (i = 0; i < nHandlers; i++) {
+        if (gHandlers[i].nType == chunkType && gHandlers[i].pfnHandler == callbackPtr) {
             gHandlers[i].nRefs++;
             return 1;
         }
     }
-    gHandlers[n].nType = nType;
-    gHandlers[n].pfnHandler = pfnHandler;
-    gHandlers[n].nRefs = 1;
+    gHandlers[nHandlers].nType = chunkType;
+    gHandlers[nHandlers].pfnHandler = callbackPtr;
+    gHandlers[nHandlers].nRefs = 1;
     gnNumHandlers++;
     return 1;
 }
 
-// Drop one reference to a type's handler; remove it when the count reaches zero.
-int Stream_UnregisterLoadChunkCallback(int nType) {
-    int n = gnNumHandlers;
-    int i;
-    for (i = 0; i < n; i++) {
-        if (gHandlers[i].nType == nType) {
-            gHandlers[i].nRefs--;
-            if (gHandlers[i].nRefs == 0) {
-                int k;
-                for (k = i; k < n - 1; k++) {
-                    gHandlers[k] = gHandlers[k + 1];
+// Drops one reference to the first handler of type chunkType; with none left it leaves the table
+// (the entries after it move down). Returns 1, or 0 when the type has no handler.
+int Stream_UnregisterLoadChunkCallback(int chunkType) {
+    int nHandlers = gnNumHandlers;
+    int cb;
+    for (cb = 0; cb < nHandlers; cb++) {
+        if (gHandlers[cb].nType == chunkType) {
+            gHandlers[cb].nRefs--;
+            if (gHandlers[cb].nRefs == 0) {
+                int cbdel;
+                for (cbdel = cb; cbdel < nHandlers - 1; cbdel++) {
+                    gHandlers[cbdel] = gHandlers[cbdel + 1];
                 }
                 gnNumHandlers--;
             }
@@ -950,29 +969,31 @@ int Stream_UnregisterLoadChunkCallback(int nType) {
     return 0;
 }
 
-// One-time allocation of the 18 read buffers.
-void UStream_AllocBuffers(void) {
+// The game's start-up, once: the memory of the USTREAM_NUM_BUFFERS read buffers. A read waits for
+// fillBuffers to start it until the movie player sets gbAutoRead.
+void Stream_InitOnce(void) {
     gpBufferMemory = Mem_AllocFunc(USTREAM_NUM_BUFFERS * sizeof(CDBuf), 0x40, 1);
     gbAutoRead = 0;
 }
 
-void UStream_FreeBuffers(void) {
+// The game's shut-down, once: frees the read buffers' memory.
+void Stream_CloseOnce(void) {
     if (gpBufferMemory != NULL) {
         Mem_FreeFunc(gpBufferMemory);
         gpBufferMemory = NULL;
     }
 }
 
-// Reset all state: rings, lists, the buffer free list, the node pool and the handler table.
-void UStream_Init(void) {
+// The main loop's start-up: no read in flight, the rings, lists and object queue empty, every read
+// buffer on the released list, a new node pool for the done list, no stream open and the handler
+// table empty.
+void Stream_InitModule(void) {
     s32 i;
-    CDBuf* p;
-    CDBuf* pPrev;
-    s32 n;
+    CDBuf* bp;
+    CDBuf* lastBp;
+    s32 numBuffers;
     gbReadPending = 0;
     gpReadBuffer = NULL;
-    // section note: a chain, as .sbss is laid out last-defined-first; two statements store in the
-    // other order
     gReadyRingHead = gReadyRingTail = 0;
     gRPNSBase = 0;
     gpQueueHead = NULL;
@@ -985,22 +1006,22 @@ void UStream_Init(void) {
         gFreeRing[i] = NULL;
     }
     gpNodePool = NULL;
-    pPrev = NULL;
-    p = (CDBuf*)gpBufferMemory;
-    n = USTREAM_NUM_BUFFERS;
+    lastBp = NULL;
+    bp = (CDBuf*)gpBufferMemory;
+    numBuffers = USTREAM_NUM_BUFFERS;
     do {
-        p->pNext = pPrev;
-        p->uPos = 0;
-        p->nRefs = 0;
-        pPrev = p;
-        p++;
-    } while (--n);
-    gpFreeList = pPrev;
+        bp->pNext = lastBp;
+        bp->uPos = 0;
+        bp->nRefs = 0;
+        lastBp = bp;
+        bp++;
+    } while (--numBuffers);
+    gpFreeList = lastBp;
     gpCurList = NULL;
     gpUsedList = NULL;
     gFill.pObject = NULL;
     gpDoneList = NULL;
-    gpNodePool = CreateMemPool(0x200, 8, MEMTYPE_HIGH, 0x10);
+    gpNodePool = CreateMemPool(USTREAM_NUM_QUEUE_NODES, sizeof(TStreamQueue), MEMTYPE_HIGH, 0x10);
     gnNumStreams = 0;
     gnNumHandlers = 0;
     for (i = 0; i < USTREAM_MAX_HANDLERS; i++) {
@@ -1008,40 +1029,42 @@ void UStream_Init(void) {
     }
 }
 
-// Clears the per-file callbacks of a stream's open parameters.
-static void fn_8000E708(StreamFileList* p) {
+// Clears every file's open and close callbacks in streamFileList, and the open callbacks'
+// arguments.
+static void Stream_ClearFileCallbacks(StreamFileList* streamFileList) {
     int i;
 
     for (i = 0; i < USTREAM_MAX_FILES; i++) {
-        p->apfnOpened[i] = NULL;
-        p->apfnClosed[i] = NULL;
-        p->apOpenedArg[i] = NULL;
-        p->apOpenedArg[i] = NULL;   // EA bug: clears apOpenedArg twice; apClosedArg is never cleared
+        streamFileList->apfnOpened[i] = NULL;
+        streamFileList->apfnClosed[i] = NULL;
+        streamFileList->apOpenedArg[i] = NULL;
+        streamFileList->apOpenedArg[i] = NULL;
     }
 }
 
-// Copies a delivered object's data into pDst (at most uMax bytes) and frees the object. Returns
-// the number of bytes copied.
-u32 Stream_StreamLoadFixedSize(TStreamData* pObject, u32 uMax, void* pDst) {
-    void* pData;
-    u32 uSize;
+// A handler's load of a table of known size: copies the object's data into pInFillBuffer, at most
+// expectedSize bytes, and frees the object. Returns the bytes copied (0 for an empty object).
+u32 Stream_StreamLoadFixedSize(TStreamData* pStreamData, u32 expectedSize, void* pInFillBuffer) {
+    void* pFileData;
+    u32 datasize;
 
-    uSize = fn_8000E81C(pObject, &pData);
-    if (uSize != 0) {
-        if (uSize != uMax) {
-            uSize = (uSize <= uMax) ? uSize : uMax;
+    datasize = Stream_StreamLoadVariableSize(pStreamData, &pFileData);
+    if (datasize != 0) {
+        if (datasize != expectedSize) {
+            datasize = (datasize <= expectedSize) ? datasize : expectedSize;
         }
-        Mem_cpy(pDst, pObject->pData, uSize);
+        Mem_cpy(pInFillBuffer, pStreamData->pData, datasize);
     }
-    Circular_MemFreeFunc(pObject);
-    return uSize;
+    Circular_MemFreeFunc(pStreamData);
+    return datasize;
 }
 
-// An object's data and its size.
-u32 fn_8000E81C(TStreamData* pObject, void** ppData) {
-    u32 uSize;
+// Sets *ppFileData to the object's data and returns its size. The object stays; the handlers that
+// call it copy the data and free the object when the size is not 0.
+u32 Stream_StreamLoadVariableSize(TStreamData* pStreamData, void** ppFileData) {
+    u32 datasize;
 
-    uSize = pObject->uSize;
-    *ppData = pObject->pData;
-    return uSize;
+    datasize = pStreamData->uSize;
+    *ppFileData = pStreamData->pData;
+    return datasize;
 }

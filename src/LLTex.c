@@ -1,6 +1,6 @@
 // LLTex.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): texture banks, made
 // from the 'txf ' objects of the stream files, and the byte-code scripts that drive the texture
-// items (fn_8000EA1C).
+// items (RPN_RunScript).
 
 #include "engine.h"
 #include "gx.h"
@@ -112,7 +112,7 @@ void fn_8000E9A8(int nId, int nMsg, int bOn) {
 // above a 1. An opcode with bit 7 set pushes its low 7 bits; opcodes 9 and up pop one operand (a,
 // the top), 0x1D and up a second (b), 0x38 and up a third (c). Every opcode that makes a value
 // pushes it.
-int fn_8000EA1C(u8* pCode, int nArg, int nPush, DynObj* pObj) {
+int RPN_RunScript(u8* pCode, int nArg, int nPush, DynObj* pObj) {
     int a;
     int b;
     int nSp;

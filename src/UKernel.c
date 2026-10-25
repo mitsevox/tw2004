@@ -267,11 +267,11 @@ void Kernel_SweepDeadObjects(void) {
 }
 
 // Marks the object for removal: its id n134 becomes 0 (Kernel_SweepDeadObjects frees it later),
-// first running its p160 byte-code (fn_8000EA1C) unless p160 is NULL or flag 0x20000000 is set.
+// first running its p160 byte-code (RPN_RunScript) unless p160 is NULL or flag 0x20000000 is set.
 void Kernel_ReleaseObject(DynObj* pObj) {
     if (pObj->n134 != 0) {
         if (!(pObj->uFlags & 0x20000000) && pObj->p160 != NULL) {
-            fn_8000EA1C(pObj->p160, !(pObj->uFlags & 0x10000000), -1, pObj);
+            RPN_RunScript(pObj->p160, !(pObj->uFlags & 0x10000000), -1, pObj);
         }
         pObj->n134 = 0;
     }
@@ -319,7 +319,7 @@ int Kernel_PostPairToObject(DynObj* pObj, int a, int b, int bOverflow) {
 }
 
 // Stores (a, b) on every object with an id (n134 not 0) whose actor id n140 (the actor chunk's id)
-// is nKey; nothing when a is 126. The actor byte-code's opcode 56 (fn_8000EA1C).
+// is nKey; nothing when a is 126. The actor byte-code's opcode 56 (RPN_RunScript).
 void Kernel_PostPairByActorId(int nKey, int a, int b) {
     DynObj* pObj;
 

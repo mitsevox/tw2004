@@ -252,8 +252,6 @@ void fn_80037DD8(void);
 void PsBallFx_InitModule(void);
 void fn_800B251C_ShadowInit(int n);
 void UI_Obj_InitModule(void);
-void UStream_CloseAll(void);
-void UStream_Init(void);
 void FE_vUpdateGolferAll(void);
 
 f32  fn_8006C630(void);
@@ -389,7 +387,7 @@ void fn_8006C7A8(void) {
     AudMem_InitModule();
     fn_800080D4();
     Resources_InitModule();
-    UStream_Init();
+    Stream_InitModule();
     GoARAM_InitModule();
     fn_8000F060();
     fn_8006DC44();
@@ -445,7 +443,7 @@ void fn_8006C854(void) {
     fn_8006DC48();
     fn_8000F0E8();
     GoARAM_CloseModule();
-    UStream_CloseAll();
+    Stream_CloseModule();
     Resources_CloseModule();
     fn_80071890();
     fn_800081C4();

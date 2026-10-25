@@ -561,7 +561,7 @@ static void StreamManagerLoadScreen_AddStreamFileName(const char* fileName,
 
 // Each list's close and open: the list's stream is kept in gpStreamManagerLists->nStream.
 static void StreamManagerIngame_CloseStreamFiles(void) {
-    UStream_Close(gpStreamManagerLists->nStream);
+    Stream_CloseStreamFile(gpStreamManagerLists->nStream);
 }
 
 static void StreamManagerIngame_OpenStreamFiles(void) {
@@ -571,7 +571,7 @@ static void StreamManagerIngame_OpenStreamFiles(void) {
 }
 
 static void StreamManagerFrontend_CloseStreamFiles(void) {
-    UStream_Close(gpStreamManagerLists->nStream);
+    Stream_CloseStreamFile(gpStreamManagerLists->nStream);
 }
 
 static void StreamManagerFrontend_OpenStreamFiles(void) {
@@ -581,7 +581,7 @@ static void StreamManagerFrontend_OpenStreamFiles(void) {
 }
 
 static void StreamManagerLoadScreen_CloseStreamFiles(void) {
-    UStream_Close(gpStreamManagerLists->nStream);
+    Stream_CloseStreamFile(gpStreamManagerLists->nStream);
 }
 
 static void StreamManagerLoadScreen_OpenStreamFiles(void) {
@@ -591,7 +591,7 @@ static void StreamManagerLoadScreen_OpenStreamFiles(void) {
 }
 
 static void StreamManagerStartup_CloseStreamFiles(void) {
-    UStream_Close(gpStreamManagerLists->nStream);
+    Stream_CloseStreamFile(gpStreamManagerLists->nStream);
 }
 
 static void StreamManagerStartup_OpenStreamFiles(void) {
@@ -607,7 +607,7 @@ static void StreamManagerGlobals_OpenStreamFiles(void) {
 }
 
 static void StreamManagerHole_CloseStreamFiles(void) {
-    UStream_Close(gpStreamManagerLists->nStream);
+    Stream_CloseStreamFile(gpStreamManagerLists->nStream);
 }
 
 static void StreamManagerHole_OpenStreamFiles(void) {

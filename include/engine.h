@@ -408,7 +408,7 @@ typedef struct LLTexItemList {
 } LLTexItemList;
 extern LLTexItemList* lbl_80281C60;
 
-// LLTex.c's script interpreter (fn_8000EA1C): its value stack, a flag that stops every script, and
+// LLTex.c's script interpreter (RPN_RunScript): its value stack, a flag that stops every script, and
 // the four variable tables its opcodes read and write. lbl_80281C6C's entries from 7 on hold
 // addresses that some opcodes read and write through; lbl_80281C74 keeps its values times 5.
 extern int lbl_801A3438[8];
@@ -422,7 +422,7 @@ struct DynObj;
 // Runs a byte-code script and returns the value left on top of the stack (1 for an empty script).
 // An opcode reads nArg; nPush, when not negative, starts on the stack; pObj is the DynObj the
 // script asks for values or sends messages (NULL for a stream object's scripts).
-int  fn_8000EA1C(u8* pCode, int nArg, int nPush, struct DynObj* pObj);
+int  RPN_RunScript(u8* pCode, int nArg, int nPush, struct DynObj* pObj);
 
 // Find a loaded texture by its packed name: its bank and entry (both NULL if none).
 int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
@@ -1226,10 +1226,11 @@ void PostFx_SetBlur(u8 b, int nView, f32 f4, f32 f8);   // sets (b) or clears vi
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
-// An object built from SHOC chunks. The header is 0x34 bytes (FETextureMgr.c copies one, the
-// loading bar's; URes.c's divider gResDivider is one), then the rest of the
-// copied chunk header (chunk+0x30 onward: a word, the name's length at 0x38, the name at 0x40)
-// and, 0x80-aligned, the data.
+// An object built from SHOC chunks (loadStreamChunk). The header is 0x34 bytes (FETextureMgr.c
+// copies one, the loading bar's; URes.c's divider gResDivider is one); from uFlags on it holds the
+// SHDR chunk's fields from its uFlags on. A 'Csac' keeps more of its SHDR chunk after the header:
+// from StreamChunk.unk30 on, 8 bytes plus nScriptLen + nKeepLen rounded up to a word. Then, at
+// USTREAM_DATA_ALIGN, the data.
 typedef struct TStreamData {
     u8*   pData;                  // 0x00
     u32   uHandlerData;           // 0x04  0 when made; what its handler made of it, kept here (a
@@ -1239,24 +1240,27 @@ typedef struct TStreamData {
     struct TStreamData* pPrev;    // 0x0C  finished-object queue; resource list: toward the tail
     struct TStreamData* pNext;    // 0x10  resource list: toward the head
     int   nReserved;              // 0x14  cleared when the object is made; nothing reads it
-    u32   uFlags;                 // 0x18  chunk+0x14: where its block came from (a TTypeAcces;
-                                  //       MEMTYPE_HIGH for txf / Cpyr / Cact / txf2)
-    u32   uType;                  // 0x1C  chunk+0x18, e.g. 'ter '
-    u32   uId;                    // 0x20  chunk+0x1C: the object's id within its type (Resources_Get
+    u32   uFlags;                 // 0x18  where its block came from (a TTypeAcces; MEMTYPE_HIGH
+                                  //       for txf / Cpyr / Cact / txf2)
+    u32   uType;                  // 0x1C  e.g. 'ter '
+    u32   uId;                    // 0x20  the object's id within its type (Resources_Get
                                   //       finds objects by type and id); for skalib's SAL and BNK
                                   //       objects, the animation slot
-    u32   uSize;                  // 0x24  chunk+0x20 decompressed size
-    u32   aScriptRefs[3];         // 0x28  chunk+0x24: three byte-code scripts (fn_8000EA1C), offsets
+    u32   uSize;                  // 0x24  the data's (unpacked) size
+    u32   aScriptRefs[3];         // 0x28  three byte-code scripts (RPN_RunScript), offsets
                                   //       into the last 'RPNS' object's data until Stream_Progress
                                   //       makes them pointers (DynObjNames reads them so)
 } TStreamData;
 LAYOUT_ASSERT(TStreamData, 0x34);
 
-int  Stream_RegisterLoadChunkCallback(int nType, void (*pfnHandler)(TStreamData*));
-int  Stream_UnregisterLoadChunkCallback(int nType);
+// A type's handler: Stream_Progress hands it each finished object of its type, which it then owns.
+typedef void (*LoadChunkCallbackPtr)(TStreamData* pStreamData);
+
+int  Stream_RegisterLoadChunkCallback(int chunkType, LoadChunkCallbackPtr callbackPtr);
+int  Stream_UnregisterLoadChunkCallback(int chunkType);
 // Copies the object's data out and frees the object.
-u32  Stream_StreamLoadFixedSize(TStreamData* pObject, u32 uMax, void* pDst);
-u32  fn_8000E81C(TStreamData* pObject, void** ppData);            // the data and its size
+u32  Stream_StreamLoadFixedSize(TStreamData* pStreamData, u32 expectedSize, void* pInFillBuffer);
+u32  Stream_StreamLoadVariableSize(TStreamData* pStreamData, void** ppFileData);    // the data, its size
 
 // ---- the resource list (URes.c) ---------------------------------------------------------------
 

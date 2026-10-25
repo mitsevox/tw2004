@@ -142,7 +142,7 @@ void GameModeDriverPGATour_LoadPGApFromStream(TStreamData* pObject) {
 // leaves pNames as it was.
 void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(TStreamData* pObject) {
     void* pData;
-    u32 nSize = fn_8000E81C(pObject, &pData);
+    u32 nSize = Stream_StreamLoadVariableSize(pObject, &pData);
     if (nSize) {
         gPgaData.pNames = Mem_AllocFunc(nSize, 0x10, 1);
         Mem_cpy(gPgaData.pNames, pData, nSize);

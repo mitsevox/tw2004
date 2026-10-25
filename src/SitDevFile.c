@@ -39,16 +39,16 @@ void SitDev_SwapHeader(void);
 void SitDev_BindHeader(SitDevHeader* pScripts);
 void SitDev_SwapTables(void);
 
-// The hole stream's 'sscr' chunk handler (SitDev_vRegisterStreamClients). Keeps the chunk
-// (SitDevData.pCC, freed at round end); the first time, takes its first word as the scripts' header
+// The hole stream's 'sscr' object handler (SitDev_vRegisterStreamClients). Keeps the object
+// (SitDevData.pCC, freed at round end); the first time, takes its data as the scripts' header
 // (gpSitDevScripts), byte-swaps the header (SitDev_SwapHeader), turns its offsets into pointers
 // (SitDev_BindHeader) and byte-swaps the tables (SitDev_SwapTables). Then allocates the group flags
 // (pGroupFlags, one byte per group, header nGroups) and clears them (SitDev_ClearGroupFlags).
-void SitDev_LoadScripts(SitDevHeader** ppScripts) {
+void SitDev_LoadScripts(TStreamData* pObject) {
     SitDev_BeginLoadScripts();
-    gpSitDevData->pCC = ppScripts;
+    gpSitDevData->pCC = pObject;
     if (gpSitDevScripts == NULL) {
-        gpSitDevScripts = *ppScripts;
+        gpSitDevScripts = (SitDevHeader*)pObject->pData;
         SitDev_SwapHeader();
         SitDev_BindHeader(gpSitDevScripts);
         SitDev_SwapTables();

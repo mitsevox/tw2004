@@ -7,7 +7,7 @@ formats are little-endian on disc and swapped at load.
 
 How the columns were filled:
 
-- **Handler**: every `UStream_RegisterHandler` call in the DOL (63; tag and function recovered from
+- **Handler**: every `Stream_RegisterLoadChunkCallback` call in the DOL (63; tag and function recovered from
   the call's `r3`/`r4` in the assembly, C or asm alike).
 - **Swap**: *swapped* = the handler reaches one of the two byte-swap routines, `BYTESWAP_SWAPDATA` (swap a
   run of values) or `ByteSwap_Records` (swap by a field-format table), within four calls; the path is
