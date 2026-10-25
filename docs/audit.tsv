@@ -20,7 +20,6 @@ Code80037AB8.c	open
 Code8006F608.c	open		
 Code80070EC4.c	open		
 Code80090940.c	open		
-Code80095564.c	open		
 Code8009AA28.c	open		
 Code8009B340.c	open		
 Code800B1AA8.c	open		
@@ -208,6 +207,7 @@ Wind.c	open
 ai_brain.c	open		
 animblender.c	open		
 char.c	open		
+char_skin.c	done	57a8c291	claude-review
 char_tex_manager.c	open		
 emotion.c	open		
 event.c	open		
