@@ -7,7 +7,6 @@
 #include "camera.h"
 #include "golfer.h"
 
-void UObject_ComposeRotation(f32 (*pMtx)[4]);
 int  DynObjTurning_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
 // Sets flag 0x04000000 once; the first time, with bNotify, also gives the object up (Kernel_ReleaseObject).
@@ -169,7 +168,7 @@ void DynObjTurning_Update(DynObjTurning* pObj, void* pArg) {
     LLMath_IdentifyMat(mTurn);
     mat44flt_EulerAngles(2.0f * PI * (pObj->fSpeed / 360.0f) / 60.0f, 0.0f, 0.0f, mTurn);
     LLMath_mat44fltMultiplyList(pObj->base.obj.mRotation, mTurn, pObj->base.obj.mRotation, 4);
-    UObject_ComposeRotation(pObj->base.obj.mRotation);
+    Object_UpdateO2WComposed33(&pObj->base.obj);
 }
 
 // Type 2's message handler (an object that turns at a steady speed): 1 its size, 2

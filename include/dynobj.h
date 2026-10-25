@@ -236,8 +236,8 @@ void fn_8000827C(UObjMeshPart* pPart, UObjArraySet* pSet, int nType, void* pArg)
 void ObjPart_Draw(UObjMeshPart* pPart);
 
 // UObject.c's object (0x118 bytes, Object_Create allocates one; a DynObj holds one at +0x10): a
-// model and the matrices that place it. Its mObjToWorld's rotation rows are mScale times mRotation
-// (TerrainData.c UObject_ComposeRotation); row 3 is the position.
+// model and the matrices that place it. Object_UpdateO2WComposed33 makes the 3x3 part of its
+// mObjToWorld mRotation x mScale; row 3 is the position.
 typedef struct TObjectS {
     f32  mRotation[4][4];       // 0x000  identity at setup
     f32  mScale[4][4];          // 0x040  identity at setup; a scale on its diagonal
@@ -492,6 +492,11 @@ TObject* Object_Create(UObjModel* pModel);
 void Object_Free(TObject* pObj);
 void Object_Destroy(TObject* xpObject_p);
 void Object_Draw(TObject* pObj);
+
+// UNetwork.c
+// The 3x3 parts of rows 0..2 of pObject's mObjToWorld become mRotation x mScale; its position row
+// mObjToWorld[3] is left alone.
+void Object_UpdateO2WComposed33(TObject* pObject);
 
 // GoDynObjBase.c
 // type 0's handler, types 2/11's default

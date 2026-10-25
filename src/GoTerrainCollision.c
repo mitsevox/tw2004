@@ -117,16 +117,16 @@ u8 Ter_LineTriangleIntersection(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3],
     Ter_Subtract3(vB, vA, vE1);
     Ter_Subtract3(vC, vA, vE2);
     vec4flt_CrossProduct(pDir, vE2, vP);
-    fDet = Vec3_Dot(vE1, vP);
+    fDet = LLMath_DotProduct3(vE1, vP);
     if (fDet > -0.00001f && fDet < 0.00001f) return 0;
     fInv = 1.0f / fDet;
     Ter_Subtract3(pFrom, vA, vS);
-    fU = fInv * Vec3_Dot(vS, vP);
+    fU = fInv * LLMath_DotProduct3(vS, vP);
     if (fU < 0.0f || fU > 1.0f) return 0;
     vec4flt_CrossProduct(vS, vE1, vQ);
-    fV = fInv * Vec3_Dot(pDir, vQ);
+    fV = fInv * LLMath_DotProduct3(pDir, vQ);
     if (fV < 0.0f || fU + fV > 1.0f) return 0;
-    fT = fInv * Vec3_Dot(vE2, vQ);
+    fT = fInv * LLMath_DotProduct3(vE2, vQ);
     if (fT <= 0.0f || fT >= fMax) return 0;
     *pT = fT;
     pHit[0] = fT * pDir[0] + pFrom[0];
@@ -138,11 +138,12 @@ u8 Ter_LineTriangleIntersection(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3],
 }
 
 // TW07's Ter_Init (the first function of GoTerrainCollision.c there): register the loaders for the
-// out-of-bounds (network type 1) and free-drop (network type 4) networks and forget the old ones.
+// out-of-bounds (NETWORK_TYPE_OUT_OF_BOUNDS) and free-drop (NETWORK_TYPE_FREE_DROP) networks and
+// forget the old ones.
 // Called when the game's systems start.
 void Ter_Init(void) {
-    Network_RegisterLoadNetworkCallback(1, (void (*)(u8*))Ter_OOBNetworkLoadCallback);
-    Network_RegisterLoadNetworkCallback(4, (void (*)(u8*))Ter_FreeDropNetworkLoadCallback);
+    Network_RegisterLoadNetworkCallback(NETWORK_TYPE_OUT_OF_BOUNDS, Ter_OOBNetworkLoadCallback);
+    Network_RegisterLoadNetworkCallback(NETWORK_TYPE_FREE_DROP, Ter_FreeDropNetworkLoadCallback);
     gTerNumOOBNetworks = 0;
     gTerNumFreeDropNetworks = 0;
 }
@@ -247,7 +248,7 @@ u8 Ter_Use3DCupGeometry(void) {
     return gTerUse3DCupGeometry;
 }
 
-// Network type 4's load callback (Ter_Init registers it): adds a loaded free-drop outline to the
+// The free-drop networks' load callback (Ter_Init registers it): adds a loaded free-drop outline to the
 // hole's list. No check against MAX_FREE_DROP_NETWORKS.
 void Ter_FreeDropNetworkLoadCallback(TNetwork* pNet) {
     gTerFreeDropNetworks[gTerNumFreeDropNetworks] = pNet;
@@ -265,7 +266,7 @@ u8 Ter_PointInFreeDropNetwork(f32* pPos) {
     return 0;
 }
 
-// Network type 1's load callback (Ter_Init registers it): adds a loaded out-of-bounds outline to
+// The out-of-bounds networks' load callback (Ter_Init registers it): adds a loaded out-of-bounds outline to
 // the hole's list. No check against MAX_OOB_NETWORKS.
 void Ter_OOBNetworkLoadCallback(TNetwork* pNet) {
     gTerOOBNetworks[gTerNumOOBNetworks] = pNet;
@@ -1369,7 +1370,7 @@ u8 Ter_LineSphereIntersection(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f
     fDist = (f32)Math_Sqrt(LLMath_LengthSquared3(vTo)) - fRadius;
     if (fDist > fRange) return 0;
     if (fDist < 0.0f) return 1;
-    if (Vec3_Dot(vTo, pDir) < 0.0f) return 0;
+    if (LLMath_DotProduct3(vTo, pDir) < 0.0f) return 0;
     return 1;
 }
 
@@ -1413,7 +1414,7 @@ u8 Ter_CheckForPinCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom, f
     vIn[1] = 0.0f;
     vIn[2] = -vFrom[2];
     vIn[3] = 1.0f;
-    if (Vec3_Dot(vIn, vFlat) < 0.0f) return 0;      // moving away from the stick
+    if (LLMath_DotProduct3(vIn, vFlat) < 0.0f) return 0; // moving away from the stick
     fC = vFrom[0] * vFrom[0] + vFrom[2] * vFrom[2];
     if (fC < PIN_RADIUS_SQ) return 0;                   // already inside it
     // where the line meets the cylinder: a t^2 + b t + c = 0
@@ -1574,7 +1575,7 @@ u8 Ter_CheckForWorldCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom,
             vEdge[nMinor] += pCourse->fGridCellSize[nMinor] * nStepMinor;
         }
     }
-    if (fBest != 1000000.0f && Vec3_Dot(vDir, pNormal) > 0.0f) {
+    if (fBest != 1000000.0f && LLMath_DotProduct3(vDir, pNormal) > 0.0f) {
         Ter_Negate(pNormal, pNormal);
     }
     return fBest != 1000000.0f;
@@ -1779,7 +1780,7 @@ u8 Ter_CheckForSolidWorldCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* p
             vEdge[nMinor] += pCourse->fGridCellSize[nMinor] * nStepMinor;
         }
     }
-    if (fBest != 1000000.0f && Vec3_Dot(vDir, pNormal) > 0.0f) {
+    if (fBest != 1000000.0f && LLMath_DotProduct3(vDir, pNormal) > 0.0f) {
         Ter_Negate(pNormal, pNormal);
     }
     return fBest != 1000000.0f;
@@ -1973,7 +1974,7 @@ u8 Ter_CheckForGroundCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f
             vEdge[nMinor] += pCourse->fGridCellSize[nMinor] * nStepMinor;
         }
     }
-    if (fBest != 1000000.0f && Vec3_Dot(vDir, pNormal) > 0.0f) {
+    if (fBest != 1000000.0f && LLMath_DotProduct3(vDir, pNormal) > 0.0f) {
         Ter_Negate(pNormal, pNormal);
     }
     return fBest != 1000000.0f;
@@ -2165,7 +2166,7 @@ u8 Ter_CheckForObjectCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f
             vEdge[nMinor] += pCourse->fGridCellSize[nMinor] * nStepMinor;
         }
     }
-    if (fBest != 1000000.0f && Vec3_Dot(vDir, pNormal) > 0.0f) {
+    if (fBest != 1000000.0f && LLMath_DotProduct3(vDir, pNormal) > 0.0f) {
         Ter_Negate(pNormal, pNormal);
     }
     return fBest != 1000000.0f;

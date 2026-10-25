@@ -90,8 +90,8 @@ Objects delivered by UStream
 The course file's sub-chunks (`Cnet`)
 -------------------------------------
 
-`Network_RegisterLoadNetworkCallback(n, fn)` adds a loader to the table (`lbl_801A2A00`) that the `Cnet` handler
-walks; each loader gets its sub-chunk's bytes.
+`Network_RegisterLoadNetworkCallback(n, fn)` adds a loader to the table (`gNetworkLoaders`) that the `Cnet`
+handler walks; each loader of the network's type gets the `TNetwork*`.
 
 | Sub-chunk | Loader | Unit | Swap | Overlay |
 |---|---|---|---|---|

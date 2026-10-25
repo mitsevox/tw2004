@@ -914,7 +914,7 @@ config.libs = [
             Object(Matching, "urandom.c"),
             Object(Matching, "URes.c"),
             Object(Matching, "FETextureMgr.c"),
-            Object(Matching, "TerrainData.c"),
+            Object(Matching, "UNetwork.c"),
             Object(Matching, "UStream.c"),
             Object(Matching, "LLTex.c"),
             Object(Matching, "LLTexGrp.c"),

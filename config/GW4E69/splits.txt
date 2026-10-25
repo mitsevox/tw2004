@@ -103,7 +103,7 @@ FETextureMgr.c:
 	.bss        start:0x801A25F0 end:0x801A2A00
 	.sbss       start:0x80281C00 end:0x80281C10
 
-TerrainData.c:
+UNetwork.c:
 	.text       start:0x8000BF20 end:0x8000C624
 	.bss        start:0x801A2A00 end:0x801A2AC0
 	.sdata      start:0x80280DB0 end:0x80280DB8

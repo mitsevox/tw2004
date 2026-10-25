@@ -452,7 +452,7 @@ void fn_8006B87C(int nPlayer) {
     if (0.0f != vShot[0] && 0.0f != vShot[2]) {
         LLMath_Normalize3(vShot, vShot);
     }
-    fDot = Vec3_Dot(vAim, vShot);
+    fDot = LLMath_DotProduct3(vAim, vShot);
     nLevel = lbl_801D5F78[nPlayer].n4;
     if (lbl_801D5F78[nPlayer].n0 == 0) {
         if (fDot > 0.9f) {

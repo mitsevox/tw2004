@@ -881,8 +881,9 @@ typedef struct TargetMarker {
 LAYOUT_ASSERT(TargetMarker, 0x2C);
 
 extern TargetMarker lbl_801D5BF0[5];   // per player
-extern TNetwork*    lbl_80281E30;       // the hole's chunk 3 (fn_8006A7A8): an outline the placed ball
-                                        // must be inside, NULL when the hole has none
+extern TNetwork*    lbl_80281E30;       // the hole's ball-placement network (fn_8006A7A8): an
+                                        // outline the placed ball must be inside, NULL when
+                                        // the hole has none
 extern TexBank*     lbl_80281E34;       // } the "shadow" texture
 extern TexEntry*    lbl_80281E38;       // }
 extern TexBank*     lbl_80281E3C;       // } the "tball" texture (the aim marker)

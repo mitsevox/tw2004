@@ -216,37 +216,44 @@ LAYOUT_ASSERT(Ball, 0xBC);
 
 // A node of a TNetwork outline (0x30 bytes). Each names its two neighbours; the outline is
 // walked from node 0 by taking the neighbour it did not come from.
-typedef struct TNetNode {
+typedef struct TNodeS {
     f32  vPos[3];               // 0x00
     u8   unkC[4];
     s16  aLinks[10];            // 0x10  linked node indexes (-1: none); an outline's first two
                                 //       are its two neighbours. fn_8006A7A8 clears those naming
                                 //       the node itself
     u8   unk24[0x30 - 0x24];
-} TNetNode;
-LAYOUT_ASSERT(TNetNode, 0x30);
+} TNode;
+LAYOUT_ASSERT(TNode, 0x30);
 
 // The placement outline's nodes (target.c fn_8006A7A8 fills pNode; lbl_80281E44 counts them).
 // Only what the cleaned code reads; the table's full size (0x2AC) is not a whole number of these.
 typedef struct TPlaceNode {
-    TNetNode* pNode;            // 0x0
+    TNode* pNode;               // 0x0
     u8   unk4[4];
 } TPlaceNode;
 extern TPlaceNode lbl_801D5CCC[85];
 extern s32 lbl_80281E44;
 
-// A closed outline on the course (TW06: TNetwork, 0x14 bytes there): the free-drop areas and the
-// in-bounds outlines, from the hole's 'Cnet' stream objects (TerrainData.c). The nodes follow
-// the header (TerrainData.c's walks index them from the network's address).
+// A network: a set of linked nodes on the course, from the hole's 'Cnet' stream objects
+// (UNetwork.c). Most are closed outlines (out of bounds, free-drop areas, commentary zones, where
+// the ball may be placed); the AI's aim points and the grass come the same way. The nodes follow
+// the two halfwords, and some types put more data after the last node.
 typedef struct TNetwork {
-    s16  nExportType;           // 0x0  TW06: ExportType
-    s16  nNumNodes;             // 0x2  TW06: NumNodes
-    TNetNode aNodes[1];         // 0x4  nNumNodes of them
+    s16  nExportType;           // 0x0  which system it is for (NetworkType)
+    s16  nNumNodes;             // 0x2
+    TNode aNodes[1];            // 0x4  nNumNodes of them
 } TNetwork;
 
-// TNetwork.nExportType: which system a network is for (Network_RegisterLoadNetworkCallback).
+// TNetwork.nExportType: which system a network is for, the type its loader is registered under
+// (Network_RegisterLoadNetworkCallback).
 enum NetworkType {
-    NETWORK_TYPE_COMMENTARY_ZONE = 5    // a commentary zone (SitDevCommentaryZones.c)
+    NETWORK_TYPE_AI_TARGETS = 0,        // the AI's aim points (AI_TargetsLoad)
+    NETWORK_TYPE_OUT_OF_BOUNDS = 1,     // an in-bounds outline (Ter_OOBNetworkLoadCallback)
+    NETWORK_TYPE_PLACE_BALL = 3,        // where the ball may be placed (target.c)
+    NETWORK_TYPE_FREE_DROP = 4,         // a free-drop area (Ter_FreeDropNetworkLoadCallback)
+    NETWORK_TYPE_COMMENTARY_ZONE = 5,   // a commentary zone (SitDevCommentaryZones.c)
+    NETWORK_TYPE_GRASS = 6              // the grass (Grass_LoadNetworkData)
 };
 
 #define MAX_FREE_DROP_NETWORKS 25
@@ -273,24 +280,33 @@ extern u8        gTerUse3DCupGeometry;        // the cup is real geometry
 extern s32       gTerNumFreeDropNetworks;        // free-drop networks loaded
 extern s32       gTerNumOOBNetworks;        // out-of-bounds networks loaded
 
-// A handler for the hole's networks ('Cnet' stream objects, TerrainData.c): pfn gets each
-// network whose nExportType is nChunk.
-typedef struct CourseLoader {
-    int  nChunk;                // 0x0
-    void (*pfn)(u8* pNet);      // 0x4
-} CourseLoader;
-LAYOUT_ASSERT(CourseLoader, 0x8);
+// UNetwork.c: the hole's networks and the outline tests.
+typedef void (*LoadNetworkCallbackPtr)(TNetwork* pNetwork);   // a loader: gets each network of its type
 
-TGD_TerrainInfo* Ter_GetTGD(void);          // the current hole's terrain data
-u8   Network_RegisterLoadNetworkCallback(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets each
-                                                                          // network of nExportType nChunk
-void Network_CloseModule(void);                 // network count 0, loader count -1
-void Network_InitModule(void);                 // register the 'Cnet' handler, clear the loaders
-s32  wn_PnPoly(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
-// The segment from pFrom to pTo crosses the outline (in x and z); pHit gets the nearest crossing.
-u8   Network_LineNetworkIntersection(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);
-// the ray crosses the outline
-u8   Network_RayNetworkDoesIntersect(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes);
+// A registered loader: the network type it takes and the loader.
+typedef struct TLoadNetworkCallbackListEntryS {
+    int  nNetType;                      // 0x0  a NetworkType
+    LoadNetworkCallbackPtr pfnLoad;     // 0x4
+} TLoadNetworkCallbackListEntry;
+LAYOUT_ASSERT(TLoadNetworkCallbackListEntry, 0x8);
+
+#define NETWORK_NUM_NETWORKS 32         // the networks the hole's list holds
+#define NETWORK_NUM_LOADERS  8          // the loaders that can be registered
+
+// Registers callbackPtr as the loader of networks of type netType; 0 when all
+// NETWORK_NUM_LOADERS are taken.
+u8   Network_RegisterLoadNetworkCallback(int netType, LoadNetworkCallbackPtr callbackPtr);
+void Network_CloseModule(void);
+void Network_InitModule(void);
+// The winding number of the outline around P (x, z): nonzero when P is inside.
+s32  wn_PnPoly(f32* P, TNetwork* network, s32 n);
+// Whether the segment start-end crosses the outline (x, z); intersect gets the crossing nearest start.
+u8   Network_LineNetworkIntersection(f32* start, f32* end, TNetwork* network, s32 n, f32* intersect);
+// Whether the ray from start through end crosses the outline (x, z).
+u8   Network_RayNetworkDoesIntersect(f32* start, f32* end, TNetwork* network, s32 n);
+TGD_TerrainInfo* Ter_GetTGD(void);          // the current hole's terrain data, NULL until loaded
+
+// GoTerrainCollision.c
 s32  Ter_iNumOOBNetworksLoaded(void);
 
 // target.c: placing the ball (TW06's PlaceBall_* functions, names not proven here)

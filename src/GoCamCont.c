@@ -495,13 +495,13 @@ void CameraController_CameraCollision(int nView, f32* pBounds) {
     if (vMove[0] != 0.0f || vMove[1] != 0.0f || vMove[2] != 0.0f) {
         LLMath_Normalize3(vMove, vMove);
     }
-    fMoveCos = Vec3_Dot(vMove, vToObj);
+    fMoveCos = LLMath_DotProduct3(vMove, vToObj);
     CameraController_Vec3Sub(pAt, pPos, vLook);
     vLook[1] = 0.0f;
     if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
         LLMath_Normalize3(vLook, vLook);
     }
-    fLookCos = Vec3_Dot(vLook, vToObj);
+    fLookCos = LLMath_DotProduct3(vLook, vToObj);
     if (fSpeed <= 0.0f) {
         return;
     }
@@ -647,9 +647,9 @@ void CameraController_LagSideVector(f32* pA, f32* pB, f32* pOut) {
         vB[1] = 0.0f;
         vB[2] = 0.0f;
     }
-    fAngle = acosf(Vec3_Dot(vA, vB) < -1.0f  ? -1.0f
-                         : Vec3_Dot(vA, vB) > 1.0f ? 1.0f
-                                                      : Vec3_Dot(vA, vB));
+    fAngle = acosf(LLMath_DotProduct3(vA, vB) < -1.0f  ? -1.0f
+                         : LLMath_DotProduct3(vA, vB) > 1.0f ? 1.0f
+                                                      : LLMath_DotProduct3(vA, vB));
     fAngle *= 0.2f;
     vec4flt_CrossProduct(vA, vB, vAxis);
     if (vAxis[0] != 0.0f || vAxis[1] != 0.0f || vAxis[2] != 0.0f) {

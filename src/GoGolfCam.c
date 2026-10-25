@@ -293,7 +293,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
         Vec3_Scale(fSlow, vCreep, vCreep);
         GolfCam_Vec3Add(pCam, vCreep, pCam);
         fDist = 0.0f;
-    } else if (fDist > gpCamTuning->fZoomArriveDist && Vec3_Dot(vMove, vAimMove) > 0.0f
+    } else if (fDist > gpCamTuning->fZoomArriveDist && LLMath_DotProduct3(vMove, vAimMove) > 0.0f
                && pView->script.f108 >= 0.0f) {
         // on the way: faster the further it is
         if (fDist < 1.0f) {
@@ -585,7 +585,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
                     pCam[1] = pView->shot19C.fMinHeight + fHeight;
                 }
             }
-        } else if (fDist > gpCamTuning->fZoomArriveDist && Vec3_Dot(vMove, vAimMove) > 0.0f) {
+        } else if (fDist > gpCamTuning->fZoomArriveDist && LLMath_DotProduct3(vMove, vAimMove) > 0.0f) {
             // still short of the goal: faster the further it is
             if (fDist < 1.0f) {
                 f = fBase;
@@ -2716,8 +2716,8 @@ u8 GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32
     }
     Vec3_Scale(pView->shot19C.fDist, vDir, vOff);
     GolfCam_Vec3Add(pBall, vOff, pAim);
-    pAim[0] += pView->shot19C.fSideOffset * -Vec3_Dot(vDir, gGolfCamAxisZ);
-    pAim[2] += pView->shot19C.fSideOffset * Vec3_Dot(vDir, gGolfCamAxisX);
+    pAim[0] += pView->shot19C.fSideOffset * -LLMath_DotProduct3(vDir, gGolfCamAxisZ);
+    pAim[2] += pView->shot19C.fSideOffset * LLMath_DotProduct3(vDir, gGolfCamAxisX);
     pAim[1] = pView->shot19C.vLook[1];
     GolfCam_Vec3Sub(vTarget, pAim, vBack);
     vBack[1] = 0.0f;
@@ -2774,7 +2774,7 @@ u8 GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32
     GolfCam_Vec3Sub(pCam, pAim, v);
     v[1] = 0.0f;
     vDir[1] = 0.0f;
-    if (Vec3_Dot(vDir, v) < 0.0f) {
+    if (LLMath_DotProduct3(vDir, v) < 0.0f) {
         pCam[0] = pAim[0];
         pCam[2] = pAim[2];
         GolfCam_Vec3Sub(pCam, pSub, vBack);
@@ -3052,8 +3052,9 @@ void GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut) {
         vFlatDir[1] = 0.0f;
         vFlatDir[2] = 0.0f;
     }
-    fAngle = acosf((Vec3_Dot(vDir, vFlatDir) < -1.0f) ? -1.0f
-                         : ((Vec3_Dot(vDir, vFlatDir) > 1.0f) ? 1.0f : Vec3_Dot(vDir, vFlatDir)));
+    fAngle = acosf((LLMath_DotProduct3(vDir, vFlatDir) < -1.0f) ? -1.0f
+                   : ((LLMath_DotProduct3(vDir, vFlatDir) > 1.0f) ? 1.0f
+                      : LLMath_DotProduct3(vDir, vFlatDir)));
     bClamp = 0;
     if (v[1] > 0.0f && fAngle > fMaxUp) {
         fOver = fAngle - fMaxUp;
@@ -4166,7 +4167,7 @@ u8 GolfCamera_IsBallFlightPaused(View* pView, int nPlayer) {
     if (vBall[0] != 0.0f || vBall[1] != 0.0f || vBall[2] != 0.0f) {
         LLMath_Normalize3(vBall, vBall);
     }
-    if (Vec3_Dot(vLook, vBall) > 0.0f) {
+    if (LLMath_DotProduct3(vLook, vBall) > 0.0f) {
         return 0;
     }
     return GolfCamera_IsCameraTrackingPlayer(pView);
