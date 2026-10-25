@@ -31,8 +31,6 @@ u8   gHoleContestDecided;           // the contest on this hole is decided (Hole
 u8   gHoleContestWon;               // a contest has a winner this round (HoleContest_RankResults), or
                                     // the hole in one was made
 
-// a flag of the hole's course data (byte 0x35): the drive can count
-u8   GM_GetHoleIndexDrivingSideGame(int nHole);
 u8   GameAnalysis_GetFairwayDrive(int nPlayer); // the shot started on fairway-class ground and ended on the
                                                 // fairway,
                                 // the green or in the cup (HoleScore.c)
@@ -73,8 +71,8 @@ u8 HoleContest_RoundHasContests(void) {
 }
 
 // Draws the contest holes at random among the round's 18 (Misc_RandFunc until one fits): the
-// longest drive on a par 4 or 5 whose course data allows it (GM_GetHoleIndexDrivingSideGame, byte
-// 0x35); closest to the pin on a par 3; and one round in five (20 in 100) the hole-in-one prize on
+// longest drive on a par 4 or 5 whose course data allows it (GM_GetHoleIndexDrivingSideGame);
+// closest to the pin on a par 3; and one round in five (20 in 100) the hole-in-one prize on
 // another par 3. A contest with no hole that fits gets -1.
 void HoleContest_DrawHoles(void) {
     u8 bFound;

@@ -2280,14 +2280,14 @@ void GM_vIsGolferUnlocked(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 79: whether course pArgs[1] can be picked: 1 when a loaded save profile
-// (bActive) or a cheat code (lbl_80281DF4) has unlocked it, and always for course 23, else 0.
-// pArgs[0] is not read. For course 23 the tests read aCourseUnlocked[23], one past its 23 entries;
-// the answer is already 1 then.
+// (bActive) or a cheat code (lbl_80281DF4) has unlocked it, and always for Random 18, else 0.
+// pArgs[0] is not read. For Random 18 (course 23) the tests read aCourseUnlocked[23], one past its
+// 23 entries; the answer is already 1 then.
 void GM_vIsCourseUnlockedOnAnyProfile(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     pResult->i = 0;
-    if (pArgs[1].i == 23) {
+    if (pArgs[1].i == COURSE_RANDOM_18) {
         pResult->i = 1;
     }
     for (i = 0; i < 5; i++) {
@@ -3658,8 +3658,9 @@ void GM_vSaveProfileWithDefaultName(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 193: the par of hole pArgs[1] (0-based) of course pArgs[0] (GM_GetHolePar). Below
 // 0 it is the saved round being edited (save slot gpFEProfile->nCustomRoundSlot, round
-// gpFEProfile->nCustomRound: that entry's course and hole); 22 and 24..29 are built rounds, whose
-// holes come from other courses (GM_CourseInfo_GetCompilationCourse, GM_CourseInfo_GetCompilationHole).
+// gpFEProfile->nCustomRound: that entry's course and hole); Tiger's Dream 18 and Compilation 1..6
+// (22, 24..29) are compilation courses, whose holes come from other courses
+// (GM_CourseInfo_GetCompilationCourse, GM_CourseInfo_GetCompilationHole).
 void GM_vGetHolePar(MsgArg* pArgs, MsgArg* pResult) {
     int nCourse;
     int nCourseArg = pArgs[0].i;
@@ -3671,13 +3672,13 @@ void GM_vGetHolePar(MsgArg* pArgs, MsgArg* pResult) {
             .aSavedRound[gpFEProfile->nCustomRound].nHoleNum[pArgs[1].i]);
         return;
     }
-    if (nCourseArg == 22) {
-        nCourse = GM_CourseInfo_GetCompilationCourse(22, pArgs[1].i);
-        pResult->i = GM_GetHolePar(nCourse, GM_CourseInfo_GetCompilationHole(22, pArgs[1].i) - 1);
+    if (nCourseArg == COURSE_TIGERS_DREAM_18) {
+        nCourse = GM_CourseInfo_GetCompilationCourse(COURSE_TIGERS_DREAM_18, pArgs[1].i);
+        pResult->i = GM_GetHolePar(nCourse,
+                                   GM_CourseInfo_GetCompilationHole(COURSE_TIGERS_DREAM_18, pArgs[1].i) - 1);
         return;
     }
-    if (nCourseArg >= 24 && nCourseArg < 30) {
-        // the argument is read again here (the original reloads it after the call)
+    if (nCourseArg >= COURSE_COMPILATION_1 && nCourseArg < NUM_COURSES) {
         nCourse = GM_CourseInfo_GetCompilationCourse(pArgs[0].i, pArgs[1].i);
         pResult->i = GM_GetHolePar(nCourse, GM_CourseInfo_GetCompilationHole(pArgs[0].i, pArgs[1].i) - 1);
         return;
@@ -5152,10 +5153,10 @@ void GM_vIsCourseChoiceUnlocked(MsgArg* pArgs, MsgArg* pResult) {
             }
             break;
         case 3:
-            if (gpSaveData[i].bActive != 0 && gpSaveData[i].aCourseUnlocked[22] != 0) {
+            if (gpSaveData[i].bActive != 0 && gpSaveData[i].aCourseUnlocked[COURSE_TIGERS_DREAM_18] != 0) {
                 b = 1;
             }
-            if (lbl_80281DF4->aCourseUnlocked[22] != 0) {
+            if (lbl_80281DF4->aCourseUnlocked[COURSE_TIGERS_DREAM_18] != 0) {
                 b = 1;
             }
             break;

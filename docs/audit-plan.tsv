@@ -42,7 +42,7 @@ order	area	file	task	scope	state
 39	Core services	UStream.c	chunk 1/2	addToFreeList .. Stream_Progress	done
 40	Core services	UStream.c	chunk 2/2	UStream_ReleaseBufferRef .. Stream_StreamLoadVariableSize	done
 41	Core services	UStream.c	whole-file review	the whole file	done
-42	The course	CourseData.c	pass	the whole file	open
+42	The course	CourseInfo.c	pass	the whole file	done
 43	The course	TerrainGround.c	pass	the whole file	done
 44	The course	TerrainData.c	pass	the whole file	open
 45	The course	UObject.c	pass	the whole file	open

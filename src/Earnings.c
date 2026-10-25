@@ -100,7 +100,6 @@ int   GameAnalysis_CountHoleScoresOrBetter(int nPlayer, int nToPar);
 int   GameAnalysis_CountHolesOverPar(int nPlayer);
 int   GameAnalysis_CountStreakHoleScores(int nPlayer, int nToPar);
 int   GameAnalysis_CountTotalPutts(int nPlayer);
-int   GM_CurrentCourseTotalPar4andPar5Holes(void);                                // CourseData.c
 u8    GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bPreview);
 u8    GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bPreview);
 u8    GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bPreview);
@@ -1623,7 +1622,7 @@ f32 GM_Earnings_GetCourseModifier(void) {
     case 9:
         fMult = gEarningsTable.aMult[EARN_MULT_COURSE +11];
         break;
-    case 22:
+    case COURSE_TIGERS_DREAM_18:
         fMult = gEarningsTable.aMult[EARN_MULT_COURSE +12];
         break;
     case 7:
