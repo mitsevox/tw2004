@@ -1139,7 +1139,7 @@ config.libs = [
             Object(Matching, "UISScreen.c", extra_cflags=UIS_CFLAGS),
             Object(Matching, "GoDynObjTypes.c"),
             Object(Matching, "GoDynObjBase.c"),
-            Object(Matching, "ShaderRow0.c"),
+            Object(Matching, "GoShaderObject_PrelitTextured_Gc.c"),
 
             Object(Matching, "Main.c"),
             # Built optimized for size: under -O4,p the copy and fill loops are unrolled and the
@@ -1148,7 +1148,7 @@ config.libs = [
             Object(Matching, "fe_craputils.c"),
             Object(Matching, "DynamicRenderingBuffer.c"),
             Object(Matching, "Code80070EC4.c"),
-            Object(Matching, "Code8009A928.c"),
+            Object(Matching, "GlowMgr.c"),
             Object(Matching, "hlaudvoice.c"),
             Object(Matching, "AudLock.c"),
             Object(Matching, "unsorted/sweep_801654F4.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
@@ -1168,8 +1168,7 @@ config.libs = [
             Object(Matching, "event.c"),
             Object(Matching, "SitDev.c"),
             Object(Matching, "unsorted/sweep_8009554C.c"),
-            Object(Matching, "Code80095564.c"),
-            Object(Matching, "unsorted/sweep_8009B314.c"),
+            Object(Matching, "char_skin.c"),
             Object(Matching, "Code8009B340.c"),
             Object(Matching, "unsorted/sweep_801338E0.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "unsorted/sweep_80155F40.c"),

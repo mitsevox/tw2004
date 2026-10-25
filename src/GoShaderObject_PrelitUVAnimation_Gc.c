@@ -37,11 +37,6 @@ void fn_8006FED4(u8* p0, s32 p1);
 void fn_8006FF08(u8* p0);
 // GoShaderObjectContainer_OBFData_Gc.c
 void fn_8006FF2C(void* arg0);
-// ShaderRow0.c
-void fn_8006FF80(DynRenderObject* pObj, const DynRenderSize* pSize);
-void fn_8006FFD4(DynRenderObject* pObj);
-void fn_8006FFF8(DynRenderObject* pObj);
-void fn_80070078(DynRenderObject* pObj, DynRenderFill* pFill, u8 bRestart);
 // DynamicRenderingBuffer.c
 void fn_80070B74(void);
 void fn_80070B78(StaticShaderObject* pObj, ShaderCmds* pCmds);
@@ -140,9 +135,9 @@ void fn_800711A4(StaticShaderObject* pObj) {
 // matrix, unmoved.
 void fn_800711F8(PrelitUVObject* pObj, const DynRenderSize* pSize) {
     if (pSize != NULL) {
-        pObj->pBuf = fn_8007018C(pSize->nMaxVerts, pSize->nMaxDraws);
+        pObj->pBuf = DynRenderBuffer_Create(pSize->nMaxVerts, pSize->nMaxDraws);
     } else {
-        pObj->pBuf = fn_8007018C(50, 1);
+        pObj->pBuf = DynRenderBuffer_Create(50, 1);
     }
     pObj->pMtx = Circular_MemAllocFunc(0x20, MEMTYPE_LOW, 32, "GoShaderObject_PrelitUVAnimation_Gc.c", 172);
     pObj->pMtx[0][0] = 1.0f;
@@ -158,7 +153,7 @@ void fn_800711F8(PrelitUVObject* pObj, const DynRenderSize* pSize) {
 // Free the object's texture matrix and buffer.
 void fn_800712B4(PrelitUVObject* pObj) {
     Circular_MemFreeFunc(pObj->pMtx);
-    fn_80070348(pObj->pBuf);
+    DynRenderBuffer_Free(pObj->pBuf);
 }
 
 // Draw every draw in the object's buffer, texture coordinates through its matrix.
@@ -179,7 +174,7 @@ void fn_800712EC(PrelitUVObject* pObj) {
         u32 nCount = pDraw->nCount;
         int nPrim = pDraw->nPrim;
         pDraw++;
-        fn_800703B8(pObj->pBuf, nStart, nCount, nPrim);
+        DynRenderBuffer_Draw(pObj->pBuf, nStart, nCount, nPrim);
     }
     GXSetTexCoordGen2(0, 1, 4, 0x3C, 0, 0x7D);
 }
@@ -196,7 +191,8 @@ void fn_800713B4(PrelitUVObject* pObj, PrelitUVFill* pFill, u8 bRestart) {
     u16 nIndices;
     u16 i;
 
-    fn_80070764(pObj->pBuf, pFill->fill.pDraws, pFill->fill.nCount, 0, bRestart);
+    DynRenderBuffer_AddDraws(pObj->pBuf, pFill->fill.pDraws, pFill->fill.nCount,
+                             DYNRENDER_PRIM_TRIANGLE_STRIP, bRestart);
     fTime = fn_80076E18();
     fU = pFill->anim.fU * fTime;
     fV = pFill->anim.fV * fTime;
@@ -208,7 +204,7 @@ void fn_800713B4(PrelitUVObject* pObj, PrelitUVFill* pFill, u8 bRestart) {
     pObj->pMtx[0][3] = (s32)fStepU * pFill->anim.fInv;
     pObj->pMtx[1][3] = (s32)fStepV * pFill->anim.fInv;
     if (pFill->fill.pDraws == NULL) {
-        fn_800705F0(pObj->pBuf, pFill->fill.pIndices, pFill->fill.nCount, bRestart);
+        DynRenderBuffer_AddIndices(pObj->pBuf, pFill->fill.pIndices, pFill->fill.nCount, bRestart);
     } else {
         nIndices = 0;
         for (i = 0; i < pFill->fill.nCount; i++) {
@@ -216,10 +212,10 @@ void fn_800713B4(PrelitUVObject* pObj, PrelitUVFill* pFill, u8 bRestart) {
                 nIndices = pFill->fill.pDraws[i].nStart + pFill->fill.pDraws[i].nCount;
             }
         }
-        fn_800705F0(pObj->pBuf, pFill->fill.pIndices, nIndices, bRestart);
+        DynRenderBuffer_AddIndices(pObj->pBuf, pFill->fill.pIndices, nIndices, bRestart);
     }
-    fn_800704C4(pObj->pBuf, pFill->fill.pPos, pFill->fill.pColour, pFill->fill.pTexCoord, pFill->fill.nVerts,
-                bRestart);
+    DynRenderBuffer_AddVertices(pObj->pBuf, pFill->fill.pPos, pFill->fill.pColour, pFill->fill.pTexCoord,
+                                pFill->fill.nVerts, bRestart);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -482,10 +478,10 @@ ModuleHooks lbl_80188E88[20] = {
         },
         { 0 },
         {
-            (void (*)(ShaderObject*, const void*))fn_8006FF80,
-            (void (*)(ShaderObject*))fn_8006FFD4,
-            (void (*)(ShaderObject*))fn_8006FFF8,
-            (void (*)(ShaderObject*, const void*, int))fn_80070078,
+            (void (*)(ShaderObject*, const void*))SD_vShaderObject_PrelitTextured_Dynamic_Init,
+            (void (*)(ShaderObject*))SD_vShaderObject_PrelitTextured_Dynamic_Close,
+            (void (*)(ShaderObject*))SD_vShaderObject_PrelitTextured_Dynamic_Render,
+            (void (*)(ShaderObject*, const void*, int))SD_vShaderObject_PrelitTextured_Dynamic_Refresh,
         },
     },
     {   // 1

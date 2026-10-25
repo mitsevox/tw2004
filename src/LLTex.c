@@ -35,7 +35,7 @@ void fn_8000E830(DynObj* pObj) {
 
     if (lbl_80281C60 != NULL) {
         ppItem = (LLTexItem**)(lbl_80281C60 + 1);
-        nId = pObj->n140;
+        nId = pObj->nActorId;
         for (n = lbl_80281C60->nItems; n > 0; n--) {
             pState = (*ppItem++)->p4;
             if (pState->p2C->n0 == nId) {
@@ -331,16 +331,16 @@ int RPN_RunScript(u8* pCode, int nArg, int nPush, DynObj* pObj) {
                 break;
             case 56:
                 if (c == 0) {
-                    Kernel_PostPairByActorId(pObj->n140, b, a);
+                    Kernel_PostPairByActorId(pObj->nActorId, b, a);
                 } else {
                     Kernel_PostPairByActorId(c, b, a);
                 }
                 continue;
             case 58:
-                Kernel_PostPairByKey148(c, b, a);
+                Kernel_PostPairByKey(c, b, a);
                 continue;
             case 57:
-                Kernel_PostPairByKey147(c, b, a);
+                Kernel_PostPairByGroup(c, b, a);
                 continue;
             case 60:
                 fn_8000E948(c, b, a);

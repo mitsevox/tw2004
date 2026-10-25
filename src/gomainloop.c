@@ -9,10 +9,12 @@
 #include "core/memcard.h"
 #include "core/gbacable.h"
 #include "core/goaram.h"
+#include "core/audcontainers.h"
 #include "game/frontend.h"
 #include "frontend/fe.h"
 #include "llpict.h"
 #include "ustream.h"
+#include "glows.h"
 
 void*       lbl_80281E60;
 FB_SFrameBuffer* lbl_80281E5C;
@@ -167,10 +169,6 @@ void fn_80099BA0(void);
 void fn_8009A16C(void);
 u8   fn_8009A180(void);
 void DEMO_Restore(void);
-void GLW_vInitModule(int n);
-void GLW_vCloseModule(void);
-void GLW_vUpdateGlows(int nView);
-void GLW_vRenderGlows(int nView);
 void fn_8009B134(void);
 void GR_vClose(void);
 void GR_UpdateGreenGrid(int nView);
@@ -191,8 +189,6 @@ void fn_800B28D4(Character* pChar, int a, int b);
 void fn_800B2FB0(Character* pChar, int a, int b);
 void ComicCam_InitComicCam(void);
 void ComicCam_CloseComicCam(void);
-void AudMem_InitModule(void);
-void AudMem_CloseModule(void);
 void UI_EATraxDraw(void);
 void fn_800BA940(void);
 void fn_800BAA4C(void);

@@ -147,9 +147,10 @@ typedef struct TGD_TerrainInfo {
 // reports it. Only the fields Ball.c reads are known; its size is not.
 typedef struct HitObject {
     u8   unk0[0x140];
-    u16  n140;                  // 0x140  passed to gpGame->pfnCollisionActor when the ball hits it (event.c)
+    u16  nActorId;              // 0x140  DynObj.nActorId: passed to gpGame->pfnCollisionActor when the
+                                //        ball hits it (event.c)
     u8   unk142[0x146 - 0x142];
-    u8   nKind;                 // 0x146  11 = the flagstick
+    u8   nType;                 // 0x146  DynObj.nType; 11 = the flagstick
     u8   unk147[0x19C - 0x147];
     f32  fSway;                 // 0x19C  the flag's sway; not 0 while it still moves
 } HitObject;

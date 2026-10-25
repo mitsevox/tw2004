@@ -512,7 +512,7 @@ GoShaderObjectContainer_OBFData_Gc.c:
 	.text       start:0x8006FCDC end:0x8006FF80
 	.data       start:0x80188DF0 end:0x80188E18
 
-ShaderRow0.c:
+GoShaderObject_PrelitTextured_Gc.c:
 	.text       start:0x8006FF80 end:0x80070168
 
 DynamicRenderingBuffer.c:
@@ -682,7 +682,7 @@ LLTime.c:
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564
 
-Code80095564.c:
+char_skin.c:
 	.text       start:0x80095564 end:0x80095744
 
 CharAnim.c:
@@ -730,22 +730,19 @@ SunFlr_Gc.c:
 	.data       start:0x80189DA8 end:0x80189E78
 	.sdata2     start:0x80283E78 end:0x80283E90
 
-Code8009A928.c:
+GlowMgr.c:
 	.text       start:0x8009A928 end:0x8009AA28
 	.sdata2     start:0x80283E90 end:0x80283E98
 
 Code8009AA28.c:
-	.text       start:0x8009AA28 end:0x8009B314
+	.text       start:0x8009AA28 end:0x8009B320
 	.data       start:0x80189E78 end:0x8018C6C8
 	.bss        start:0x801E1470 end:0x801E3068
 	.sdata      start:0x802813B8 end:0x802813C0
 	.sdata2     start:0x80283E98 end:0x80283EC0
 
-unsorted/sweep_8009B314.c:
-	.text       start:0x8009B314 end:0x8009B340
-
 Code8009B340.c:
-	.text       start:0x8009B340 end:0x8009B630
+	.text       start:0x8009B320 end:0x8009B630
 	.sbss       start:0x80281FA0 end:0x80281FA8
 	.sdata2     start:0x80283EC0 end:0x80283EC8
 
