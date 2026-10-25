@@ -35,7 +35,7 @@ void SkinBurn_CheckSignatureFile(void) {
     File_Close(hFile);
 }
 
-// Renumbers each SkinModel.p44 entry's n0 (a SkinDesc.p34 mesh) to its number in the burnt
+// Renumbers each SkinModel.p44 entry's n0 (a SkinDesc.pMeshes mesh) to its number in the burnt
 // description (pBurn->a30) and packs the kept entries to the front, dropping those the burn dropped
 // (-1). SkinModel.n40 becomes the count kept.
 void SkinBurn_RenumberMeshEntries(Skin* pSkin, HwsBurn* pBurn) {
@@ -105,7 +105,7 @@ void SkinBurn_RenumberOptionBits(Skin* pSkin, s32 n) {
 // put in place of Skin.aMtxBits), packs their p54 entries to the front, numbered 0, 1, 2..., and
 // renumbers the bits of every option's meshes to match (gBurnNewMtxBits: each old bit's new
 // number, -1 dropped). Then each SkinModel.p44 entry's list (p4) is cut to the kept count at most
-// and numbered 0, 1, 2..., and the SkinDesc.p34 mesh of the same index gets that count (n8) and a
+// and numbered 0, 1, 2..., and the SkinDesc.pMeshes mesh of the same index gets that count (n8) and a
 // size of 64 bytes each. SkinModel.n50 becomes the count kept.
 void SkinBurn_DropUnusedMatrices(Skin* pSkin) {
     SkinModel* pModel;
@@ -184,8 +184,8 @@ void SkinBurn_DropUnusedMatrices(Skin* pSkin) {
         for (j = 0; j < n; j++) {
             pEntry->p4[j] = j;
         }
-        pSkin->pModel->pDesc->p34[k].n8 = n;
-        pSkin->pModel->pDesc->p34[k].nSize = n << 6;
+        pSkin->pModel->pDesc->pMeshes[k].n8 = n;
+        pSkin->pModel->pDesc->pMeshes[k].nSize = n << 6;
     }
 
     pModel->n50 = nKept;
@@ -232,7 +232,7 @@ void* SkinBurn_TakeAligned(u8* pBase, s32* pOffset, s32 nSize, s32 nAlign) {
     return p;
 }
 
-// Packs the skin's model and its arrays (p34, p38, p3C, p54, p44, each 16-byte aligned) into one
+// Packs the skin's model and its arrays (pPoses, p38, p3C, p54, p44, each 16-byte aligned) into one
 // allocation, which becomes Skin.pModel (its n08: the allocation's size), and frees the old model.
 // The p44 entries' p4 lists go into one shared block of indexes at the end.
 void SkinBurn_PackModel(Skin* pSkin) {
@@ -253,7 +253,7 @@ void SkinBurn_PackModel(Skin* pSkin) {
     pOld = pSkin->pModel;
     // EA passes &pOld where an array is expected: never NULL, so the model always counts
     nSize = SkinBurn_GetAlignedSize(&pOld, 1, sizeof(SkinModel), 16);
-    nSize += SkinBurn_GetAlignedSize(pOld->p34, pOld->nBones, 0x20, 16);
+    nSize += SkinBurn_GetAlignedSize(pOld->pPoses, pOld->nBones, 0x20, 16);
     nSize += SkinBurn_GetAlignedSize(pOld->p38, 1, 0x50, 16);
     nSize += SkinBurn_GetAlignedSize(pOld->p3C, pOld->n0C, 0x50, 16);
     nSize += SkinBurn_GetAlignedSize(pOld->p54, pOld->n50, sizeof(SkinModel54), 16);
@@ -269,7 +269,7 @@ void SkinBurn_PackModel(Skin* pSkin) {
     nOffset = 0;
     pNew = SkinBurn_CopyAligned(pBase, &nOffset, pOld, sizeof(SkinModel), 16);
     pNew->n08 = nSize;
-    pNew->p34 = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p34, pOld->nBones * 0x20, 16);
+    pNew->pPoses = SkinBurn_CopyAligned(pBase, &nOffset, pOld->pPoses, pOld->nBones * 0x20, 16);
     pNew->p38 = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p38, 0x50, 16);
     pNew->p3C = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p3C, pOld->n0C * 0x50, 16);
     pNew->p54 = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p54, pOld->n50 * sizeof(SkinModel54), 16);

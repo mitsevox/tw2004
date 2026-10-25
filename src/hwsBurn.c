@@ -393,9 +393,9 @@ SkinDesc44* HwsBurn_CopyEntries(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAl
     return aOut;
 }
 
-// Lists the meshes the burn keeps (p28 bits, one per SkinDesc.p34 mesh) in order (a2C, n24 of them)
+// Lists the meshes the burn keeps (p28 bits, one per SkinDesc.pMeshes mesh) in order (a2C, n24 of them)
 // and gives each its new number (a30). Gives the bytes their data takes, each rounded up to nAlign
-// (meshes with flag 0x400000 left out).
+// (SKINMESH_OWN_BITS meshes left out).
 s32 HwsBurn_ListMeshes(HwsBurn* pBurn, s32 nAlign) {
     SkinDesc* pDesc = pBurn->pDesc;
     int i;
@@ -411,8 +411,8 @@ s32 HwsBurn_ListMeshes(HwsBurn* pBurn, s32 nAlign) {
             pBurn->a2C[n] = i;
             pBurn->a30[i] = n;
             n++;
-            if (!(pDesc->p34[i].uFlags & 0x400000)) {
-                nBytes += HwsBurn_AlignedSize(pDesc->p34[i].pBits, pDesc->p34[i].nSize, 1, nAlign);
+            if (!(pDesc->pMeshes[i].uFlags & SKINMESH_OWN_BITS)) {
+                nBytes += HwsBurn_AlignedSize(pDesc->pMeshes[i].pBits, pDesc->pMeshes[i].nSize, 1, nAlign);
             }
         }
     }
@@ -442,15 +442,15 @@ SkinMesh* HwsBurn_CopyMeshes(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign
     *pOffset = nEnd;
     for (i = 0; i < n; i++) {
         nMesh = pBurn->a2C[i];
-        memcpy(&aOut[i], &pDesc->p34[nMesh], sizeof(SkinMesh));
+        memcpy(&aOut[i], &pDesc->pMeshes[nMesh], sizeof(SkinMesh));
         if (aOut[i].pBits != NULL) {
             if (pBurn->pOverride != NULL && nMesh < pBurn->pOverride->nMeshes &&
                 pBurn->pOverride->apMesh[nMesh] != NULL) {
                 pSrc = pBurn->pOverride->apMesh[nMesh];
             } else {
-                pSrc = pDesc->p34[nMesh].pBits;
+                pSrc = pDesc->pMeshes[nMesh].pBits;
             }
-            aOut[i].pBits = HwsBurn_CopyAligned(pBase, pOffset, pSrc, pDesc->p34[nMesh].nSize, nAlign);
+            aOut[i].pBits = HwsBurn_CopyAligned(pBase, pOffset, pSrc, pDesc->pMeshes[nMesh].nSize, nAlign);
         }
     }
     return aOut;
@@ -665,7 +665,7 @@ SkinDesc* HwsBurn_BuildDesc(HwsBurn* pBurn) {
     nBytes += HwsBurn_AlignedSize(pDesc->p20, pDesc->n1C, 4, 16);
     nBytes += HwsBurn_AlignedSize(pDesc->p28, pDesc->n24, sizeof(SkinDesc28), 16);
     nBytes += HwsBurn_AlignedSize(pDesc->p44, pBurn->n38, sizeof(SkinDesc44), 16);
-    nBytes += HwsBurn_AlignedSize(pDesc->p34, pBurn->n24, sizeof(SkinMesh), 16);
+    nBytes += HwsBurn_AlignedSize(pDesc->pMeshes, pBurn->n24, sizeof(SkinMesh), 16);
     nBytes += HwsBurn_AlignedSize(pDesc->p3C, pBurn->n50, 4, 16);
     nBytes += HwsBurn_AlignedSize(pDesc->pParts, pDesc->nParts, sizeof(SkinPartDef), 16);
     nBytes += HwsBurn_AlignedSize(pDesc->pVariants, pDesc->nVariants, sizeof(SkinVariant), 16);
@@ -694,7 +694,7 @@ SkinDesc* HwsBurn_BuildDesc(HwsBurn* pBurn) {
     pOut->p84 = NULL;
     pOut->p28 = HwsBurn_CopyDesc28(pBurn, pBlock, &nOffset, 16);
     pOut->p44 = HwsBurn_CopyEntries(pBurn, pBlock, &nOffset, 16);
-    pOut->p34 = HwsBurn_CopyMeshes(pBurn, pBlock, &nOffset, 16);
+    pOut->pMeshes = HwsBurn_CopyMeshes(pBurn, pBlock, &nOffset, 16);
     pOut->p3C = HwsBurn_CopyMeshRefs(pBurn, pBlock, &nOffset, 16);
     pOut->p6C = HwsBurn_CopyOptionEntries(pBurn, pBlock, &nOffset, 16);
     pOut->pMaterialEntries = HwsBurn_CopyMaterials(pBurn, pBlock, &nOffset, 16);
@@ -730,7 +730,7 @@ SkinDesc* HwsBurn_BuildDesc(HwsBurn* pBurn) {
     }
     nLast = 0;
     for (j = 0; j < pOut->nMeshes; j++) {
-        if (pOut->p34[j].uFlags & 0x100000) {
+        if (pOut->pMeshes[j].uFlags & 0x100000) {
             nLast = j + 1;
         }
     }

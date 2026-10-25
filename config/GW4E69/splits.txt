@@ -279,7 +279,7 @@ Skin.c:
 	.sbss       start:0x80281D70 end:0x80281D80
 	.sdata2     start:0x80283018 end:0x80283020
 
-Code80037AB8.c:
+SkinUtil.c:
 	.text       start:0x80037AB8 end:0x80037DD8
 	.bss        start:0x801D4F68 end:0x801D4F80
 	.sdata      start:0x80281100 end:0x80281108
@@ -522,10 +522,13 @@ DynamicRenderingBuffer.c:
 	.sbss       start:0x80281E70 end:0x80281E78
 	.sdata2     start:0x802839B8 end:0x802839C8
 
-Code80070EC4.c:
-	.text       start:0x80070EC4 end:0x8007110C
-	.sbss       start:0x80281E78 end:0x80281E80
+GoShaderObject_PrelitRGBAUVAnimation_Gc.c:
+	.text       start:0x80070EC4 end:0x80070FB0
 	.sdata2     start:0x802839C8 end:0x802839D0
+
+GoShaderObject_PrelitTexturedMorph_Gc.c:
+	.text       start:0x80070FB0 end:0x8007110C
+	.sbss       start:0x80281E78 end:0x80281E80
 
 GoShaderObject_PrelitUVAnimation_Gc.c:
 	.text       start:0x8007110C end:0x80071AD0

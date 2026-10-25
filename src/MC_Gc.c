@@ -1279,7 +1279,7 @@ s32 MC_CheckCardReady(s32 nPort, s32 nSlot) {
 // Vertex format 2: position (x, y, z floats), colour (RGBA8) and a texture coordinate (s, t floats).
 // port: GameCube only.
 void fn_8009F780(void) {
-    GXSetVtxAttrFmt(2, 9, 1, 4, 0);
+    GXSetVtxAttrFmt(2, GX_VA_POS, 1, 4, 0);
     GXSetVtxAttrFmt(2, 11, 1, 5, 0);
     GXSetVtxAttrFmt(2, 13, 1, 4, 0);
 }

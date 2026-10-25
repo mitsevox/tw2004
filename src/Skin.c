@@ -21,8 +21,6 @@
 #include "terrain.h"
 #include "game.h"
 
-void  fn_80008380(void);                                  // wait for the GPU (fn_800070DC)
-void  fn_80016978(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);   // Code80016198.c: the viewport
 void  fn_8006E7A4(LightGroup* pGroup);                   // GoLighting.c: load the group's lights
 void  fn_8006EADC(TObject* pObj);                        // GoLighting.c: light the object
 void  fn_8006ED70(void);                                 // GoLighting.c: lighting off
@@ -43,7 +41,6 @@ s32   SkinMorph_GetBlendSize(Skin* pSkin);                          // SkinMorph
 void  SkinMorph_UpdateAllTargets(Skin* pSkin);                          // SkinMorph.c
 void  BitArray_CopyArray(u32* pSrc, u32* pDst, u32 nBits);      // Skeleton.c
 u8    Character_IsGolfer(Character* pChar);              // char.c
-void  fn_80037D5C(SkinDesc* pDesc);                      // Code80037AB8.c
 
 void  SKN_DrawClubParts(Character* pChar);
 void  SKN_DrawBoneTri(Character* pChar, int nView);
@@ -276,7 +273,7 @@ int SKN_GetLightCourse(void) {
 
 // Poses the character's skin for this frame: blends its changed morph targets (single view or game
 // type 3 only), builds its matrices from the model's and points its drawn meshes at them (override
-// table nView); then the same for its current club's skin, from the grip bone (0x52) on. Sets
+// table nView); then the same for its current club's skin, from the club bone (SKEL_BONE_IGDRIVER) on. Sets
 // bPosed to 1 (posed), except for player 1000. n: every caller passes 0; unused.
 void SKN_PoseCharacter(Character* pChar, int n) {
     Skin* pClub;
@@ -291,8 +288,9 @@ void SKN_PoseCharacter(Character* pChar, int n) {
     if (pChar->pClubSet != NULL) {
         pClub = pChar->pClubSet->apSkins[pChar->nClubClass];
         if (pClub != NULL) {
-            SKN_BuildMatrices(pClub, pChar->pModel, CharModel_GetBoneIndex(pChar->pModel, 0x52) - 0x52, 0x52,
-                        pChar->nView);
+            SKN_BuildMatrices(pClub, pChar->pModel,
+                              CharModel_GetBoneIndex(pChar->pModel, SKEL_BONE_IGDRIVER) - SKEL_BONE_IGDRIVER,
+                              SKEL_BONE_IGDRIVER, pChar->nView);
             SKN_SetMeshMatrices(pClub, pChar->nView);
         }
     }
@@ -387,13 +385,13 @@ void RC_ApplyCurrentViewport(void) {
     RC_ApplyViewport(RC_spGetCurrentRenderCtx());
 }
 
-// Hands the render context's viewport (left, top, width, height) to fn_80016978, which makes it the
-// current one.
+// Hands the render context's viewport (left, top, width, height) to RenderView_SetViewport, which
+// makes it the current one.
 void RC_ApplyViewport(void* pCamera) {
     VM_SViewport* pRect;
 
     pRect = RC_spGetRenderCtxViewport(pCamera);
-    fn_80016978(VM_fGetViewportLeft(pRect), VM_fGetViewportTop(pRect), VM_fGetViewportWidth(pRect),
+    RenderView_SetViewport(VM_fGetViewportLeft(pRect), VM_fGetViewportTop(pRect), VM_fGetViewportWidth(pRect),
                 VM_fGetViewportHeight(pRect));
 }
 
@@ -473,15 +471,17 @@ void SKN_BlendMorphWeights(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fW
         pBlockA = &pA->aBlocks[i];
         pBlockB = &pB->aBlocks[i];
         pBlockOut = &pOut->aBlocks[i];
-        BitArray_MergeArrayWithOr(pBlockA->aBits, pBlockB->aBits, aBits, 20);
-        BitArray_CopyArray(aBits, pBlockOut->aBits, 20);
-        for (j = 0; j < 20; j++) {
+        BitArray_MergeArrayWithOr(pBlockA->aBits, pBlockB->aBits, aBits, SKELPOSE_NUM_MORPHS);
+        BitArray_CopyArray(aBits, pBlockOut->aBits, SKELPOSE_NUM_MORPHS);
+        for (j = 0; j < SKELPOSE_NUM_MORPHS; j++) {
             if (BitArray_TestBit(aBits, j)) {
-                pBlockOut->af8[j] = fWeight * (pBlockB->af8[j] - pBlockA->af8[j]) + pBlockA->af8[j];
+                pBlockOut->afMorphWeights[j] = fWeight * (pBlockB->afMorphWeights[j] -
+                                                          pBlockA->afMorphWeights[j]) +
+                                               pBlockA->afMorphWeights[j];
             }
         }
-        BitArray_ClearArray(pBlockA->aBits, 20);
-        BitArray_ClearArray(pBlockB->aBits, 20);
+        BitArray_ClearArray(pBlockA->aBits, SKELPOSE_NUM_MORPHS);
+        BitArray_ClearArray(pBlockB->aBits, SKELPOSE_NUM_MORPHS);
     }
 }
 
@@ -549,13 +549,13 @@ void SKN_BeginFrame(void) {
     gSkinFrameBufUsed = 0;
 }
 
-// Makes a model copied from its file usable, once (bit 31 of u30 marks it done): its offsets become
+// Makes a model copied from its file usable, once (bit 31 of uFlags marks it done): its offsets become
 // pointers, its mesh entries and matrix blends are byte-swapped. A model that is not version 4
 // (n00) is cleared to an empty version 4 one instead.
 void SKN_FixupModel(SkinModel* pModel) {
     int i;
 
-    if (pModel->u30 & 0x80000000) {
+    if (pModel->uFlags & 0x80000000) {
         return;
     }
     if (pModel->n00 != 4) {
@@ -565,11 +565,11 @@ void SKN_FixupModel(SkinModel* pModel) {
         pModel->n18 = pModel->n1A = pModel->n1C = pModel->n1E = -1;
         pModel->n20 = pModel->n24 = -1;
         pModel->n28 = pModel->n2C = -1;
-        pModel->u30 = 0x80000000;
+        pModel->uFlags = 0x80000000;
         return;
     }
-    if (pModel->p34 != NULL) {
-        pModel->p34 = (BonePose*)((u8*)pModel + (uptr)pModel->p34);
+    if (pModel->pPoses != NULL) {
+        pModel->pPoses = (BonePose*)((u8*)pModel + (uptr)pModel->pPoses);
     }
     if (pModel->p38 != NULL) {
         pModel->p38 = (u8*)pModel + (uptr)pModel->p38;
@@ -596,7 +596,7 @@ void SKN_FixupModel(SkinModel* pModel) {
         // still an offset; right only for a single entry.
         SKN_SwapMeshEntryLists(pModel->p44, pModel->n40);
     }
-    pModel->u30 = pModel->u30 | 0x80000000;
+    pModel->uFlags = pModel->uFlags | 0x80000000;
 }
 
 // Builds the skin's matrices (p108C) for this frame; nothing without its render data
@@ -694,9 +694,9 @@ void SKN_SwapDescHeader(SkinDesc* pDesc) {
     ByteSwap_Records(&pSrc, &pDst, aFormat, 48, 1);
 }
 
-// fake match: EA takes the mesh through an inline; &pDesc->p34[j] in place allocates pMesh r19, not r18
+// fake match: EA takes the mesh through an inline; &pDesc->pMeshes[j] in place allocates pMesh r19, not r18
 static inline SkinMesh* fn_800368FC_Read(SkinDesc* pDesc, int j) {
-    return &pDesc->p34[j];
+    return &pDesc->pMeshes[j];
 }
 
 // Byte-swaps a skin description's arrays (its header is SKN_SwapDescHeader's), in place, and turns
@@ -795,7 +795,7 @@ void SKN_SwapDesc(SkinDesc* pDesc) {
         }
     }
 
-    pData = (u8*)pDesc->p34;
+    pData = (u8*)pDesc->pMeshes;
     if (pData != NULL && pDesc->nMeshes != 0) {
         for (i = 0; i < pDesc->nMeshes; i++) {
             pSrc = pDst = pData;
@@ -806,8 +806,8 @@ void SKN_SwapDesc(SkinDesc* pDesc) {
 
     // Each mesh's bit data: its layout depends on the mesh's flags.
     for (i = 0; i < pDesc->nMeshes; i++) {
-        if (pDesc->p34[i].pBits != NULL) {
-            pDesc->p34[i].pBits = (SkinMeshBit*)((u8*)pDesc + (uptr)pDesc->p34[i].pBits);
+        if (pDesc->pMeshes[i].pBits != NULL) {
+            pDesc->pMeshes[i].pBits = (SkinMeshBit*)((u8*)pDesc + (uptr)pDesc->pMeshes[i].pBits);
         }
         pMesh = fn_800368FC_Read(pDesc, i);
         pData = (u8*)pMesh->pBits;
@@ -1006,14 +1006,14 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
 
 // Frees what SKN_AllocRenderData gave the skin, after waiting for the GPU to finish drawing; 0 when
 // it had none, else 1. With a description, also p1090 and the description's own mesh bit data
-// (fn_80037D5C).
+// (SKN_FreeDescMeshBits).
 s32 SKN_FreeRenderData(Skin* pSkin) {
     SkinModel* pModel;
 
     if (!(pSkin->uFlags & SKIN_HAS_RENDER_DATA)) {
         return 0;
     }
-    fn_80008380();
+    DL_vWaitForEndOfDrawing();
     pModel = pSkin->pModel;
     if (pModel != NULL && pModel->pDesc != NULL) {
         fn_80112910(pSkin->p1090);
@@ -1022,7 +1022,7 @@ s32 SKN_FreeRenderData(Skin* pSkin) {
         pSkin->apMemBlock[0] = NULL;
         fn_80112A58(pSkin->apOverride[0]);
         pSkin->apOverride[0] = NULL;
-        fn_80037D5C(pSkin->pModel->pDesc);
+        SKN_FreeDescMeshBits(pSkin->pModel->pDesc);
     }
     // port: EA passes an argument SkinPart_ShutdownSkin ignores
     ((void (*)(Skin*))SkinPart_ShutdownSkin)(pSkin);
@@ -1045,7 +1045,7 @@ s32 SKN_FreeRenderData(Skin* pSkin) {
 // ---- end of sweep code ----
 
 // Makes a skin from its file (pData: a SkinModel; version 4 carries a SkinDesc at pDesc's offset).
-// The file's headers are byte-swapped in place the first time (u30 flags 0x40000002 mark it). The
+// The file's headers are byte-swapped in place the first time (uFlags 0x40000002 mark it). The
 // model and its description are copied into memory of their own (b: MEMTYPE_HIGH instead of
 // MEMTYPE_LOW) and made usable; the pose starts at the model's bone poses; the
 // skin gets its part choices, morph state and render data (SKN_AllocRenderData). SkinPart's
@@ -1066,10 +1066,10 @@ Skin* SKN_Create(u8* pData, u8 b) {
     pSkin = Circular_MemAllocFunc(sizeof(Skin), MEMTYPE_LOW, 0x80, "Skin.c", 0x5C4);
     memset(pSkin, 0, sizeof(Skin));
     pModel = (SkinModel*)pData;     // the file's model, then the copy
-    if ((pModel->u30 & 0x40000002) != 0x40000002) {
+    if ((pModel->uFlags & 0x40000002) != 0x40000002) {
         SKN_SwapModelHeader((SkinModel*)pData);
         bSwap = 1;
-        ((SkinModel*)pData)->u30 = ((SkinModel*)pData)->u30 | 0x40000000 | 2;
+        ((SkinModel*)pData)->uFlags = ((SkinModel*)pData)->uFlags | 0x40000000 | 2;
     } else {
         bSwap = 0;
     }
@@ -1110,15 +1110,15 @@ Skin* SKN_Create(u8* pData, u8 b) {
     }
     pDesc = pModel->pDesc;
     pSkin->bFootPoints = 0;
-    pBones = pModel->p34;
+    pBones = pModel->pPoses;
     SKN_SwapBonePoses(pBones, pModel->nBones);
     BitArray_FillArray(pSkin->pose.a0, 0x80);
     BitArray_FillArray(pSkin->pose.a10, 0x80);
     BitArray_FillArray(pSkin->pose.a20, 0x80);
     BitArray_FillArray(pSkin->pose.a30, 0x80);
     for (i = 0; i < pModel->nBones; i++) {
-        Quat_Copy(pBones[i].q0, pSkin->pose.aBones[i].q0);
-        Quat_Copy(pBones[i].v10, pSkin->pose.aBones[i].v10);
+        Quat_Copy(pBones[i].qRot, pSkin->pose.aBones[i].qRot);
+        Quat_Copy(pBones[i].vPos, pSkin->pose.aBones[i].vPos);
     }
     pSkin->pWorld2Bone = Circular_MemAllocFunc(pModel->nBones * sizeof(*pSkin->pWorld2Bone), MEMTYPE_LOW,
                                                0x80, "Skin.c", 0x62A);

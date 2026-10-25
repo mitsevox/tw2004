@@ -24,13 +24,9 @@ u8          lbl_80281E50;
 
 // The other systems' start-up, shut-down and per-frame calls, from their files (most are not
 // decompiled yet; the types are from the calls here).
-void fn_80007254(void);
-void fn_80007260(void);
 void fn_800080D0(void);
 void fn_800080D4(void);
 void fn_800081C4(void);
-void fn_80008380(void);
-void fn_800083A0(void);
 void fn_8000F060(void);
 void fn_8000F0E8(void);
 void fn_800103C0(void);
@@ -322,7 +318,7 @@ void fn_8006C63C(void) {
     if (!lbl_80281B8E) {
         lbl_80281B8E = OSGetResetButtonState();
     }
-    fn_80007254();
+    Displ_WaitFrameEmpty();
 }
 
 // Hands the frame parity (lbl_80281B88 & 1) to fn_8006DC40 and fn_800162A4 (both empty) and,
@@ -756,7 +752,7 @@ static u8 GO_bMainLoopDone(void) {
             bDone = 1;
         }
     } else if (gSession.nGameType == GAMESTATE_STARTUP && (gSession.bEndLoop || gSession.nC == 2)) {
-        fn_800BA74C(1);
+        ScreenClear_DarkenScreen(1);
         bDone = 1;
         gSession.bEndLoop = 0;
     }
@@ -1005,7 +1001,7 @@ void fn_8006D8E8(void) {
             Character_ResetTimeScalesOnCombo();
         }
         fn_8006C69C();
-        fn_80006EDC();
+        Displ_FrameStart();
         uNow = TI_sReadCounter(TI_COUNTER_GAME);
         // fake match: the double step gives the original's frsp (EA's gomainloop.c saw a double
         // return; every other file saw the float TI_fConvertTimeDifToSeconds returns).
@@ -1073,8 +1069,8 @@ void fn_8006D8E8(void) {
             fn_8006D7E8();
             break;
         }
-        fn_80008380();
-        fn_80006FE8();
+        DL_vWaitForEndOfDrawing();
+        Displ_FrameEnd();
         if (gSession.nGameType != GAMESTATE_STARTUP) {
             if (gSession.nGameType != GAMESTATE_FE_RUN) {
                 Character_UpdateClothesIG();
@@ -1086,12 +1082,12 @@ void fn_8006D8E8(void) {
         }
         UI_FreeMarkedEntryPictures();
         Pict_AfterFree();
-        fn_80007260();
+        Displ_EndFrameEmpty();
         Gaud_Monitor();
         if (!gSession.nSplitScreen && gSession.nGameType != GAMESTATE_STARTUP) {
             fn_8006E0F8();
         }
-        fn_800083A0();
+        LLObj_FrameEmpty();
         if (gSession.nGameType == GAMESTATE_QUIT) {
             if (gSession.uFlags & 0x1000) {
                 Gaud_ExitFE();
@@ -1148,25 +1144,25 @@ void fn_8006DCA0(int n) {
 void fn_8006DCA4(int n) {
 }
 
-// Sets up the screen copy (lbl_80281100): with a size, render surface 1 of that size and kind
+// Sets up the screen copy (gpScreenCopy): with a size, render surface 1 of that size and kind
 // becomes its buffer; with none, it has no buffer.
 void fn_8006DCA8(s32 nWidth, s32 nHeight, s32 nC, s32 nKind) {
-    lbl_80281100->nWidth = nWidth;
-    lbl_80281100->nHeight = nHeight;
-    lbl_80281100->nC = nC;
+    gpScreenCopy->nWidth = nWidth;
+    gpScreenCopy->nHeight = nHeight;
+    gpScreenCopy->nC = nC;
     if (nWidth == 0 && nHeight == 0) {
-        lbl_80281100->nSize = 0;
-        lbl_80281100->pPixels = NULL;
+        gpScreenCopy->nSize = 0;
+        gpScreenCopy->pPixels = NULL;
         return;
     }
-    fn_8002F260(2, lbl_80281100->nWidth, lbl_80281100->nHeight, nKind, 8, 1);
-    lbl_80281100->nSize = fn_8002F454(1);
-    lbl_80281100->pPixels = lbl_801D3950[1].pBuffer;
+    fn_8002F260(2, gpScreenCopy->nWidth, gpScreenCopy->nHeight, nKind, 8, 1);
+    gpScreenCopy->nSize = fn_8002F454(1);
+    gpScreenCopy->pPixels = lbl_801D3950[1].pBuffer;
 }
 
 // Frees the screen copy's surface, if it has one.
 void fn_8006DD44(void) {
-    if (lbl_80281100->nWidth != 0 && lbl_80281100->nHeight != 0) {
+    if (gpScreenCopy->nWidth != 0 && gpScreenCopy->nHeight != 0) {
         fn_8002F32C(1);
     }
 }

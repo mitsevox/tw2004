@@ -16,9 +16,7 @@ Code8002BBB0.c	open
 Code8002C984.c	open		
 Code8002DB80.c	open		
 Code8002EE1C.c	open		
-Code80037AB8.c	open		
 Code8006F608.c	open		
-Code80070EC4.c	open		
 Code80090940.c	open		
 Code8009AA28.c	open		
 Code8009B340.c	open		
@@ -118,7 +116,9 @@ GoShaderObjectContainer_OBFData_Gc.c	open
 GoShaderObject_Glows_Gc.c	open		
 GoShaderObject_Grass_Gc.c	open		
 GoShaderObject_Particle_Gc.c	open		
+GoShaderObject_PrelitRGBAUVAnimation_Gc.c	done	3ca8191c	claude-review
 GoShaderObject_PrelitTexturedLine_Gc.c	done	598b5f2b	claude-review
+GoShaderObject_PrelitTexturedMorph_Gc.c	done	3ca8191c	claude-review
 GoShaderObject_PrelitTextured_Gc.c	done	e9d81c8e	claude-review
 GoShaderObject_PrelitUVAnimation_Gc.c	open		
 GoShaderObject_Rain_Gc.c	open		
@@ -162,7 +162,7 @@ PsBallFx.c	open
 PsMgr.c	open		
 RenderAccessors.c	done	63883fe8	claude-review
 Replay.c	open		
-ScreenClear.c	open		
+ScreenClear.c	done	dc4bce89	claude-review
 SitDev.c	open		
 SitDevCommentaryZones.c	done	503eba0e	claude-review
 SitDevFile.c	open		
@@ -175,6 +175,7 @@ Skin.c	open
 SkinBurn.c	open		
 SkinMorph.c	open		
 SkinPart.c	open		
+SkinUtil.c	done	83bbdccf	claude-review
 StateGolfer.c	done	2b0ee2a1	claude-review
 StreamManager.c	done	7511d865	claude-review
 SunFlr_Gc.c	open		

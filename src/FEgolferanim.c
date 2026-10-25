@@ -122,10 +122,7 @@ void FE_CloseGolferStream(void);
 void FE_Vec4Sub(f32* pA, f32* pB, f32* pOut);
 void FE_CharMgrInit(void);
 
-void fn_80007254(void);
-void fn_80008380(void);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
-void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void RC_UpdateCurrentScreenMatrices(void);
 void SKN_DrawCharacterParts(Character* pChar);
@@ -499,12 +496,12 @@ void FE_StreamInitStateMgr(void) {
     gFEStreamStateMgr.bPaused = 0;
 }
 
-// Run the golfer loader's state machine until it reaches state nState (a busy wait; fn_80007254,
-// called each turn, is empty).
+// Run the golfer loader's state machine until it reaches state nState (a busy wait;
+// Displ_WaitFrameEmpty, called each turn, is empty).
 void FE_StreamWaitForState(int nState) {
     while (gFEStreamStateMgr.nState != nState) {
         FE_StreamUpdateState();
-        fn_80007254();
+        Displ_WaitFrameEmpty();
     }
 }
 
@@ -869,7 +866,7 @@ void FE_vUpdateGolferAll(void) {
         if (gpCrAPState->nScreenKind == 0) {
             gSession.nGolfer[0] = gpCrAPState->pShown->nGolferId;
         }
-        fn_80008380();
+        DL_vWaitForEndOfDrawing();
         if (gpCrAPState->pShown->nGolferId == 7 || gpCrAPState->pShown->nGolferId == 29) {
             if (FE_GetCurrentProfile()->nGolferOutfit >= 0) {
                 FE_CrAPBall_SetLogo(DynObj_GetGolfBallLogoTextureName(FE_GetCurrentProfile()->nGolferOutfit));
@@ -990,7 +987,7 @@ void FE_DrawGolferTexture(void) {
     RenderView_SetUseCurrentMatrices(0);
     colour[3] = gpCrAPState->fAlpha;
     RenderView_SetColor(colour);
-    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_SetViewport(0.0f, 0.0f, 1.0f, 1.0f);
     fn_8002A608(&gFEScreenCopyTex);
     RenderState_Flush();
     RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
@@ -1207,7 +1204,7 @@ void FE_SetupCharState(void) {
 
 // The shown golfer's pre-bones callback (pfnPreBones, set by FE_vUpdateGolferAll), with b85 set:
 // pins him to his spot by zeroing the waist bone's (bone 1) x, z and w, and moves the club bone
-// (0x52, when the character's bit 0x4000 is set) and the ball bone (0x54, when he holds the ball:
+// (when the character's bit 0x4000 is set) and the ball bone (0x54, when he holds the ball:
 // Character_IsHoldingBall) with it, keeping their offsets from the waist.
 void FE_CharPositionOverwrite(void) {
     f32 vClubPos[4];
@@ -1220,7 +1217,7 @@ void FE_CharPositionOverwrite(void) {
 
     pModel = gpCrAPState->pShown->pChar->pModel;
     pWaistBone = &pModel->pBones[CharModel_GetBoneIndex(pModel, 1)];
-    pClubBone = &pModel->pBones[CharModel_GetBoneIndex(pModel, 0x52)];
+    pClubBone = &pModel->pBones[CharModel_GetBoneIndex(pModel, SKEL_BONE_IGDRIVER)];
     CharModel_GetBoneIndex(pModel, 0x54);              // EA looks bone 0x54 up here without using it
     bBallExists = Character_IsHoldingBall(gpCrAPState->pShown->pChar);
     if (gpCrAPState->b85 == 0) {
@@ -1366,7 +1363,7 @@ void FE_vFreeUnusedCharacters(void) {
             && (gpCrAPState->pShown->bLoaded == 0 || &gpCrAPState->aGolfer[0] != gpCrAPState->pShown)
             && (FE_StreamGetCurrentState() == 1 || &gpCrAPState->aGolfer[0] != gpCrAPState->pLoadingGolfer)) {
             if (gpCrAPState->aGolfer[0].pChar != NULL) {
-                fn_80008380();
+                DL_vWaitForEndOfDrawing();
                 Character_Free(gpCrAPState->aGolfer[0].pChar);
             }
             gpCrAPState->aGolfer[0].bLoaded = 0;

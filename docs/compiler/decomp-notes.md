@@ -397,7 +397,7 @@ The fixes that come up most often. Each points to its full entry below.
   expression inline as the argument (GoTerrain Ter_RenderView 96.7 -> 100).
 - **[verified] Two calls multiplied: the right-hand one runs first** (`f(a) * f(b)`; Skeleton SKEL_ItterateIKChain,
   GoRenderCtx RenderState_SetViewport). `f = call(); f *= c;` puts the call result first in `fmuls`; `call() * c` puts
-  the constant first (GoCamCont CameraController_LagSideVector, TexAnimManager fn_80076C20).
+  the constant first (GoCamCont CameraController_LagSideVector, TexAnimManager TexAnim_Update).
 - **[verified] A global read twice with no store in between** (once for a test, again for a call): write
   the second read as `*(volatile T*)&gGlobal` at that one use (GameHoleContests HoleContest_GetWinnerShotKind 95.3 -> 100).
 - **[verified] `a[i] = a[i] + base` with value and offset in each other's registers:** three statements

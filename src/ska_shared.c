@@ -231,15 +231,15 @@ void SKA_Update(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 
         pBone = &pPose->aBones[i];
         uFlags = pTrack->uFlags;
         if (uFlags & 4) {
-            Quat_Copy(pRot, pBone->q0);
+            Quat_Copy(pRot, pBone->qRot);
             pRot += 4;
         } else if (uFlags & 8) {
             if (uFlags & 0x20) {
-                SKA_BlendQuat(pA10, pB10, pBone->q0, fFrac);
+                SKA_BlendQuat(pA10, pB10, pBone->qRot, fFrac);
                 pA10 += 4;
                 pB10 += 4;
             } else {
-                SKA_BlendQuat(pA14, pB14, pBone->q0, fFrac);
+                SKA_BlendQuat(pA14, pB14, pBone->qRot, fFrac);
                 pA14 += 4;
                 pB14 += 4;
             }
@@ -250,7 +250,7 @@ void SKA_Update(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 
         if (pTrack->pKeys != NULL) {
             SKA_Expand16BitPoint(pTrack->pKeys + nKey * 3, pTrack->aRange, aA);
             SKA_Expand16BitPoint(pTrack->pKeys + nNext * 3, pTrack->aRange, aB);
-            SKA_BlendVec3(aA, aB, pBone->v10, fFrac);
+            SKA_BlendVec3(aA, aB, pBone->vPos, fFrac);
             BitArray_SetBit(pPose->a10, i);
         }
     }

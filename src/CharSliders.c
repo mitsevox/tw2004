@@ -461,7 +461,7 @@ void CharSlider_SetMorphTargets(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode
                     for (m = 0; m < pDefs->nMorphs; m++) {
                         if (pMorph->uId == pDefs->aMorphIds[m]) {
                             SkinMorph_SetTargetWeight(pSkin, m, fWeight);
-                            if (m < 20) {
+                            if (m < SKELPOSE_NUM_MORPHS) {
                                 SKABlender_ClearMorph(pNode, m);
                             }
                         }

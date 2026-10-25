@@ -225,9 +225,9 @@ void fn_80112DD8(s32 nEntry) {
                 nMesh = *pMesh++;
                 if (nMesh >= 0) {
                     if (nMesh < nOverrides && apOverride[nMesh] != NULL) {
-                        fn_801136C4(&pDesc->p34[nMesh], apOverride[nMesh], pRefs, anFirst[j], *pCount);
+                        fn_801136C4(&pDesc->pMeshes[nMesh], apOverride[nMesh], pRefs, anFirst[j], *pCount);
                     } else {
-                        fn_8011368C(&pDesc->p34[nMesh], pRefs, anFirst[j], *pCount);
+                        fn_8011368C(&pDesc->pMeshes[nMesh], pRefs, anFirst[j], *pCount);
                     }
                 }
                 anFirst[j] += *pCount;
@@ -336,14 +336,14 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
         DCFlushRange(lbl_802824F0, uSize);
         pTexCoords = pRefs->p1C;
         GXInvalidateVtxCache();
-        GXSetVtxAttrFmt(1, 9, 1, 4, 0);         // positions: xyz floats
+        GXSetVtxAttrFmt(1, GX_VA_POS, 1, 4, 0); // positions: xyz floats
         GXSetVtxAttrFmt(1, 10, 0, 1, 6);        // normals: s8, 6 fraction bits
         GXSetVtxAttrFmt(1, 13, 1, 3, 12);       // texture coordinates: s16 pairs, 12 fraction bits
-        GXSetArray(9, pPosBuf, 12);
+        GXSetArray(GX_VA_POS, pPosBuf, 12);
         GXSetArray(10, pNormalBuf, 3);
         GXSetArray(13, pTexCoords, 4);
         GXClearVtxDesc();
-        GXSetVtxDesc(9, 3);                     // all three by 16-bit index
+        GXSetVtxDesc(GX_VA_POS, 3);             // all three by 16-bit index
         GXSetVtxDesc(10, 3);
         GXSetVtxDesc(13, 3);
     }
@@ -477,7 +477,7 @@ void fn_80113904(s32 p0) {
 
 // ---- end of sweep code ----
 
-// An iterator in pBuf over the SkinDesc.p34 meshes of pArgs's SkinDesc.p44 entry (first step
+// An iterator in pBuf over the SkinDesc.pMeshes meshes of pArgs's SkinDesc.p44 entry (first step
 // taken). It takes as many steps as the n1s of the entry's SkinDesc28 add up to.
 SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs) {
     SkinMeshIter* pIter = (SkinMeshIter*)pBuf;
@@ -568,7 +568,7 @@ void fn_80113BCC(SkinIter* pIter) {
         }
         p->iter.nCur = p->pDesc->p3C[p->pEntry->n0 + p->n1C];
         if (p->iter.nCur >= 0) {
-            p->iter.pCur = &p->pDesc->p34[p->iter.nCur];
+            p->iter.pCur = &p->pDesc->pMeshes[p->iter.nCur];
         }
     } while (p->iter.nCur < 0);
 }

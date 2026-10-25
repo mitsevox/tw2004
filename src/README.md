@@ -95,7 +95,7 @@ The outer loop moves between start-up screens, the front end and rounds (`gSessi
 | gomainloop.c | T6 | the main loop: every system's start-up and shut-down, the frame update, the render passes |
 | GoHoleLoader.c | ph | the hole loader: streams a hole's files in and sets the systems up for it |
 | BootCourse.c | ours | the demo rounds (`DEMO_Start`: four fixed set-ups) and a 120-second idle timer `GoEntry.c` tests |
-| ScreenClear.c | ours | a black full-screen quad for 1, 2 or 30 frames |
+| ScreenClear.c | ours | darkens the screen with a black full-screen quad over 1, 2 or 30 frames as the start-up state ends |
 
 ### Core services
 
@@ -179,7 +179,8 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | GoShaderObjectContainer_OBFData_Gc.c | EA | copies a shader object's chunks into GPU-ready buffers *(last function's file unverified)* |
 | GoShaderObject_PrelitTextured_Gc.c | ours (after TW06) | row 0's hooks: a prelit, textured mesh on a dynamic rendering buffer |
 | DynamicRenderingBuffer.c | ours | vertices a shader object rewrites each frame (EA's header name `GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h`) *(first function's file unverified)* |
-| Code80070EC4.c | ph | rows 4 and 2's static hooks (row 2 plays a morph animation) |
+| GoShaderObject_PrelitRGBAUVAnimation_Gc.c | ours (after TW06) | row 4's static hooks: a display list whose texture scrolls *(last function's file unverified: the split from the next file follows TW06's file per shader type, not this game's data)* |
+| GoShaderObject_PrelitTexturedMorph_Gc.c | ours (after TW06) | row 2's static hooks: a display list whose vertices morph *(first function's file unverified, as above)* |
 | GoShaderObject_PrelitUVAnimation_Gc.c | EA | row 5: prelit geometry with scrolling textures; init/close of every shader type |
 | GoShaderObjectCommon_ShaderObjectsData_Gc.c | EA | builds the display lists that draw shader objects |
 | GoShaderObjectCommon_TexAnimManager_Gc.c | EA | scrolling-texture matrices |
@@ -281,7 +282,7 @@ choice, and the golfer's streamed textures and clothes.
 | skalib.c | EA | the animation library: SAL libraries and BNK clip banks in three slots, clip choice |
 | Skeleton.c | EA | the skeleton: IK chains and weights, per-bone factors |
 | Skin.c | EA | a skinned model: bone matrices, morph weights, drawing |
-| Code80037AB8.c | ph | split off Skin.c: bone inverse matrices, morph weights from a pose, frees description bits |
+| SkinUtil.c | ours | a skin's rest pose and default world-to-bone matrices, the body skin's morph weights from the animation, freeing a skin; the screen copy's globals *(which file holds them is unverified)* |
 | animblender.c | T6 *(name unproven)* | blend trees (`SKABlendNode`) and the animation player (`TSKATime`) |
 | CharAnim.c | ours (TW06: `char_state.c`) | the golfer's animation state: clip-group blends, idle and emotion updates, queued state changes |
 | char_skin.c | T03 | in a single view, which golfer's body skin has its render data; six empty hooks *(where the file starts is unverified)* |

@@ -163,19 +163,13 @@ void Aud_ExitMovie(void);
 void Aud_StartMovie(void);
 void Aud_CycleMovie(void);
 // the renderer
-void fn_80008380(void);
-void fn_800083A0(void);
 void FO_vSetCurrentAddMode(s32 v);
 s32  FO_eGetCurrentAddMode(void);
 void fn_80012B2C(f32 x0, f32 x1);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
-void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void RC_vApplyRenderCtxToRenderState(void* pCamera);
-void fn_800162A8(void);
-void fn_80007254(void);
 u8   fn_80007258(void);
-void fn_80007260(void);
 void VIWaitForRetrace(void);
 void UI_EATraxShowSong(int n, s8 nTrack);
 
@@ -189,8 +183,8 @@ u8   LLVideo_HasEnded(Video* pVideo);
 // Draws a full-screen black quad (alpha 0.5) over the screen for one frame, two when nFlags bit 0
 // is set. With bit 1 it first fades to black over 30 frames (alpha 0.1 each, 0.5 for the last two),
 // then runs again with bit 0 alone. Bit 0 also picks which of LLDisp_Gc.c's two frame hooks runs
-// (fn_80007254 or fn_80007260, both empty). Used before a movie (LLVideo_PlayFile) and after it
-// (LLVideo_RunPlayback, 6: the fade, then one frame).
+// (Displ_WaitFrameEmpty or Displ_EndFrameEmpty, both empty). Used before a movie
+// (LLVideo_PlayFile) and after it (LLVideo_RunPlayback, 6: the fade, then one frame).
 void LLVideo_DarkenScreen(int nFlags) {
     f32 xy[8];
     f32 colour[4];
@@ -206,8 +200,8 @@ void LLVideo_DarkenScreen(int nFlags) {
     colour[3] = bFade ? 0.1f : 0.5f;
     RenderView_SetColor(colour);
     RenderView_MakeQuad(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
-    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
-    fn_80008380();
+    RenderView_SetViewport(0.0f, 0.0f, 1.0f, 1.0f);
+    DL_vWaitForEndOfDrawing();
     if (bFade) {
         nFrames = 30;
     } else {
@@ -219,8 +213,8 @@ void LLVideo_DarkenScreen(int nFlags) {
             colour[3] = 0.5f;
             RenderView_SetColor(colour);
         }
-        fn_800162A8();
-        fn_80006EDC();
+        RenderView_FrameEmpty();
+        Displ_FrameStart();
         RC_vApplyRenderCtxToRenderState(RC_spGetCurrentRenderCtx());
         // the original tests bBit0 here although both branches make the same call
         if (bBit0) {
@@ -236,15 +230,15 @@ void LLVideo_DarkenScreen(int nFlags) {
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
         Input_vUpdate();
-        fn_80006FE8();
-        fn_80008380();
+        Displ_FrameEnd();
+        DL_vWaitForEndOfDrawing();
         if (!bBit0) {
-            fn_80007254();
+            Displ_WaitFrameEmpty();
         }
         if (bBit0) {
-            fn_80007260();
+            Displ_EndFrameEmpty();
         }
-        fn_800083A0();
+        LLObj_FrameEmpty();
     }
     if (bFade) {
         LLVideo_DarkenScreen(bBit0);
@@ -395,14 +389,14 @@ u8 LLVideo_IsFrameDue(Video* pVideo) {
     return 1;
 }
 
-// LLVideo_RunPlayback's first call: calls LLDisp_Gc.c's fn_80007254, which is empty in this build.
+// LLVideo_RunPlayback's first call: calls LLDisp_Gc.c's Displ_WaitFrameEmpty, which is empty.
 void LLVideo_BeginPlayback(void) {
-    fn_80007254();
+    Displ_WaitFrameEmpty();
 }
 
-// LLVideo_RunPlayback's last call: calls LLDisp_Gc.c's fn_80007254, which is empty in this build.
+// LLVideo_RunPlayback's last call: calls LLDisp_Gc.c's Displ_WaitFrameEmpty, which is empty.
 void LLVideo_EndPlayback(void) {
-    fn_80007254();
+    Displ_WaitFrameEmpty();
 }
 
 // Sets the renderer up for full-screen movie frames: a 512 x 448 render surface, textured draws
@@ -410,7 +404,7 @@ void LLVideo_EndPlayback(void) {
 // colour. Saves the font add mode (gVideoSlots.n20) and sets add mode 1, fn_80012B2C(1, 1) and text
 // colour 10 on the current font packet. LLVideo_RestoreRender puts it back.
 void LLVideo_SetupRender(void) {
-    fn_80008380();
+    DL_vWaitForEndOfDrawing();
     RenderState_SetRenderSurface(0, 512, 448, 0, 8, 1);
     RenderState_SetDrawFlags(0x10);
     DS_vEnableZBufferUpdate(0);
@@ -418,7 +412,7 @@ void LLVideo_SetupRender(void) {
     DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     RenderState_SetScissor(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
-    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_SetViewport(0.0f, 0.0f, 1.0f, 1.0f);
     RenderView_SetColor(NULL);
     gpVideoSlots->n20 = FO_eGetCurrentAddMode();
     FO_vSetCurrentAddMode(1);
@@ -427,22 +421,22 @@ void LLVideo_SetupRender(void) {
 }
 
 // Puts the renderer back after a movie (undoes LLVideo_SetupRender): the saved font add mode, depth
-// writes on, depth compare GX_LEQUAL, the whole-screen view, drawn through one frame (fn_80006EDC
-// to fn_80006FE8).
+// writes on, depth compare GX_LEQUAL, the whole-screen view, drawn through one frame (Displ_FrameStart
+// to Displ_FrameEnd).
 void LLVideo_RestoreRender(void) {
-    fn_80008380();
-    fn_80006EDC();
+    DL_vWaitForEndOfDrawing();
+    Displ_FrameStart();
     fn_80012B2C(1.0f, 1.0f);
     FO_vSetCurrentAddMode(gpVideoSlots->n20);
     DS_vEnableZBufferUpdate(1);
     DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     fn_80016B54(512, 448, 1.0f, 1.0f);
-    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_SetViewport(0.0f, 0.0f, 1.0f, 1.0f);
     RenderState_Flush();
-    fn_80006FE8();
-    fn_800083A0();
-    fn_80008380();
+    Displ_FrameEnd();
+    LLObj_FrameEmpty();
+    DL_vWaitForEndOfDrawing();
 }
 
 // Plays a movie full screen: sets the renderer up, starts the movie, and each pass runs the stream
@@ -483,8 +477,8 @@ void LLVideo_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), 
                 continue;
             }
             nLastFrame = LLVideo_GetFrame(pVideo);
-            fn_80006EDC();
-            fn_800162A8();
+            Displ_FrameStart();
+            RenderView_FrameEmpty();
             RenderState_SetScissor(0, 0, 512, 448);
             RenderState_Flush();
             if (bFirst) {
@@ -498,11 +492,11 @@ void LLVideo_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), 
         RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
         while (TI_fConvertTimeDifToSeconds(TI_sReadCounter(TI_COUNTER_REALTIME), tFrame) < 1.0f / 33.0f) {
         }
-        fn_80006FE8();
+        Displ_FrameEnd();
         VIWaitForRetrace();
         tFrame = TI_sReadCounter(TI_COUNTER_REALTIME);
-        fn_800083A0();
-        fn_80008380();
+        LLObj_FrameEmpty();
+        DL_vWaitForEndOfDrawing();
     } while (!bDone);
     LLVideo_Stop(pVideo);
     LLVideo_DarkenScreen(6);
@@ -521,7 +515,7 @@ void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg),
 
     gbVideoFrameWasOpen = fn_80007258();
     if (gbVideoFrameWasOpen) {
-        fn_80006FE8();
+        Displ_FrameEnd();
     }
     UI_EATraxShowSong(0, 0);
     LLVideo_DarkenScreen(nFlags | 1);

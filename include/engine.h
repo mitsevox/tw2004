@@ -617,8 +617,13 @@ void* File_ReadFileToHeap(const char* filename, u32* fileLength, int align);
 
 void fn_800066E4(u8 bOnRelease, s32 nReset, s32 nCode, u8 bMenu);  // LLDisp_Gc.c: reset the console
                                         //       (OSResetSystem's arguments) unless a memory card is busy
-void fn_80006EDC(void);                 // LLDisp_Gc.c: set the viewport (DiscCheck.c, ScreenClear.c)
-void fn_80006FE8(void);                 // LLDisp_Gc.c: end the frame (returns nothing)
+void Displ_FrameStart(void);            // LLDisp_Gc.c: start a frame, viewport on the whole frame
+void Displ_FrameEnd(void);              // LLDisp_Gc.c: end the frame, copy it to the image buffer
+void Displ_WaitFrameEmpty(void);        // LLDisp_Gc.c: empty; wait loops and frames outside the main
+                                        //       loop call it
+void Displ_EndFrameEmpty(void);         // LLDisp_Gc.c: empty; called after each main-loop frame
+void DL_vWaitForEndOfDrawing(void);     // LLObj_Gc.c: wait until the GPU reaches the last break point
+void LLObj_FrameEmpty(void);            // LLObj_Gc.c: empty
 extern struct GXFifoObj* lbl_80281BA0; // LLDisp_Gc.c: the command FIFO (GXInit's)
 extern u32 lbl_80281B9C;                // LLDisp_Gc.c: the most the FIFO has held (fn_800124CC)
 extern void* lbl_80281BA4[2];           // LLDisp_Gc.c: two image buffers (DepthField.c and
@@ -757,16 +762,16 @@ BufferPoolBlock* BufferPool_GetFreeBlock(void);     // the first block not in us
 typedef struct ViewState {
     f32  m0[4][4];              // 0x000  the projection (fn_80016208: orthographic 0..1)
     f32  m40[3][4];             // 0x040  fn_80016208: identity; fn_800169AC sets its scale
-    s32  n70;                   // 0x070  } the viewport in pixels: the corners fD4..fE0 times
+    s32  n70;                   // 0x070  } the viewport in pixels: fD4..fE0 times
     s32  n74;                   // 0x074  } the screen size nE4/nE8
     s32  n78;                   // 0x078  }
     s32  n7C;                   // 0x07C  }
     f32  m80[4][4];             // 0x080  the viewport's scale and offset (fn_800169AC)
     u8   unkC0[0xD0 - 0xC0];
     s32  nD0;                   // 0x0D0  set by GoRenderCtx_Gc.c
-    f32  fD4;                   // 0x0D4  } the viewport's corners as fractions of the screen
-    f32  fD8;                   // 0x0D8  } (fn_80016978; fn_80016948 gives the whole screen:
-    f32  fDC;                   // 0x0DC  } 0, 0, 1, 1)
+    f32  fD4;                   // 0x0D4  } the viewport's left, top, width and height as fractions
+    f32  fD8;                   // 0x0D8  } of the screen (RenderView_SetViewport; fn_80016948
+    f32  fDC;                   // 0x0DC  } gives the whole screen: 0, 0, 1, 1)
     f32  fE0;                   // 0x0E0  }
     s32  nE4;                   // 0x0E4  } the screen's size in pixels and two scales
     s32  nE8;                   // 0x0E8  } (fn_80016B54: 512, 448, 1, 1 at reset)
@@ -1057,6 +1062,7 @@ void DynRenderBuffer_AddVertices(DynRenderBuffer* pBuf, const void* pPos, const 
 void DynRenderBuffer_AddIndices(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart);
 void DynRenderBuffer_AddDraws(DynRenderBuffer* pBuf, const DynRenderDrawIn* pDraws, u16 nCount, int nPrim,
                               u8 bRestart);
+void SD_CallDisplayList(void* pList, u32 nSize);
 
 // A shader object that draws through a dynamic rendering buffer, as the hooks of rows 0 and 19 of
 // lbl_80188E88 see it (our names): the ShaderObject with its row's data.
@@ -1121,9 +1127,9 @@ LAYOUT_ASSERT(TexAnimManager, 0x610);
 
 void fn_80076B7C(void);             // make the manager
 void fn_80076BC4(void);             // free it
-void fn_80076C20(f32 fFrame);       // set the clock and move every matrix
+void TexAnim_Update(f32 fFrame);    // set the clock and move every matrix
 f32  fn_80076E18(void);             // the clock
-void fn_80076E24(void);             // forget every animation
+void TexAnim_RemoveAll(void);       // forget every animation, clock back to 0
 
 // A shader object that scrolls its texture (GoShaderObject_PrelitUVAnimation_Gc.c, row 5 of
 // lbl_80188E88): a DynRenderObject with its own texture matrix, loaded as matrix 0x39.
@@ -1166,9 +1172,9 @@ void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
 s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
 
 // The graphics helpers (GxUtil.c, 0x80029FC8; the rest are in gx.h)
-void* fn_8002A624(void);            // the screen copy's pixels (lbl_80281100->pPixels)
+void* fn_8002A624(void);            // the screen copy's pixels (gpScreenCopy->pPixels)
 
-// The screen copy (our name; what lbl_80281100 points at): render surface 1, set up by gomainloop
+// The screen copy (gScreenCopy, reached through gpScreenCopy): render surface 1, set up by gomainloop
 // fn_8006DCA8 for each game type; screen copies fill it (fn_8002A164, DepthField, FEgolferanim).
 typedef struct ScreenCopy {
     void* pPixels;              // 0x00  surface 1's buffer, NULL without a size
@@ -1178,8 +1184,8 @@ typedef struct ScreenCopy {
     s32   nSize;                // 0x10  the buffer's size in bytes (fn_8002F454)
 } ScreenCopy;
 
-extern ScreenCopy  lbl_801D4F68;
-extern ScreenCopy* lbl_80281100;
+extern ScreenCopy  gScreenCopy;
+extern ScreenCopy* gpScreenCopy;
 extern s32 lbl_80281B88;        // bit 0: the video field being drawn
 extern s32* lbl_802811F8;       // points at lbl_80281E80, a copy of lbl_80281B88 (fn_800718E4)
 
@@ -1592,12 +1598,14 @@ void RenderView_SetDefaultColor(void);  // GoRenderCtx_Gc.c: the default vertex 
 void RenderView_MakeQuad(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
 void RenderView_SetUseCurrentMatrices(int a);
 void RenderView_DrawPrimitive(int a, f32* pXY, f32* pColour, f32* pUV, int c);
+void RenderView_SetViewport(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);  // fractions of the screen
+void RenderView_FrameEmpty(void);       // Code80016198.c: empty
 // LLVideo.c's render helpers (the movies and the menus draw pictures with them).
 void RenderState_SetScissor(int nLeft, int nTop, int nRight, int nBottom);  // both edges inclusive
 void RenderState_SetPicture(struct LLPict* pPict);           // texture the next draw with pPict
 void RenderView_MakePictUV(f32* pUV, struct LLPict* pPict);  // a quad's UVs covering pPict
 void FO_vSetCurrentColor(s32 nColor);           // the next strings' colour (TW07: in UFont.c)
-void fn_800BA74C(u8 bFade);             // ScreenClear.c: a black screen for 1, 2 or 30 frames
+void ScreenClear_DarkenScreen(u8 bFade);    // ScreenClear.c: a black quad over 1, 2 or 30 frames
 u32  Input_uiMap(int nButton, u8 bShift);                // a button's mask (bShift: moved up 16 bits)
 extern s8   gnInputControlSet;          // GoRenderCtx_Gc.c: the row of gauInputButtonMap in use
                                         // (Input_vSelectControlSet)
