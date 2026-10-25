@@ -447,7 +447,7 @@ s32 GameModeSkillZoneTarget_GreenType(int nPlayer, int nTarget) {
     return 0;
 }
 
-// The ball hit a bonus object (pfnCollisionActor, with its id, Ball.n140): the bullseye ball effect
+// The ball hit a bonus object (pfnCollisionActor, with its id, DynObj.nActorId): the bullseye ball effect
 // plays and the bonus multiplier (gTargetBonusMultiplier) goes up by 2 plus the object's index
 // (GameModeSkillZoneBase_GetBonusIndex), so by 2 to 6.
 void GameModeSkillZoneTarget_CollisionActor(int nPlayer, int nId) {

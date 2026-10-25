@@ -1789,7 +1789,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, TGD_MaterialIn
     return 1;
 }
 
-// The flagstick (object kind 11; any other object is a plain hit). Not while it is still
+// The flagstick (object type 11; any other object is a plain hit). Not while it is still
 // swaying. A hit is within the pole's radius (at least 1 in) plus 2 ft and within
 // 8 in of it along z; the ball is stopped against it along z (normal +-z), and a real ball sets
 // the flag swaying by how far off centre and how fast it hit.
@@ -1798,7 +1798,7 @@ u8 Physics_CheckFlagstickHit(Ball* pBall, void* pv, f32* pHit, f32* pNormal) {
     f32 vPole[4];
     f32 fRadius;
     f32 fDZ, fDist2;
-    if (pObj->nKind != 11) return 1;
+    if (pObj->nType != 11) return 1;
     if (0.0f != pObj->fSway) return 0;
     fDist2 = (pHit[0] - pBall->vPos[0]) * (pHit[0] - pBall->vPos[0])
              + (pHit[2] - pBall->vPos[2]) * (pHit[2] - pBall->vPos[2]);
