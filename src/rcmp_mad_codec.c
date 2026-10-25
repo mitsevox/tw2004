@@ -116,7 +116,7 @@ PictFrame* MAD_DecodeFrame(MadDecoder* p, PictFile* pFile) {
         if (pFrame == NULL) {
             return NULL;
         }
-        MAD_initdecode(pFile->aData, 0, pFile->n15);
+        MAD_initdecode(pFile->aData, 0, pFile->nQuality);
         // a key frame has no reference: it gets its own Y plane for all three
         pRefY = pRefU = pRefV = PictFrame_GetPlaneY(pFrame);
     } else {
@@ -137,7 +137,7 @@ PictFrame* MAD_DecodeFrame(MadDecoder* p, PictFile* pFile) {
         if (pFrame == NULL) {
             return NULL;
         }
-        MAD_initdecode(pFile->aData, 1, pFile->n15);
+        MAD_initdecode(pFile->aData, 1, pFile->nQuality);
     }
     pY = PictFrame_GetPlaneY(pFrame);
     pU = PictFrame_GetPlaneU(pFrame);
@@ -186,7 +186,7 @@ PictFrame* MAD_GetNextFrame(MadDecoder* p, PictFile* pFile) {
         }
     }
     if (p->bFirst) {
-        p->nRate = pFile->uC;
+        p->nRate = pFile->uRate;
         p->fFrameTime = 1000.0f / (p->nRate / 65535.0f);
         p->nWidth = pFile->nWidth;
         p->nHeight = pFile->nHeight;
@@ -224,7 +224,7 @@ void MAD_AddFrameToList(PictFrame** apList, PictFrame* pFrame) {
 }
 
 // The next MAD file from the read function (MAD_SetReadCallback), NULL when there is none; its rate
-// (uC), width and height are swapped to big-endian and the decoder's file count goes up. The end
+// (uRate), width and height are swapped to big-endian and the decoder's file count goes up. The end
 // count (nEnd) is never set: see the EA bug inside.
 // port: the swaps assume a big-endian machine; a little-endian port reads the header as it is.
 PictFile* MAD_ReadNextFile(MadDecoder* p) {
@@ -243,7 +243,7 @@ PictFile* MAD_ReadNextFile(MadDecoder* p) {
             p->nEnd = 2;
         }
     }
-    __stwbrx(pFile->uC, &pFile->uC, 0);
+    __stwbrx(pFile->uRate, &pFile->uRate, 0);
     pFile->nWidth = ((u16)pFile->nWidth >> 8) | (((u16)pFile->nWidth & 0xFF) << 8);
     // fake match: the height's redundant & 0xFF (the width without it gives other code)
     pFile->nHeight = (((u16)pFile->nHeight >> 8) & 0xFF) | (((u16)pFile->nHeight & 0xFF) << 8);
