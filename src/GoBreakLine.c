@@ -117,8 +117,8 @@ void BreakLine_Update(int nView) {
 void BreakLine_Render(int nView) {
     f32 vAxis[4] = {0.0f, 0.0f, 1.0f, 0.0f};
     int nPlayer = ViewController_GetActivePlayerNumber(nView);
-    TrailMeshDescEx desc;
-    s16 aIndex[BREAKLINE_VERTS];        // the frame fits at least this many; the size is not known
+    PrelitUVFill desc;
+    u16 aIndex[BREAKLINE_VERTS];        // the frame fits at least this many; the size is not known
     s32 nFrame;
     f32 vCross[4];
     f32 vDir[4];
@@ -226,17 +226,17 @@ void BreakLine_Render(int nView) {
             for (i = 0; i < gpBreakLine->anVerts[nView]; i++) {
                 aIndex[i] = i;
             }
-            desc.desc.n0 = gpBreakLine->anVerts[nView];
-            desc.desc.nVerts = gpBreakLine->anVerts[nView];
-            desc.desc.pDraw = NULL;
-            desc.desc.pIndices = aIndex;
-            desc.desc.pPos = gpBreakLine->aVert[nView][0];
-            desc.desc.pColour = gpBreakLine->aColor[nView][0];
-            desc.desc.pUV = gpBreakLine->aUV[nView][0];
-            desc.af18[0] = gpBreakLine->fAB10;
-            desc.af18[1] = gpBreakLine->fAB14;
-            desc.af18[2] = gpBreakLine->fAB18;
-            desc.af18[3] = 1.0f / gpBreakLine->fAB18;
+            desc.fill.nCount = gpBreakLine->anVerts[nView];
+            desc.fill.nVerts = gpBreakLine->anVerts[nView];
+            desc.fill.pDraws = NULL;
+            desc.fill.pIndices = aIndex;
+            desc.fill.pPos = gpBreakLine->aVert[nView][0];
+            desc.fill.pColour = gpBreakLine->aColor[nView][0];
+            desc.fill.pTexCoord = gpBreakLine->aUV[nView][0];
+            desc.anim.fU = gpBreakLine->fAB10;
+            desc.anim.fV = gpBreakLine->fAB14;
+            desc.anim.fScale = gpBreakLine->fAB18;
+            desc.anim.fInv = 1.0f / gpBreakLine->fAB18;
             nFrame = gSession.nFrameCount;
             SD_SetShaderTypeParameters(5, &nFrame);
             SD_FillShaderObject((ShaderObject*)gpBreakLine->aMesh[nView], &desc, 1);

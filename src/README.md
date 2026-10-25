@@ -182,7 +182,7 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | Code8006F608.c | ph | the hole's weather: rolls per-course choices and starts/stops effects, the rain among them (PsMgr.c) |
 | GoShaderObjectContainer_OBFData_Gc.c | EA | copies a shader object's chunks into GPU-ready buffers |
 | unsorted/sweep_8006FF2C.c | ph | one of row 0's hooks (sets a vertex array, then calls sweep_80070168.c) |
-| ShaderRow0.c | ours | row 0's hooks on a dynamic rendering buffer |
+| GoShaderObject_PrelitTextured_Gc.c | ours (after TW06) | row 0's hooks: a prelit, textured mesh on a dynamic rendering buffer |
 | unsorted/sweep_80070168.c | ph | calls a display list, then `fn_800124CC` (LLFont.c) |
 | DynamicRenderingBuffer.c | ours | vertices a shader object rewrites each frame (EA's header name `GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h`) |
 | Code80070EC4.c | ph | rows 4 and 2's static hooks (row 2 plays a morph animation) |
@@ -199,7 +199,7 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | PsBallFx.c | EA | the ball's particle effects and sand trail |
 | GoShaderObject_Rain_Gc.c | EA | rain streaks and splashes |
 | GoShaderObject_Grass_Gc.c | ours (after TW06) | the grass shader object: grass shells over the terrain |
-| ShaderRow19.c | ours | row 19's hooks (row 0's code, another primitive kind) |
+| ShaderRow19.c | ours | row 19's hooks (row 0's code, line strips) |
 
 ### Cameras
 

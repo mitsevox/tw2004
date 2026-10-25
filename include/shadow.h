@@ -45,8 +45,8 @@ extern s32   lbl_8028215C;      //   (fn_800B2FB0)
 #define SHADOW_NUM_VERTS  0x800 // vertices in the shadow's ground mesh
 // The shadow's ground mesh, made by fn_800B251C_ShadowInit (SHADOW_NUM_STRIPS strips,
 // SHADOW_NUM_VERTS vertices):
-extern TrailDraw* lbl_80282160; // the strips
-extern s16*  lbl_80282164;      // the vertex indices
+extern DynRenderDrawIn* lbl_80282160; // the strips
+extern u16*  lbl_80282164;      // the vertex indices
 extern f32*  lbl_80282168;      // the texture coordinates, two a vertex
 extern u8*   lbl_8028216C;      // the colours, four bytes a vertex
 extern f32*  lbl_80282170;      // the positions, three a vertex

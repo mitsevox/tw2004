@@ -21,7 +21,9 @@ void fn_80070B50(u16 nIndex);
 void fn_80070B5C(u16 nIndex);
 void fn_80070B68(u16 nIndex);
 
-DynRenderBuffer* fn_8007018C(int nMaxVerts, int nMaxDraws) {
+// Make a buffer for nMaxVerts vertices (two pairs of position, colour and texture-coordinate
+// arrays), 1.6 indices per vertex and nMaxDraws draws.
+DynRenderBuffer* DynRenderBuffer_Create(int nMaxVerts, int nMaxDraws) {
     DynRenderBuffer* pBuf;
 
     pBuf = Circular_MemAllocFunc(sizeof(DynRenderBuffer), MEMTYPE_LOW, 32, DRB_FILE, 163);
@@ -44,7 +46,8 @@ DynRenderBuffer* fn_8007018C(int nMaxVerts, int nMaxDraws) {
     return pBuf;
 }
 
-void fn_80070348(DynRenderBuffer* pBuf) {
+// Free the buffer and each of its arrays.
+void DynRenderBuffer_Free(DynRenderBuffer* pBuf) {
     Circular_MemFreeFunc(pBuf->pDraws);
     Circular_MemFreeFunc(pBuf->apTexCoord[1]);
     Circular_MemFreeFunc(pBuf->apTexCoord[0]);
@@ -58,7 +61,7 @@ void fn_80070348(DynRenderBuffer* pBuf) {
 
 // Draw nCount of the buffer's indices from nStart as one primitive, from the vertex arrays last
 // filled.
-void fn_800703B8(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPrim) {
+void DynRenderBuffer_Draw(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPrim) {
     u32 i;
     u8 nBuffer = pBuf->nBuffer;
 
@@ -81,8 +84,8 @@ void fn_800703B8(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPrim) {
 
 // Append nVerts vertices (any array may be NULL); bFlip first switches to the other pair of arrays
 // and starts them over.
-void fn_800704C4(DynRenderBuffer* pBuf, const void* pPos, const void* pColour, const void* pTexCoord,
-                 int nVerts, u8 bFlip) {
+void DynRenderBuffer_AddVertices(DynRenderBuffer* pBuf, const void* pPos, const void* pColour,
+                                 const void* pTexCoord, int nVerts, u8 bFlip) {
     u8* pDst;
     int uSize;
     u8 nBuffer;
@@ -118,7 +121,7 @@ void fn_800704C4(DynRenderBuffer* pBuf, const void* pPos, const void* pColour, c
 
 // Append nCount indices, offset by the indices already there; bRestart starts the list over and
 // copies them as they are.
-void fn_800705F0(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart) {
+void DynRenderBuffer_AddIndices(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart) {
     u16* pDst = pBuf->pIndices;
     u32 i;
 
@@ -141,7 +144,8 @@ void fn_800705F0(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart) 
 // the list over. Appended draws start after the indices already there.
 // EA writes the list (DynRenderDrawList) as a stream of words through one cursor: the count, then
 // three words per draw (nStart, nCount, nPrim).
-void fn_80070764(DynRenderBuffer* pBuf, const DynRenderDrawIn* pIn, u16 nCount, int nPrim, u8 bRestart) {
+void DynRenderBuffer_AddDraws(DynRenderBuffer* pBuf, const DynRenderDrawIn* pIn, u16 nCount, int nPrim,
+                              u8 bRestart) {
     u32* pWord = (u32*)pBuf->pDraws;
     u32 nOld;
     u32 i;
