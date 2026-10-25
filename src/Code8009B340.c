@@ -73,7 +73,8 @@ void fn_8009B4B4(void) {
     }
 }
 
-void fn_8009B528(f32 fTime) {
+// Advances every node by fTime seconds, then frees the ones that have faded out.
+void FadeGlow_UpdateAll(f32 fTime) {
     FadeNode* pNode;
 
     for (pNode = lbl_80281FA0; pNode != NULL; pNode = pNode->pNext) {
@@ -82,7 +83,8 @@ void fn_8009B528(f32 fTime) {
     fn_8009B4B4();
 }
 
-void fn_8009B57C(void) {
+// Queues every node's glows for drawing.
+void FadeGlow_RenderAll(void) {
     FadeNode* pNode;
 
     for (pNode = lbl_80281FA0; pNode != NULL; pNode = pNode->pNext) {
@@ -104,10 +106,12 @@ void fn_8009B5BC(void) {
     lbl_80281FA0 = NULL;
 }
 
-void fn_8009B604(void) {
+// Starts with no nodes.
+void FadeGlow_InitModule(void) {
     lbl_80281FA0 = NULL;
 }
 
-void fn_8009B610(void) {
+// Frees every node.
+void FadeGlow_CloseModule(void) {
     fn_8009B5BC();
 }

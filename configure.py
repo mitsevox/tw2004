@@ -1161,7 +1161,7 @@ config.libs = [
             Object(Matching, "DynamicRenderingBuffer.c"),
             Object(Matching, "Code80070EC4.c"),
             Object(Matching, "unsorted/sweep_80097EC4.c"),
-            Object(Matching, "Code8009A928.c"),
+            Object(Matching, "GlowMgr.c"),
             Object(Matching, "hlaudvoice.c"),
             Object(Matching, "AudLock.c"),
             Object(Matching, "unsorted/sweep_801654F4.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code

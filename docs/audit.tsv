@@ -21,7 +21,6 @@ Code8006F608.c	open
 Code80070EC4.c	open		
 Code80090940.c	open		
 Code80095564.c	open		
-Code8009A928.c	open		
 Code8009AA28.c	open		
 Code8009B340.c	open		
 Code800B1AA8.c	open		
@@ -89,6 +88,7 @@ GameMode_Skins.c	open
 GameRound.c	open		
 GameUI.c	open		
 GameUICommands.c	open		
+GlowMgr.c	open		
 GoARAM.c	done	77c51d42	claude-review
 GoAnimalActors.c	open		
 GoBreakLine.c	open		
