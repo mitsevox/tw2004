@@ -6,7 +6,7 @@
 #include "engine.h"
 
 void FO_vClearPacketLists(void);
-void UFont_LoadFontFromStream(UStreamObject* pObject);
+void UFont_LoadFontFromStream(TStreamData* pObject);
 void UFont_ResetContext(void);
 void UFont_LoadFont(u32 uSlot, void* pData, s32 bFlag);
 void UFont_SetFont(s32 nFont);
@@ -40,7 +40,7 @@ void FO_vClearPacketLists(void) {
 }
 
 // The 'sfn ' stream handler: loads the font into the slot its id names (bit 0x80 is a flag).
-void UFont_LoadFontFromStream(UStreamObject* pObject) {
+void UFont_LoadFontFromStream(TStreamData* pObject) {
     s32 bFlag;
     u32 uId;
 

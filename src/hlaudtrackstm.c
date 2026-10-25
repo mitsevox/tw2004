@@ -161,7 +161,7 @@ void Stm_SendBlockToVoices(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uSt
         pVoice = pTrack->apVoices[i];
         if ((!bSkipEmpty || pVoice != NULL) && pVoice != NULL) {
             uAram = pVoice->uAram + pVoice->flags.b.bHalf * 0x7F00;
-            HwVoice_SetStreamDecoder(pVoice->nHwVoice, (StreamChunk*)pSrc, 0x8000, pVoice->flags.b.bHalf);
+            HwVoice_SetStreamDecoder(pVoice->nHwVoice, (StmBlock*)pSrc, 0x8000, pVoice->flags.b.bHalf);
             AudDma_ToAram(uAram, pSrc + 0x100, 0x7F00, pfnDone, i == nChannels - 1);
             pSrc += uStep;
             pVoice->flags.b.bHalf ^= 1;
@@ -190,7 +190,7 @@ void Stm_SendSilenceToVoices(AudTrack* pTrack) {
     // the memset's 0 before its size, as in EA's schedule
     AudTrack* pCopy = (AudTrack*)(void*)pTrack;
 
-    Mem_set(pCopy->u.stm.pBuffer, 0, sizeof(StreamChunk));
+    Mem_set(pCopy->u.stm.pBuffer, 0, sizeof(StmBlock));
     Stm_SendBlockToVoices(pCopy, Stm_SilenceDmaDoneCB, 0, 0);
 }
 

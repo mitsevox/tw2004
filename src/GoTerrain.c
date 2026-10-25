@@ -62,9 +62,9 @@ void  Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s3
                           u8 b1,
                   u8 b2, f32 fNear, f32 fFar);
 void  Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag);
-void  Ter_LODLoadCallback(UStreamObject* pObject);
-void  Ter_HoleDataLoadCallback(UStreamObject* pObject);
-void  Ter_CourseLoadCallback(UStreamObject* pObject);
+void  Ter_LODLoadCallback(TStreamData* pObject);
+void  Ter_HoleDataLoadCallback(TStreamData* pObject);
+void  Ter_CourseLoadCallback(TStreamData* pObject);
 void  SF_vSetFlareType(s32 v);
 void  SF_vSetSunPosition(f32* p0);
 void  SF_vSetSunColor(f32* p0);
@@ -1924,7 +1924,7 @@ void Ter_DrawPanoramaList(void* pHoleData, u32 nList) {
 
 // The 'tLOD' chunk arrived: two values, made whole numbers and, when the second is the larger and
 // both are at least gTerLOD1OverlapSteps x gTerLODStepSize, turned into gTerLOD0Steps and gTerLOD1Steps.
-void Ter_LODLoadCallback(UStreamObject* pObject) {
+void Ter_LODLoadCallback(TStreamData* pObject) {
     TerLODData* pData = (TerLODData*)pObject->pData;
     s32 nRem;
 
@@ -1953,7 +1953,7 @@ void Ter_LODLoadCallback(UStreamObject* pObject) {
 
 // The 'ter ' chunk arrived: keeps it (pCurrentHoleDataStreamData) and its hole data
 // (pCurrentHoleData, from fn_800073B4) for drawing.
-void Ter_HoleDataLoadCallback(UStreamObject* pObject) {
+void Ter_HoleDataLoadCallback(TStreamData* pObject) {
     gTerRenderer.pCurrentHoleDataStreamData = pObject;
     gTerRenderer.pCurrentHoleData = fn_800073B4(pObject->pData, 0);
 }
@@ -1964,7 +1964,7 @@ void Ter_HoleDataLoadCallback(UStreamObject* pObject) {
 // defaults). The light vector gSession.f5B3C..f5B48 is the hole's own (v60) when it has one, else
 // the glows' vector; it is raised to at least its distance across the ground and made at least 2000
 // long.
-void Ter_CourseLoadCallback(UStreamObject* pObject) {
+void Ter_CourseLoadCallback(TStreamData* pObject) {
     f32 v18[4];
     f32 v8[4];
     int i;
@@ -2083,7 +2083,7 @@ void Ter_UnloadHole(void) {
 }
 
 // A tee's position arrived: into its row of the course's tees, if the course is loaded.
-void Ter_TeeLoadCallback(UStreamObject* pObject) {
+void Ter_TeeLoadCallback(TStreamData* pObject) {
     TerPosData* pTee = (TerPosData*)pObject->pData;
 
     if (gTerRenderer.pCourse != NULL) {
@@ -2098,7 +2098,7 @@ void Ter_TeeLoadCallback(UStreamObject* pObject) {
 // A pin position arrived (UKernel.c hands it on). With GM_Currently_SkillZoneMode set it goes to
 // GameModeSkillZoneBase_AddCup; otherwise a pin the course already has (w not 0) is copied into the
 // chunk, and a missing one is taken from it.
-u8 Ter_PinLoadCallback(UStreamObject* pObject) {
+u8 Ter_PinLoadCallback(TStreamData* pObject) {
     TerPosData* pPin = (TerPosData*)pObject->pData;
 
     if (gTerRenderer.pCourse != NULL) {

@@ -25,11 +25,11 @@ The stream container
 
 | Part | Where | Byte order | Overlay |
 |---|---|---|---|
-| chunk header (tag, length, sub-tag, SHDR fields) | `UStream_ParseChunks`, `UStream_BeginObject` (`UStreamChunk`, include/ustream.h) | big-endian, read through the struct | yes: `UStreamChunk`; the SHDR fields from 0x14 are copied into `UStreamObject` (engine.h) |
-| `SDAT` payload | `UStream_ParseChunks` | the object's own format (below) | copied unchanged |
+| chunk header (tag, length, sub-tag, SHDR fields) | `Stream_ParseBufs`, `loadStreamChunk` (`StreamChunk`, include/ustream.h) | big-endian, read through the struct | yes: `StreamChunk`; the SHDR fields from 0x14 are copied into `TStreamData` (engine.h) |
+| `SDAT` payload | `Stream_ParseBufs` | the object's own format (below) | copied unchanged |
 | `Rdat` payload | `UStream_Decompress` | piece size: big-endian u32, read with `BE32` (include/endian.h); command words read a byte at a time, order-free | no |
-| `SONO` sound (`shdr` / `samp`) | `UStream_ParseChunks` | header fields big-endian, through `UStreamChunk`; sample data handed to the audio code as-is | yes: `UStreamChunk` |
-| `SWVR`, `MPG2`, `DSPM`/`VAGM`/`XADP` | `UStream_ParseChunks` | passed on to the movie/audio code (asm, not checked); the `SWVR` test on a read buffer uses `BE32`, the `RPNS` base value too | asm |
+| `SONO` sound (`shdr` / `samp`) | `Stream_ParseBufs` | header fields big-endian, through `StreamChunk`; sample data handed to the audio code as-is | yes: `StreamChunk` |
+| `SWVR`, `MPG2`, `DSPM`/`VAGM`/`XADP` | `Stream_ParseBufs` | passed on to the movie/audio code (asm, not checked); the `SWVR` test on a read buffer uses `BE32`, the `RPNS` base value too | asm |
 
 Objects delivered by UStream
 ----------------------------

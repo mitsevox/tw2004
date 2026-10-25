@@ -5,7 +5,7 @@
 #include "game.h"
 #include "ustream.h"
 
-UStreamObject* gpFEtmLoadingBarObject;  // a copy of the 'txf2' object FETM_LOADING_BAR_ID
+TStreamData* gpFEtmLoadingBarObject;    // a copy of the 'txf2' object FETM_LOADING_BAR_ID
 u8* gpFEtmLoadingBarData;               // the first FETM_LOADING_BAR_DATA_SIZE bytes of its data
 u8* gpFEtmLoadScreenData;               // the 'load' object's data (FETM_LOAD_SCREEN_DATA_SIZE)
 int gFEtmNumBanks;                      // how many 'txf2' objects became banks
@@ -15,8 +15,8 @@ LoadObjInfo gFEtmLoadScreenInfo;
 
 static void FEtm_vRegisterLoadScreenStreamClient(void);
 static void FEtm_vUnregisterLoadScreenStreamClient(void);
-static void FEtm_vLoadScreenStreamCallback(UStreamObject* xpStreamData_p);
-static void FEtm_vStreamCallback(UStreamObject* xpStreamData_p);
+static void FEtm_vLoadScreenStreamCallback(TStreamData* xpStreamData_p);
+static void FEtm_vStreamCallback(TStreamData* xpStreamData_p);
 static void FEtm_ClearLoadScreenList(void);
 
 // As the front end starts: no banks.
@@ -48,7 +48,7 @@ void FEtm_CloseFETextureMgr(void) {
 // heap.
 void FEtm_AllocBuffers(void) {
     gpFEtmLoadScreenData = Mem_AllocFunc(FETM_LOAD_SCREEN_DATA_SIZE, 16, 1);
-    gpFEtmLoadingBarObject = Mem_AllocFunc(sizeof(UStreamObject), 16, 1);
+    gpFEtmLoadingBarObject = Mem_AllocFunc(sizeof(TStreamData), 16, 1);
     gpFEtmLoadingBarData = Mem_AllocFunc(FETM_LOADING_BAR_DATA_SIZE, 16, 1);
 }
 
@@ -71,7 +71,7 @@ static void FEtm_vUnregisterLoadScreenStreamClient(void) {
 
 // The 'load' object (the loading screen's picture): its size is kept and its data copied into
 // gpFEtmLoadScreenData, then the object is freed.
-static void FEtm_vLoadScreenStreamCallback(UStreamObject* xpStreamData_p) {
+static void FEtm_vLoadScreenStreamCallback(TStreamData* xpStreamData_p) {
     gFEtmLoadScreenInfo.uSize = xpStreamData_p->uSize;
     Mem_cpy(gpFEtmLoadScreenData, xpStreamData_p->pData, xpStreamData_p->uSize);
     Circular_MemFreeFunc(xpStreamData_p);
@@ -133,11 +133,11 @@ void FEtm_StreamLoadScreen(void) {
 // A 'txf2' object. The one with id FETM_LOADING_BAR_ID (modulo 100000) is copied, with the first
 // FETM_LOADING_BAR_DATA_SIZE bytes of its data, into the loading bar's buffers; any other becomes a
 // new bank with its own copy of the pixels and palettes, in the slot of its id. The object is freed.
-static void FEtm_vStreamCallback(UStreamObject* xpStreamData_p) {
+static void FEtm_vStreamCallback(TStreamData* xpStreamData_p) {
     int iAssocChkRef = (int)xpStreamData_p->uId % 100000;
 
     if (iAssocChkRef == FETM_LOADING_BAR_ID) {
-        Mem_cpy(gpFEtmLoadingBarObject, xpStreamData_p, sizeof(UStreamObject));
+        Mem_cpy(gpFEtmLoadingBarObject, xpStreamData_p, sizeof(TStreamData));
         Mem_cpy(gpFEtmLoadingBarData, xpStreamData_p->pData, FETM_LOADING_BAR_DATA_SIZE);
         gpFEtmLoadingBarObject->pData = gpFEtmLoadingBarData;
         Circular_MemFreeFunc(xpStreamData_p);

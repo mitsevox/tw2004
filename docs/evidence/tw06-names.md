@@ -223,8 +223,8 @@ Functions we had named by hand, with their TW06 equivalents (our names kept):
 | Address | Our name | TW06 name | Tier | Evidence |
 |---|---|---|---|---|
 | `8000B130` | `Rand_Next` | `Misc_RandFunc` | strong | both builds: Xbox nbr2(r3,3), PS2 xbox:nbr2(r3,3) |
-| `8000C968` | `UStream_BeginObject` | `Stream_InitModule` | strong | PS2 anchor(1) |
-| `8000CD60` | `UStream_StripStreamExt` | `Stream_RemoveExtensionInStreamName` | strong | Xbox anchor(1) |
+| `8000C968` | `loadStreamChunk` | `Stream_InitModule` | strong | PS2 anchor(1) |
+| `8000CD60` | `Stream_RemoveExtensionInStreamName` | `Stream_RemoveExtensionInStreamName` | strong | Xbox anchor(1) |
 | `8002B030` | `AI_RehearseShot` | `AIBrain::Think` | strong | both builds: Xbox nbr2(r2,2), PS2 xbox:nbr2(r2,2) |
 | `80051AF4` | `Ball_Launch` | `Physics_ShotImpact` | strong | both builds: Xbox nbr(r2,2), PS2 xbox:nbr(r2,2) |
 | `80054340` | `Ball_Stop` | `Physics_StopBall` | strong | Xbox nbr(r2,4) |

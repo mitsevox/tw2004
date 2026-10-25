@@ -1111,7 +1111,7 @@ extern AnimLib*    gBankLibs[3];     // the library of each slot, when its clips
 extern LibSlot     gLibSlots[3];
 extern u32         gClipBankAram[3];     // ARAM copy of each slot's bank file
 extern u32         gClipBankAramSizes[3];     // its size
-extern UStreamObject* gClipBankFiles[3];  // each slot's bank file, while it is in main memory
+extern TStreamData* gClipBankFiles[3];    // each slot's bank file, while it is in main memory
 extern u8          lbl_801D9908[0xC8];
 extern s32         gTrimMinLeafClips;        // leaves this short are left alone by the drop pass
 extern s32         gClipsPerLeaf;        // clips a leaf may keep this round
@@ -1123,7 +1123,7 @@ extern u8*         gSKAAramRanges;
 extern u8*         gSKAAramKeys;
 extern u8          gSlotsDoubleBuffered;        // double buffering: libraries alternate between slots 0 and 1
 extern u32         gClipBankBudget;        // bytes of clips a slot may keep
-extern UStreamObject* gClipBankRestoreFile;     // the buffer banks are brought back from ARAM into
+extern TStreamData* gClipBankRestoreFile;       // the buffer banks are brought back from ARAM into
 extern u8          gSacReloading;
 u32  Skalib_CurSlot(void);              // the current slot (gCurLibSlot)
 int  Skalib_HasOverlays(int nSlot);     // the slot has overlay libraries

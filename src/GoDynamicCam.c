@@ -16,10 +16,10 @@ DynamicCamManager_t* gpDynCam;    // the loaded shots, sequences, anim pairs and
 
 static void DynamicCam_LoadFilesFromDisk(void);
 static void DynamicCam_LoadFilesFromDiskFE(void);
-static void DynamicCam_LoadCAMSfromStream(UStreamObject* pStreamData);
-static void DynamicCam_LoadCAMVfromStream(UStreamObject* pStreamData);
-static void DynamicCam_LoadCAMVfromStreamFE(UStreamObject* pStreamData);
-static void DynamicCam_LoadCAMAfromStream(UStreamObject* pStreamData);
+static void DynamicCam_LoadCAMSfromStream(TStreamData* pStreamData);
+static void DynamicCam_LoadCAMVfromStream(TStreamData* pStreamData);
+static void DynamicCam_LoadCAMVfromStreamFE(TStreamData* pStreamData);
+static void DynamicCam_LoadCAMAfromStream(TStreamData* pStreamData);
 static void DynamicCam_CopySequenceData(u8* src, u8* dest, int numSeqs);
 static void DynamicCam_CopyScriptData(u8* src, CamShot* dest, u32 numScripts);
 static void DynamicCam_CopyAnimPairData(u8* src, CameraAnimPairs_t* dest, u32 numPairs);
@@ -109,7 +109,7 @@ static void DynamicCam_LoadFilesFromDiskFE(void) {
 // sequences' follow-ons become pointers (DynamicCam_ParseNextSeqs); the choices' shots do once the
 // shot file is in too (DynamicCam_ParseCameraSeqs). This and the round's 'CAMV' load count
 // nFilesLoaded on. Frees the object; a second sequence file is dropped.
-static void DynamicCam_LoadCAMSfromStream(UStreamObject* pStreamData) {
+static void DynamicCam_LoadCAMSfromStream(TStreamData* pStreamData) {
     s32 numSeqsToLoad;
     s32 numTriggersToLoad;
     u8* srcPtr;
@@ -144,7 +144,7 @@ static void DynamicCam_LoadCAMSfromStream(UStreamObject* pStreamData) {
 // The round's 'CAMV' handler, the shot file: copies the shots (DynamicCam_CopyScriptData) and sets
 // them up (DynamicCam_ParseCameraViews). Counts nFilesLoaded on, as 'CAMS' does. Frees the object;
 // a second shot file is dropped.
-static void DynamicCam_LoadCAMVfromStream(UStreamObject* pStreamData) {
+static void DynamicCam_LoadCAMVfromStream(TStreamData* pStreamData) {
     gpDynCam->nFilesLoaded++;
     if (gpDynCam->nFilesLoaded > 2) {
         gpDynCam->nFilesLoaded = 1;
@@ -161,7 +161,7 @@ static void DynamicCam_LoadCAMVfromStream(UStreamObject* pStreamData) {
 
 // The front end's 'CAMV' handler: as DynamicCam_LoadCAMVfromStream, but nFilesLoaded is left alone
 // and the shots are set up by DynamicCam_ParseCameraViewsFE.
-static void DynamicCam_LoadCAMVfromStreamFE(UStreamObject* pStreamData) {
+static void DynamicCam_LoadCAMVfromStreamFE(TStreamData* pStreamData) {
     if (gpDynCam->pShots != NULL) {
         Circular_MemFreeFunc(pStreamData);
         return;
@@ -174,7 +174,7 @@ static void DynamicCam_LoadCAMVfromStreamFE(UStreamObject* pStreamData) {
 
 // The 'CAMA' handler, the anim pairs: copies them (DynamicCam_CopyAnimPairData) and turns their
 // indexes into pointers (DynamicCam_ParseAnimPairs). Frees the object; a second file is dropped.
-static void DynamicCam_LoadCAMAfromStream(UStreamObject* pStreamData) {
+static void DynamicCam_LoadCAMAfromStream(TStreamData* pStreamData) {
     if (gpDynCam->pAnimPairs != NULL) {
         Circular_MemFreeFunc(pStreamData);
         return;

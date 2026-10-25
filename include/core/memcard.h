@@ -197,8 +197,8 @@ extern MCEagmEntry* lbl_80281FF0;   // the 'eagm' list (MC_FreeEAGameList frees 
 extern s32   lbl_80281FF4;      // its number of entries
 extern u32   lbl_80281FC0;     // the size parked in ARAM (MC_BUFFER_SIZE + 0x20)
 extern u32   lbl_80281FC4;      // the ARAM address they are parked at (0: none yet)
-extern UStreamObject* lbl_80281FB8;     // the 'MCI ' object (fn_8009EB30)
-extern UStreamObject* lbl_80281FBC;     // the 'MCB ' object (fn_8009EB38)
+extern TStreamData* lbl_80281FB8;       // the 'MCI ' object (fn_8009EB30)
+extern TStreamData* lbl_80281FBC;       // the 'MCB ' object (fn_8009EB38)
 
 // ---- MC_Gc.c ------------------------------------------------------------------------------------
 
@@ -268,7 +268,7 @@ u8   MC_LoadInitialUser(void);             // at boot: MC_LoadLastUser on each c
 s32  MC_LoadOptionsFromFirstCardFound(void);
 s32  MC_DeleteSaveGame(s32 nPort, s32 nSlot);
 void MC_FreeEAGameList(void);
-void MC_LoadEAGameListfromStream(UStreamObject* pObject);  // the 'eagm' handler
+void MC_LoadEAGameListfromStream(TStreamData* pObject);    // the 'eagm' handler
 void MC_RecordEATitleByName(const char* szGameCode);   // mark the first matching 'eagm' entry
 s32  MC_TalleyEATitlesFound(void);                     // how many 'eagm' entries are marked
 s32  MC_FormatCard(s32 nPort, s32 nSlot);

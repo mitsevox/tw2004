@@ -48,7 +48,7 @@ void SplitWinnings(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount);
 void GM_PgaTourSim_DistributeWinnings(int nPlayer, int nPurse, int nFirstPrize);
 void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst);
 void PlayPGAAwardVideo(int nMovie, int nNumRandom);
-void PGATourSimulation_LoadPGSTFromStream(UStreamObject* pObject);
+void PGATourSimulation_LoadPGSTFromStream(TStreamData* pObject);
 
 char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tournament's first champion
 s32  GameModeDriverPGATour_GetInitialChampScore(s32 i);                // and the champion's score
@@ -95,7 +95,7 @@ void PGATourSimulation_CloseONCE(void) {
 
 // The 'PGST' stream object's loader: the tour pros' table (gPgaPros, 174 PgaPro records) read in
 // one piece.
-void PGATourSimulation_LoadPGSTFromStream(UStreamObject* pObject) {
+void PGATourSimulation_LoadPGSTFromStream(TStreamData* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gPgaPros), gPgaPros);
 }
 

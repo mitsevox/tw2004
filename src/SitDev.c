@@ -64,7 +64,7 @@ void SitDev_vInitBeforeHole(void) {
 void SitDev_vRegisterStreamClients(void) {
     // port: SitDevFile.c defines the handler with the object's first word (the scripts) as its
     //       parameter; UStream calls it with the object. Same address on the GameCube.
-    Stream_RegisterLoadChunkCallback('sscr', (void (*)(UStreamObject*))SitDev_LoadScripts);
+    Stream_RegisterLoadChunkCallback('sscr', (void (*)(TStreamData*))SitDev_LoadScripts);
 }
 
 // Unregisters the loader of the hole stream's 'sscr' chunks that SitDev_vRegisterStreamClients set

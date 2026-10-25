@@ -16,8 +16,8 @@ TNetwork* gNetworks[32];                // the hole's networks, in the order the
 CourseLoader gNetworkLoaders[8];        // (network type, loader), Network_RegisterLoadNetworkCallback
 int gNetworkLoaderCount = -1;           // loaders registered; -1: Network_DownloadDataPNB calls none
 
-void Network_FreeDownloadData(UStreamObject* pObject);
-void Network_DownloadDataPNB(UStreamObject* pObject);
+void Network_FreeDownloadData(TStreamData* pObject);
+void Network_DownloadDataPNB(TStreamData* pObject);
 f32  isLeft(f32* pA, f32* pB, f32* pP);
 u8   Network_LineIntersection(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut);
 u8   Network_RayIntersection(f32* pA, f32* pB, f32* pC, f32* pD);
@@ -55,7 +55,7 @@ f32 Network_GetNodeGroundHeight(const f32* pPos) {
 
 // A network stream object is released (Network_DownloadDataPNB installs this as its release
 // function): one network fewer in the hole's list.
-void Network_FreeDownloadData(UStreamObject* pObject) {
+void Network_FreeDownloadData(TStreamData* pObject) {
     gNetworkCount = gNetworkCount - 1;
 }
 
@@ -63,7 +63,7 @@ void Network_FreeDownloadData(UStreamObject* pObject) {
 // already kept, adds its network (after a 12-byte header) to the hole's list, puts nodes stored at
 // height 0 on the ground, and hands the network to every loader registered for its type
 // (TNetwork.nExportType).
-void Network_DownloadDataPNB(UStreamObject* pObject) {
+void Network_DownloadDataPNB(TStreamData* pObject) {
     TNetwork* pNet;
     int i;
     TNetNode* pNode;

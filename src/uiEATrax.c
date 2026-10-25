@@ -18,8 +18,8 @@ TraxTrack gEATraxSongs[TRAX_NUM_TRACKS];        // the song list ('TRAX')
 TraxState gEATraxDisplay;                       // the song display now
 
 u8 UI_EATraxIsLogoLoaded(void);
-void UI_vEATraxLoadfromStream(UStreamObject* pObject);
-void UI_vEATraxLoadLogoFromStream(UStreamObject* pObject);
+void UI_vEATraxLoadfromStream(TStreamData* pObject);
+void UI_vEATraxLoadLogoFromStream(TStreamData* pObject);
 f32 UI_EATraxGetBoxHeight(void);
 f32 UI_EATraxGetBoxWidth(void);
 f32 UI_EATraxGetBoxTop(void);
@@ -73,14 +73,14 @@ void UI_vEATraxUnRegisterStreamClients(void) {
 
 // The 'TRAX' stream object's loader: copy its song list into gEATraxSongs (19 songs), then free the
 // object.
-void UI_vEATraxLoadfromStream(UStreamObject* pObject) {
+void UI_vEATraxLoadfromStream(TStreamData* pObject) {
     Mem_cpy(gEATraxSongs, pObject->pData, sizeof(gEATraxSongs));
     Circular_MemFreeFunc(pObject);
 }
 
 // The 'TRXT' stream object's loader: load its texture bank (the EA Trax logo) into a texture slot
 // (gEATraxDisplay.nLogo), then free the object.
-void UI_vEATraxLoadLogoFromStream(UStreamObject* pObject) {
+void UI_vEATraxLoadLogoFromStream(TStreamData* pObject) {
     gEATraxDisplay.nLogo = fn_800107C0(pObject, NULL, 0);
     Circular_MemFreeFunc(pObject);
 }

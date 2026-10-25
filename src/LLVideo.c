@@ -33,12 +33,12 @@ static f32 LLVideo_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Runs the stream loader once (UStream_Update, which hands each MPG2 chunk read to
+// Runs the stream loader once (Stream_Progress, which hands each MPG2 chunk read to
 // LLVideo_HandleChunk); pnQueued, if given, gets how many chunks are now queued. Returns 0 once the
 // stream has nothing left to do: no stream open, or the file read to its end and no buffer still in
 // use (queued chunks hold theirs).
 u8 LLVideo_UpdateStream(Video* pVideo, int* pnQueued) {
-    u8 bRet = UStream_Update();
+    u8 bRet = Stream_Progress();
     if (pnQueued != NULL) {
         *pnQueued = LLVideo_QueueGetCount(&pVideo->queue);
     }
@@ -179,7 +179,6 @@ void fn_80007260(void);
 void VIWaitForRetrace(void);
 // the stream loader (UStream.c) and the music (UI_EATraxShowSong)
 int  Stream_OpenStreamFile(const char* pName);
-void UStream_SetAutoRead(u8 bAuto);
 int  UStream_Stop(void);
 int  UStream_Close(int nStream);
 void UI_EATraxShowSong(int n, s8 nTrack);

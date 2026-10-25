@@ -12,8 +12,8 @@
 
 void GM_CourseInfo_RegisterStreamClients(void);
 void GM_CourseInfo_UnRegisterStreamClients(void);
-void GM_CourseInfo_LoadCRIfromStream(UStreamObject* pObject);
-void GM_CourseInfo_LoadCMPSfromStream(UStreamObject* pObject);
+void GM_CourseInfo_LoadCRIfromStream(TStreamData* pObject);
+void GM_CourseInfo_LoadCMPSfromStream(TStreamData* pObject);
 s32  GM_GetHoleIndexHandicap(int nHole);
 s32  GM_GetHoleTeeDistance(int nCourse, int nHole, int nTee);
 s32  GM_GetCurrentCourseTotalYardage(int nTee);
@@ -49,12 +49,12 @@ void GM_CourseInfo_UnRegisterStreamClients(void) {
 // The 'CRI ' chunk's loader: copies it into gCourseInfo.
 // port: both chunks are copied straight into their tables; they are big-endian on disc, so a
 //       little-endian port converts them field by field here (docs/game/formats/byte-order.md)
-void GM_CourseInfo_LoadCRIfromStream(UStreamObject* pObject) {
+void GM_CourseInfo_LoadCRIfromStream(TStreamData* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gCourseInfo), gCourseInfo);
 }
 
 // The 'CMPS' chunk's loader: copies it into gCompilationCourses.
-void GM_CourseInfo_LoadCMPSfromStream(UStreamObject* pObject) {
+void GM_CourseInfo_LoadCMPSfromStream(TStreamData* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gCompilationCourses), gCompilationCourses);
 }
 

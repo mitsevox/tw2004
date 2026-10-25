@@ -89,7 +89,7 @@ f32 gTournamentPayoutShares[70] = {
 };
 
 
-void  EarningsInfo_LoadERNFromStream(UStreamObject* pObject);
+void  EarningsInfo_LoadERNFromStream(TStreamData* pObject);
 int   GameMode4_GetNumEventsWon(void);
 int   GameMode4_GetCurrentEvent(void);                                // GameMode4: the current ladder event
 f32   GameAnalysis_GetInitialDistanceToPin(int nPlayer); // HoleScore.c
@@ -174,7 +174,7 @@ void EarningsInfo_UnRegisterStreamClients(void) {
 
 // The 'ERN ' chunk loader: copies the object into the prize table lbl_80200538 (EarningsTable,
 // 0x22F0 bytes). TW07: EarningsInfo::LoadERNFromStream.
-void EarningsInfo_LoadERNFromStream(UStreamObject* pObject) {
+void EarningsInfo_LoadERNFromStream(TStreamData* pObject) {
     // port: the 'ERN ' object is copied straight into the prize table (EarningsTable); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/game/formats/byte-order.md)

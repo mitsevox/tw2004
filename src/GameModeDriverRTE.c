@@ -21,13 +21,13 @@ s32 gRTESavedWind;                      // gSession.options.nWind saved while an
 RTEData gRTEs;
 
 void GameModeDriverRTE_UnregisterStreamClients(void);
-void GameModeDriverRTE_Locale_LoadRTEcFromStream(UStreamObject* pObject);
-void GameModeDriverRTE_LoadRTEsFromStream(UStreamObject* pObject);
+void GameModeDriverRTE_Locale_LoadRTEcFromStream(TStreamData* pObject);
+void GameModeDriverRTE_LoadRTEsFromStream(TStreamData* pObject);
 s32 GameModeDriverRTE_GetEventDays(s32 i);
 s32 GM_RealtimeMode_GetSelectedEvent(s32* pRound);
 void GM_RealtimeMode_SelectEvent(s32 nId, s32 nRound);
 
-void  GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject);
+void  GameModeDriverRTE_Locale_LoadRTEnFromStream(TStreamData* pObject);
 void  GameModeDriverRTE_Shutdown(void);
 void  GameModeDriverRTE_EndGame(void);
 s32   GM_RealtimeMode_GetNEventsWon(void);
@@ -70,7 +70,7 @@ void GameModeDriverRTE_UnregisterStreamClients(void) {
 }
 
 // The 'RTEc' stream object: the 118 calendar entries, copied into gRTEs.aEvent.
-void GameModeDriverRTE_Locale_LoadRTEcFromStream(UStreamObject* pObject) {
+void GameModeDriverRTE_Locale_LoadRTEcFromStream(TStreamData* pObject) {
     // port: the 'RTEc' object is copied straight into gRTEs.aEvent (RTEvent[118]); it is big-endian
     //       on disc, so a little-endian port converts it field by field here
     //       (docs/game/formats/byte-order.md)
@@ -79,7 +79,7 @@ void GameModeDriverRTE_Locale_LoadRTEcFromStream(UStreamObject* pObject) {
 
 // The 'RTEs' stream object: the events' 111 challenges (TW06 scenarios), copied into
 // gRTEs.aChallenge.
-void GameModeDriverRTE_LoadRTEsFromStream(UStreamObject* pObject) {
+void GameModeDriverRTE_LoadRTEsFromStream(TStreamData* pObject) {
     // port: the 'RTEs' object is copied straight into gRTEs.aChallenge (Challenge[111]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/game/formats/byte-order.md)
@@ -89,7 +89,7 @@ void GameModeDriverRTE_LoadRTEsFromStream(UStreamObject* pObject) {
 // The 'RTEn' stream object: the events' names and descriptions (the string table RTEvent.nName and
 // nDesc index), copied into a new 16-byte aligned block at gRTEs.pNames; the stream's copy is
 // freed. An empty object leaves pNames as it was.
-void GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject) {
+void GameModeDriverRTE_Locale_LoadRTEnFromStream(TStreamData* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {

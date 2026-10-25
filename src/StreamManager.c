@@ -177,7 +177,7 @@ void StreamManagerIngame_StreamFiles(void) {
     StreamManagerIngame_OpenStreamFiles();
     do {
         UI_DrawLoadingScreenAndProgressBar(UI_LOADSCREEN_STEP);
-    } while (UStream_Update() != 0);
+    } while (Stream_Progress() != 0);
     StreamManagerIngame_CloseStreamFiles();
 }
 
@@ -235,7 +235,7 @@ void StreamManagerFrontend_StreamFiles(void) {
         if (gFEState.bFirstTime == 0) {
             UI_DrawLoadingScreenAndProgressBar(UI_LOADSCREEN_STEP);
         }
-    } while (UStream_Update() != 0);
+    } while (Stream_Progress() != 0);
     if (gFEState.bFirstTime == 0) {
         UI_DrawLoadingScreenAndProgressBar(UI_LOADSCREEN_DONE);
     }
@@ -251,7 +251,7 @@ void StreamManagerLoadScreen_StreamFiles(void) {
     StreamManagerLoadScreen_OpenStreamFiles();
     do {
 
-    } while (UStream_Update() != 0);
+    } while (Stream_Progress() != 0);
     StreamManagerLoadScreen_CloseStreamFiles();
 }
 
@@ -278,7 +278,7 @@ void StreamManagerStartup_StreamFiles(void) {
     StreamManagerStartup_OpenStreamFiles();
     do {
 
-    } while (UStream_Update() != 0);
+    } while (Stream_Progress() != 0);
     StreamManagerStartup_CloseStreamFiles();
 }
 
@@ -317,7 +317,7 @@ void StreamManagerGlobals_StreamFiles(void) {
     StreamManagerGlobals_OpenStreamFiles();
     do {
 
-    } while (UStream_Update() != 0);
+    } while (Stream_Progress() != 0);
     StreamManagerFrontend_CloseStreamFiles();
 }
 
@@ -364,7 +364,7 @@ void StreamManagerHole_StreamFiles(void) {
     StreamManagerHole_OpenStreamFiles();
     do {
         UI_DrawLoadingScreenAndProgressBar(UI_LOADSCREEN_STEP);
-    } while (UStream_Update() != 0);
+    } while (Stream_Progress() != 0);
     UI_DrawLoadingScreenAndProgressBar(UI_LOADSCREEN_DONE);
     StreamManagerHole_CloseStreamFiles();
     UI_FreeLoadingPicture();
@@ -462,7 +462,7 @@ void StreamManagerIngame_StreamSacFiles(void) {
     StreamManagerIngame_OpenStreamFiles();
     do {
         UI_DrawLoadingScreenAndProgressBar(UI_LOADSCREEN_STEP);
-    } while (UStream_Update() != 0);
+    } while (Stream_Progress() != 0);
     StreamManagerIngame_CloseStreamFiles();
 }
 
