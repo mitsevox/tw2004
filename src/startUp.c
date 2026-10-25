@@ -592,7 +592,7 @@ void HwVoice_SetReverb(u16 nVoice, u8 bA, u8 bB) {
 
 // A streamed sound's first chunk (nBuffer 0, the first half of its ARAM buffer) sets the voice's
 // decoder: the chunk's coefficients and its first frame's header, also used when it loops.
-void HwVoice_SetStreamDecoder(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer) {
+void HwVoice_SetStreamDecoder(u16 nVoice, StmBlock* pChunk, u32 uSize, int nBuffer) {
     Voice* p = &gpHwVoices[nVoice];
     if (nBuffer == 0) {
         u8 nHeader = pChunk->aData[0];
