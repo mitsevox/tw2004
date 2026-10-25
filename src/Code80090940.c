@@ -13,8 +13,6 @@
 #include "frontend/fe.h"
 #include "game/frontend.h"
 
-void fn_80008380(void);
-
 void UI_FreeEntryPicture(int nEntry);
 void UI_FreeMarkedEntryPictures(void);
 
@@ -50,10 +48,10 @@ void UI_FreeEntryPicture(int nEntry) {
 }
 
 // With a front end, free the pictures of the picture table's entries marked by
-// UI_MarkEntryPictureForFree (flag 0x10), waiting for the GPU (fn_80008380) before the first. Each
-// such entry's u0 is then cleared whole, kind 2 included, so UI_LoadEntryPicture no longer takes it
-// for a picture entry and uiProcessInterface.c UI_ResolveFileEntries (which tests u0 == 2) does not resolve
-// it again. gomainloop.c calls it once a frame.
+// UI_MarkEntryPictureForFree (flag 0x10), waiting for the GPU (DL_vWaitForEndOfDrawing) before the
+// first. Each such entry's u0 is then cleared whole, kind 2 included, so UI_LoadEntryPicture no
+// longer takes it for a picture entry and uiProcessInterface.c UI_ResolveFileEntries (which tests
+// u0 == 2) does not resolve it again. gomainloop.c calls it once a frame.
 void UI_FreeMarkedEntryPictures(void) {
     u8 bFreed = 0;
     UIColorTable* pTable;
@@ -66,7 +64,7 @@ void UI_FreeMarkedEntryPictures(void) {
             pEntry = pTable->apEntries[i];
             if (pEntry->u0 & 0x10) {
                 if (!bFreed) {
-                    fn_80008380();
+                    DL_vWaitForEndOfDrawing();
                 }
                 if (pEntry->p8 != NULL) {
                     Pict_Free((LLPict*)pEntry->p8);
