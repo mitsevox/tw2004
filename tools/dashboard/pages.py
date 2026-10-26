@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-The public progress page's history (GitHub Pages, fed by CI): one record per build of main.
+The progress history (fed by CI): one record per build of main, the shared site's timeline.
 
     python tools/dashboard/pages.py append <history.json> <report.json> <sha> <time> <subject>
     python tools/dashboard/pages.py seed <history.json> [<dashboard_history.json>]

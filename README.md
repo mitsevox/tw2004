@@ -20,7 +20,7 @@ The match is complete: all 7,647 functions are byte-exact and every unit links f
 
 Work now goes into making the code read well: naming what is still unnamed, giving structs real
 fields, and keeping comments to what explains the game. Progress:
-[decomp.dev](https://decomp.dev/mitsevox/tw2004) and the [progress page](https://mitsevox.github.io/tw2004/).
+[decomp.dev](https://decomp.dev/mitsevox/tw2004) and the [progress page](https://mitsevox.github.io/games/tw2004/).
 
 Layout
 ======

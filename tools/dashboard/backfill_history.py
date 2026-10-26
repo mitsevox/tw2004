@@ -9,7 +9,7 @@ in a throwaway worktree, then refresh the dashboard history.
 --first-parent: build main's own commits only (what the public page shows); implied by
 --pages-history.
 
---pages-history OUT: afterwards, also write the public page's history (tools/dashboard/pages.py
+--pages-history OUT: afterwards, also write the progress history (tools/dashboard/pages.py
 seed) to OUT; commit it once to the pages-history branch as history.json, and CI appends from then.
 
 Builds every commit in oldest..newest (inclusive) that has no cached report yet, oldest first.
