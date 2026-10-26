@@ -171,12 +171,11 @@ def main(report_path, history_path, out, sha, tree, run_id, attempt, workflow_bl
                 'publishedAt': _iso(time.time()), 'tools': TOOLS, 'runId': int(run_id), 'attempt': int(attempt),
                 'workflowBlob': workflow_blob}
     json.dump(metadata, open(os.path.join(out, 'metadata.json'), 'w'), indent=1)
-    # What package_report.py checks the package against here; the site imports it only under its own
-    # copy of this policy (config/tw2004-producer.json there), which names the approved build.yml.
-    policy = {'schemaVersion': 1, 'repository': metadata['repository'], 'target': TARGET,
-              'workflow': '.github/workflows/build.yml', 'branch': 'main', 'workflowBlobs': [workflow_blob],
-              'artifact': 'site-report', 'job': 'site-report', 'requiredSteps': ['Site report', 'Package site report'],
-              'lanes': {'full': ['Site report']}, 'tools': TOOLS}
+    # Package against the same tracked policy that the shared site reviews.
+    policy = json.load(open(os.path.join(ROOT, 'config', 'GW4E69', 'producer.json')))
+    if (policy['repository'] != metadata['repository'] or policy['target'] != TARGET
+            or policy['tools'] != TOOLS or workflow_blob not in policy['workflowBlobs']):
+        raise SystemExit('site_report.py: tracked producer policy differs from this execution')
     json.dump(policy, open(os.path.join(out, 'policy.json'), 'w'), indent=1)
     s = summary
     print('site_report.py: %s code %d/%d, data %d/%d, functions %d exact %d named, files %d exact %d named, %d history rows'

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "repository": "mitsevox/tw2004",
+  "target": {
+    "id": "GW4E69",
+    "console": "GameCube",
+    "sha1": "bbbc55485e51973931dee169e7bf87bc7379223f"
+  },
+  "workflow": ".github/workflows/build.yml",
+  "branch": "main",
+  "workflowBlobs": [
+    "2b531af751ea739676515258c6b021ce3b30fb73",
+    "9ed3eed6292124c40029f555ad75d4b8489878bb"
+  ],
+  "artifact": "site-report",
+  "job": "site-report",
+  "requiredSteps": [
+    "Site report",
+    "Package site report",
+    "Upload site report"
+  ],
+  "lanes": {
+    "full": [
+      "Site report"
+    ]
+  },
+  "tools": [
+    {"name": "build-container", "identity": "ghcr.io/mitsevox/tw2004-build:main"},
+    {"name": "decomp-toolkit", "identity": "v1.8.3"},
+    {"name": "objdiff", "identity": "v3.6.1"}
+  ]
+}
