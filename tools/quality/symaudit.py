@@ -1,4 +1,4 @@
-"""Check our declarations of the game's globals against config/GW4E69/symbols.txt.
+"""Check our declarations of the game's globals against config/GW4E69-rev0/symbols.txt.
     python tools/quality/symaudit.py            list every problem
     python tools/quality/symaudit.py --all      also list partial views (declared smaller than the object)
     python tools/quality/symaudit.py --count    one line: "<sda> <too-big> <scope>" (used by merges)
@@ -38,7 +38,7 @@ SYM = re.compile(r'^(\S+) = (\.\w+):0x([0-9A-Fa-f]+); // type:(\w+)(?: size:0x([
 def symbols():
     """name -> list of (section, size, scope); a name can repeat (file-local symbols)."""
     out = collections.defaultdict(list)
-    for l in (ROOT / 'config/GW4E69/symbols.txt').read_text(encoding='utf-8').splitlines():
+    for l in (ROOT / 'config/GW4E69-rev0/symbols.txt').read_text(encoding='utf-8').splitlines():
         m = SYM.match(l)
         if m:
             scope = re.search(r'scope:(\w+)', m.group(6))
@@ -129,7 +129,7 @@ def built_objects():
     ninja = ROOT / 'build.ninja'
     if not ninja.exists():
         return None
-    pat = re.compile(r'^build (build[\\/]GW4E69[\\/]src[\\/]\S+?\.o):')
+    pat = re.compile(r'^build (build[\\/]GW4E69-rev0[\\/]src[\\/]\S+?\.o):')
     return {pathlib.Path(ROOT, m.group(1).replace('\\', '/')).resolve()
             for m in map(pat.match, ninja.read_text(encoding='utf-8', errors='replace').splitlines()) if m}
 
@@ -137,7 +137,7 @@ def built_objects():
 def scope_findings(syms):
     hits = []
     current = built_objects()
-    for o in sorted((ROOT / 'build/GW4E69/src').rglob('*.o')):
+    for o in sorted((ROOT / 'build/GW4E69-rev0/src').rglob('*.o')):
         if current is not None and o.resolve() not in current:
             continue                        # left over from a unit no longer in configure.py
         if 'unsorted' in o.parts:
@@ -151,7 +151,7 @@ def scope_findings(syms):
             theirs = {e[3] for e in syms.get(m.group(2), ()) if e[3] in ('local', 'global')}
             if theirs and ours not in theirs:
                 hits.append(('scope', m.group(2), '%s is %s in %s but %s in the original' % (
-                    m.group(2), ours, o.relative_to(ROOT / 'build/GW4E69').as_posix(), '/'.join(sorted(theirs)))))
+                    m.group(2), ours, o.relative_to(ROOT / 'build/GW4E69-rev0').as_posix(), '/'.join(sorted(theirs)))))
     return hits
 
 

@@ -17,6 +17,8 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
+from tools.targets import registry, build_targets, define
+
 from tools.project import (
     Object,
     ProgressCategory,
@@ -26,11 +28,10 @@ from tools.project import (
     is_windows,
 )
 
-# Game versions
-DEFAULT_VERSION = 0
-VERSIONS = [
-    "GW4E69",  # 0
-]
+# Game versions: the active targets in config/targets.json
+TARGET_REGISTRY = registry()
+VERSIONS = build_targets(TARGET_REGISTRY)
+DEFAULT_VERSION = VERSIONS.index(TARGET_REGISTRY["defaultTarget"])
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -44,7 +45,6 @@ parser.add_argument(
     "-v",
     "--version",
     choices=VERSIONS,
-    type=str.upper,
     default=VERSIONS[DEFAULT_VERSION],
     help="version to build",
 )
@@ -207,7 +207,7 @@ if args.map:
     # config.ldflags.append("-listclosure") # For Wii linkers
 
 # Use for any additional files that should cause a re-configure when modified
-config.reconfig_deps = []
+config.reconfig_deps = [Path("config/targets.json"), Path("tools/targets.py")]
 
 # Optional numeric ID for decomp.me preset
 # Can be overridden in libraries or objects
@@ -246,8 +246,8 @@ cflags_base = [
     f"-i build/{config.version}/include",
     f"-i build/{config.version}/gen",   # tools/build/gendata.py's fragments of game data
     f"-DBUILD_VERSION={version_num}",
-    f"-DVERSION_{config.version}",
-    "-DVERSION=0",  # SDK revision selector for extern/sdk, see include/GameVersions.h
+    f"-D{define(config.version)}",
+    "-DVERSION=0",  # SDK revision selector for extern/sdk, see extern/sdk/include/GameVersions.h
 ]
 
 # Debug flags
@@ -290,7 +290,7 @@ cflags_sdk = [
     "-i extern/sdk/include",
     "-i extern/sdk/libc",
     f"-i build/{config.version}/include",
-    "-DVERSION=0",  # SDK revision selector for extern/sdk, see include/GameVersions.h
+    "-DVERSION=0",  # SDK revision selector for extern/sdk, see extern/sdk/include/GameVersions.h
     "-DCARD_PATCH_2003=1",  # this game's CARD library is the Apr 2 2003 patch (see docs/game/tw2004-notes.md)
 ]
 

@@ -21,7 +21,7 @@ def batch():
     """--all: every non-exact game function in report.json, one after another (the emulator's gdb
     port is fixed, so no parallel runs); summaries in build/mwccdbg/<fn>/summary.txt."""
     import json
-    rep = json.loads((ROOT / 'build/GW4E69/report.json').read_text())
+    rep = json.loads((ROOT / 'build/GW4E69-rev0/report.json').read_text())
     todo = [(u['metadata']['source_path'], f['name']) for u in rep['units']
             if 'game' in u['metadata'].get('progress_categories', [])
             for f in u.get('functions', []) if f.get('fuzzy_match_percent', 0) != 100]
@@ -44,7 +44,7 @@ def main():
     for p in (script, emu):
         if not p.exists():
             sys.exit('%s missing: see docs/workflow.md "Removing a fake match"' % p)
-    cmds = subprocess.run(['ninja', '-t', 'commands', 'build/GW4E69/report.json'],
+    cmds = subprocess.run(['ninja', '-t', 'commands', 'build/GW4E69-rev0/report.json'],
                           capture_output=True, text=True, cwd=ROOT).stdout.splitlines()
     cmd = next((c for c in cmds if ' -c %s ' % unit in c and 'mwcceppc' in c), None)
     if not cmd:

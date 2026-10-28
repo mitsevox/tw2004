@@ -1,0 +1,9 @@
+# Format: https://github.com/encounter/dtk-template/blob/main/config/GAMEID/config.example.yml
+# main.dol is byte-identical on Disc 1 and Disc 2, so there is a single code target.
+object_base: orig/GW4E69-rev0
+object: sys/main.dol
+hash: bbbc55485e51973931dee169e7bf87bc7379223f
+symbols: config/GW4E69-rev0/symbols.txt
+splits: config/GW4E69-rev0/splits.txt
+# 10 = CodeWarrior for GameCube 1.3.2 - 2.6 (see the format link above).
+mw_comment_version: 10

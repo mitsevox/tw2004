@@ -11,7 +11,7 @@ PARENT="$(cd .. && pwd)"
 command -v ninja >/dev/null || { echo "installing ninja"; pip install --quiet ninja; }
 python3 -m pip install --quiet pycparser toml Levenshtein cxxfilt 2>/dev/null || true   # permuter deps
 
-if [ ! -f orig/GW4E69/sys/main.dol ]; then
+if [ ! -f orig/GW4E69-rev0/sys/main.dol ]; then
     python3 tools/cloud/fetch_orig.py
 fi
 
@@ -19,5 +19,5 @@ mkdir -p "$PARENT/tools"
 [ -d "$PARENT/tools/decomp-permuter" ] || git clone --quiet --depth 1 https://github.com/simonlindholm/decomp-permuter "$PARENT/tools/decomp-permuter"
 
 python3 configure.py
-ninja | tail -1                                   # must print: build/GW4E69/main.dol: OK
-ninja build/GW4E69/report.json >/dev/null
+ninja | tail -1                                   # must print: build/GW4E69-rev0/main.dol: OK
+ninja build/GW4E69-rev0/report.json >/dev/null

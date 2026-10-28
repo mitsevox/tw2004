@@ -11,8 +11,8 @@ project's SDK source"). Paths to the other project and scratch files are at the 
 """
 import os; os.makedirs("C:/dev/tw2004/build/sdk_import",exist_ok=True)
 import re,glob,os,subprocess,collections,json,sys
-PRIME_OBJ='C:/dev/prime/build/GM8E01_00/obj'; TW_ASM='C:/dev/tw2004/build/GW4E69/asm'; DTK='C:/dev/prime/build/tools/dtk.exe'
-SYMS='C:/dev/tw2004/config/GW4E69/symbols.txt'
+PRIME_OBJ='C:/dev/prime/build/GM8E01_00/obj'; TW_ASM='C:/dev/tw2004/build/GW4E69-rev0/asm'; DTK='C:/dev/prime/build/tools/dtk.exe'
+SYMS='C:/dev/tw2004/config/GW4E69-rev0/symbols.txt'
 REF=re.compile(r'(?:\bbl\s+(?P<call>[A-Za-z_@.$][\w@.$]*)\b)|(?:"(?P<qsym>[^"]+)"|(?P<sym>[A-Za-z_@.$][\w@.$]*))@(?:ha|l|sda21|sda2|h)\b')
 def refs_by_fn(text):
     out=collections.OrderedDict(); cur=None

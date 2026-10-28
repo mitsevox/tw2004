@@ -121,7 +121,7 @@ def main():
     only = args[args.index('--unit') + 1] if '--unit' in args else None
     unit_of, sites, fan_in = {}, collections.Counter(), collections.Counter()
     for p in current_objects():
-        unit = str(p.relative_to(ROOT / 'build/GW4E69/obj')).removesuffix('.o')
+        unit = str(p.relative_to(ROOT / 'build/GW4E69-rev0/obj')).removesuffix('.o')
         defined, s = call_sites(p)
         for n in defined:
             unit_of[n] = unit

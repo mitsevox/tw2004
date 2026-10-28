@@ -1,5 +1,5 @@
 // Ball physics enums. Names and values from the Tiger Woods PGA Tour 06 Xbox beta PDB (2005),
-// same studio and engine lineage (see reference/README.md).
+// same studio and engine lineage (see references/README.md).
 // Every value used here was checked against this game's code; the rest are TW06's list.
 #ifndef PHYSICS_H
 #define PHYSICS_H

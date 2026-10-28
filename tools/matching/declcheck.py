@@ -45,7 +45,7 @@ def unit_command(name):
         r = subprocess.run(['ninja', '-t', 'commands', target], cwd=ROOT, capture_output=True,
                            text=True)
         return [l for l in r.stdout.splitlines() if 'mwcceppc' in l and ' -lang=c ' in l]
-    own = cmds(f'build/GW4E69/src/{name}.o')
+    own = cmds(f'build/GW4E69-rev0/src/{name}.o')
     if own:
         return own[-1]
     other = [l for l in cmds('all_source') if re.search(r'[\\/]GC[\\/]2\.5[\\/]', l) and '-O4,p' in l

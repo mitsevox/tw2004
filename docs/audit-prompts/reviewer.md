@@ -14,9 +14,9 @@ The message that sent you here gives the values in braces:
 SETUP (from the worktree root; the branch is in the shared repository, no fetch needed):
 ```
 git checkout -B review/{BRANCH} audit/{BRANCH}
-ln -s {MAIN}/orig/GW4E69/sys orig/GW4E69/sys
+ln -s {MAIN}/orig/GW4E69-rev0/sys orig/GW4E69-rev0/sys
 mkdir -p build && for d in compilers binutils tools; do ln -s {MAIN}/build/$d build/$d; done
-python configure.py && ninja    # must end with build/GW4E69/main.dol: OK
+python configure.py && ninja    # must end with build/GW4E69-rev0/main.dol: OK
 ```
 
 REVIEW:
@@ -28,12 +28,12 @@ REVIEW:
   chunk, grade the functions in `{SCOPE}` and what they own, with the whole file in mind. For a
   whole-file review, grade the whole file as it stands.
 - Check every comment, name and claim against the code and the asm, including the commit
-  message, `ea-bugs.md` rows and docs. Verify every claim about `reference/` yourself.
+  message, `ea-bugs.md` rows and docs. Verify every claim about `references/` yourself.
 - Always check:
   1. Both file ends (D3): is each proof real evidence (a reference build's file list or order,
      where data sections start, strings), or a guess? A pattern argument must be stated as one.
      A rename needs proof.
-  2. Names: each EA name against `reference/`; each of ours says only what the code shows.
+  2. Names: each EA name against `references/`; each of ours says only what the code shows.
      Locals with no reference name are Hungarian. Write-only fields are `nUnread`, not
      "reserved".
   3. Values with a meaning: every new enum or define at every use repo-wide, callers included.
@@ -57,7 +57,7 @@ VERDICT:
 - PASS: nothing blocks. In a commit of your own on `review/{BRANCH}`, set the plan row to `done`
   and, for a `pass` or a `whole-file review`, the file's `audit.tsv` row to
   `done <pass commit> <reviewer>`. Rerun `audit.py --check` (0 problems) and `ninja` (OK). The
-  commit message ends with `build/GW4E69/main.dol: OK`.
+  commit message ends with `build/GW4E69-rev0/main.dol: OK`.
 - FAIL: change no rows and fix nothing. List each blocking problem with `file:line`, the rule it
   breaks, and the fix.
 - Either way, give non-blocking suggestions in a separate short list.

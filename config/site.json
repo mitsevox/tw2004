@@ -1,0 +1,10 @@
+{
+ "schema": 1,
+ "slug": "tw2004",
+ "title": "Tiger Woods PGA Tour 2004",
+ "shortTitle": "Tiger Woods 2004",
+ "console": "GameCube",
+ "year": "2003",
+ "contributions": {"accepting": false},
+ "artwork": {"cover": "cover.webp", "width": 640, "height": 908}
+}

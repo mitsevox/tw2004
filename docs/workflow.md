@@ -10,8 +10,8 @@ Build and score
 ---------------
 
 ```
-ninja                                              # must end with: build/GW4E69/main.dol: OK
-ninja build/GW4E69/report.json                     # objdiff's per-function scores
+ninja                                              # must end with: build/GW4E69-rev0/main.dol: OK
+ninja build/GW4E69-rev0/report.json                     # objdiff's per-function scores
 python tools/quality/unitfns.py main/<Unit> all    # a unit's functions under 100%
 python tools/quality/sbs2.py main/<Unit> <fn>      # instruction diff against the original
 python tools/quality/sbs2.py main/<Unit> <fn> sbs  # the same, side by side
@@ -62,8 +62,8 @@ python tools/quality/audit.py --check         # files marked done in docs/audit.
 - `constcheck.py`: the bytes each function's constants load, ours against the original's, with
   the expression that reproduces a mismatch (`1.0f / 72.0f`, not `0.0138889f`).
 
-If the DOL check fails, `python tools/quality/doldiff.py orig/GW4E69/sys/main.dol
-build/GW4E69/main.dol` prints the differing ranges.
+If the DOL check fails, `python tools/quality/doldiff.py orig/GW4E69-rev0/sys/main.dol
+build/GW4E69-rev0/main.dol` prints the differing ranges.
 
 Removing a fake match
 ---------------------
@@ -108,7 +108,7 @@ Data built from your disc
 A few objects are Nintendo data or game assets whose bytes can't be committed: the AX library's
 compressor table and DSP microcode (`AXComp.c`, `DSPCode.c`), DiscError.c's font, startUp.c's
 boot sounds and two textures. `tools/build/gendata.py` reads them from your own
-`orig/GW4E69/sys/main.dol` into `build/GW4E69/gen/` before compiling, using the addresses and sizes
+`orig/GW4E69-rev0/sys/main.dol` into `build/GW4E69-rev0/gen/` before compiling, using the addresses and sizes
 in `symbols.txt`. To add one, add a line to its `FRAGMENTS` table and `#include` the generated
 fragment from the unit that defines the object.
 

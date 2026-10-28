@@ -14,7 +14,7 @@ appends their code to the unit's source instead of replacing it.
 """
 import re, sys, pathlib
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
-SPLITS = ROOT / 'config/GW4E69/splits.txt'
+SPLITS = ROOT / 'config/GW4E69-rev0/splits.txt'
 TEXT = re.compile(r'\.text\s+start:0x([0-9A-F]+) end:0x([0-9A-F]+)')
 
 

@@ -1,13 +1,13 @@
 """Which headers a source file sees: its #include "..." lines, followed through the headers they
 include, as the compiler finds them (the including file's own folder first, then include/ and
-build/GW4E69/include, the -i folders of every unit). Angle-bracket includes are not followed.
+build/GW4E69-rev0/include, the -i folders of every unit). Angle-bracket includes are not followed.
 
     python tools/quality/includes.py src/GoTerrain.c     # every header it sees, relative to include/
 """
 import pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
-DIRS = [ROOT / 'include', ROOT / 'build/GW4E69/include']
+DIRS = [ROOT / 'include', ROOT / 'build/GW4E69-rev0/include']
 INCLUDE = re.compile(r'^\s*#\s*include\s+"([^"]+)"', re.M)
 _cache = {}
 

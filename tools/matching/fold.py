@@ -32,7 +32,7 @@ MINE = [f'{name}.c'] + sweeps                        # the only units mkunit.py 
 def undo_mkunit():
     """Put configure.py and splits.txt back to HEAD, when every change in them is mkunit.py's for
     this unit and these sweeps; otherwise say what else changed and leave them."""
-    files = ['configure.py', 'config/GW4E69/splits.txt']
+    files = ['configure.py', 'config/GW4E69-rev0/splits.txt']
     head = {}
     for f in files:
         g = subprocess.run(['git', 'show', f'HEAD:{f}'], cwd=ROOT, capture_output=True)
@@ -48,8 +48,8 @@ def undo_mkunit():
 
     def blocks(text):
         return {b.split(':\n')[0]: b.strip() for b in re.split(r'\n(?=\S[^\n]*:\n)', text)}
-    old = blocks(head['config/GW4E69/splits.txt'].decode('utf-8'))
-    new = blocks((ROOT / 'config/GW4E69/splits.txt').read_text(encoding='utf-8'))
+    old = blocks(head['config/GW4E69-rev0/splits.txt'].decode('utf-8'))
+    new = blocks((ROOT / 'config/GW4E69-rev0/splits.txt').read_text(encoding='utf-8'))
     for k in sorted(set(old) | set(new)):
         if old.get(k) != new.get(k) and k not in MINE:
             other.append('splits.txt: block ' + k)
@@ -107,7 +107,7 @@ if dirty:
 # only. A left-out sweep between folded code, or one with no block at HEAD, stops the fold
 # before anything is changed.
 TEXT = re.compile(r'\.text\s+start:0x([0-9A-Fa-f]+) end:0x([0-9A-Fa-f]+)')
-SPLITS = ROOT / 'config/GW4E69/splits.txt'
+SPLITS = ROOT / 'config/GW4E69-rev0/splits.txt'
 
 
 def split_blocks(text):
@@ -121,7 +121,7 @@ def text_range(block):
 
 
 def restore_left_out():
-    head_splits = run('git show HEAD:config/GW4E69/splits.txt').stdout
+    head_splits = run('git show HEAD:config/GW4E69-rev0/splits.txt').stdout
     head_cfg = run('git show HEAD:configure.py').stdout
     now = split_blocks(SPLITS.read_text(encoding='utf-8'))
     old = split_blocks(head_splits)
@@ -236,21 +236,21 @@ def compile_errors(out):
 
 # A NonMatching unit is not linked, so main.dol can be OK while the unit does not even compile:
 # build its object first, on its own, and stop on a compile error.
-obj = ROOT / 'build/GW4E69/src' / f'{name}.o'
-c = run(f'ninja build/GW4E69/src/{name}.o')
+obj = ROOT / 'build/GW4E69-rev0/src' / f'{name}.o'
+c = run(f'ninja build/GW4E69-rev0/src/{name}.o')
 if c.returncode or not obj.exists() or obj.stat().st_mtime < path.stat().st_mtime:
     print(compile_errors(c.stdout) or c.stdout[-2000:] or c.stderr[-2000:])
     fail(f'src/{name}.c DOES NOT COMPILE (ninja exit {c.returncode})')
-(ROOT / 'build/GW4E69/ok').unlink(missing_ok=True)
+(ROOT / 'build/GW4E69-rev0/ok').unlink(missing_ok=True)
 b = run('ninja')
 if b.returncode or 'main.dol: OK' not in b.stdout:
     print(compile_errors(b.stdout) or b.stdout[-2000:])
     fail('BUILD NOT OK')
 # Judge only on a report made now: ninja does not rebuild report.json when a target object (from
 # the split) changes, and leaves the old one in place when any source fails to build.
-report = ROOT / 'build/GW4E69/report.json'
+report = ROOT / 'build/GW4E69-rev0/report.json'
 report.unlink(missing_ok=True)
-rp = run('ninja build/GW4E69/report.json')
+rp = run('ninja build/GW4E69-rev0/report.json')
 if rp.returncode or not report.exists():
     print(compile_errors(rp.stdout) or rp.stdout[-2000:] or rp.stderr[-2000:])
     fail('REPORT NOT GENERATED (ninja exit %d)' % rp.returncode)
@@ -272,9 +272,9 @@ rm = run('git rm -q ' + ' '.join('src/' + s for s in sweeps))
 if rm.returncode != 0:
     # e.g. a sweep file has local changes: someone edited it, so it is not deleted unchecked
     print('git rm failed, nothing committed:', rm.stderr.strip()); sys.exit(1)
-print(run(f'git add src/{name}.c config/GW4E69/splits.txt configure.py').stderr.strip())
+print(run(f'git add src/{name}.c config/GW4E69-rev0/splits.txt configure.py').stderr.strip())
 lo = re.search(r'start:(0x\w+) end:(0x\w+)',
-               (ROOT / 'config/GW4E69/splits.txt').read_text().split(name + '.c:')[1])
+               (ROOT / 'config/GW4E69-rev0/splits.txt').read_text().split(name + '.c:')[1])
 what = 'widened to' if extending else 'new unit'
 msg = f'{name}.c: {what} ({lo.group(1)}-{lo.group(2)}), {len(sweeps)} sweep files folded in'
 print(run(f'git commit -q -m "{msg}"').stderr.strip())

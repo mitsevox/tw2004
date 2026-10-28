@@ -4,22 +4,22 @@
     python tools/quality/constcheck.py --count         one number: the mismatches (for merges)
     python tools/quality/constcheck.py --all-fns       also functions below 100% (paired by offset, so a
                                                      moved instruction can pair the wrong constants)
-Run it after a build (it reads build/GW4E69/report.json and the objects).
+Run it after a build (it reads build/GW4E69-rev0/report.json and the objects).
 
 Why: objdiff masks relocations, so `lfs f1, @24@sda21(r2)` scores 100% whatever float @24 holds.
 A literal a few bits off (0.0138889f where the original has 1/72) is invisible to the score and
 to the DOL check until the unit is linked, but a port inherits it. Linked units are safe: the DOL
 hash proves their data.
 
-How: for each function objdiff scores 100%, the relocations of our object (build/GW4E69/src/X.o)
-and of the original's split object (build/GW4E69/obj/X.o) line up offset by offset. For each one
+How: for each function objdiff scores 100%, the relocations of our object (build/GW4E69-rev0/src/X.o)
+and of the original's split object (build/GW4E69-rev0/obj/X.o) line up offset by offset. For each one
 that points at data, the bytes at symbol + addend are read on both sides and compared:
   - a load or store (lfs/lwz/stfs 4 bytes, lfd/stfd 8, lhz 2, lbz 1, psq_l 4 or 8) reads its width;
   - an address (addi/ori with @l or @sda21) compares the whole object from the addend on (a string
     up to its NUL).
 A symbol the object does not define is looked up among the other objects' globals: ours in
-build/GW4E69/src, falling back to the original's (then it is the original's data, equal by
-construction); the original's in build/GW4E69/obj. .bss/.sbss read as zeros.
+build/GW4E69-rev0/src, falling back to the original's (then it is the original's data, equal by
+construction); the original's in build/GW4E69-rev0/obj. .bss/.sbss read as zeros.
 
 Mismatches are grouped as float (read by a float instruction), string, and data (the rest). For a
 float the original's value is also tried as a/q (a an integer or a short decimal, q <= 1000), times
@@ -29,7 +29,7 @@ to a few digits (0.0138889f) is the usual culprit: write the expression instead 
 import collections, json, math, pathlib, struct, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
-BUILD = ROOT / 'build/GW4E69'
+BUILD = ROOT / 'build/GW4E69-rev0'
 
 R_PPC_ADDR16_LO, R_PPC_ADDR16_HI, R_PPC_ADDR16_HA, R_PPC_EMB_SDA21 = 4, 5, 6, 109
 DATA_RELOCS = (R_PPC_ADDR16_LO, R_PPC_EMB_SDA21)     # @ha/@hi halves are covered by their @l

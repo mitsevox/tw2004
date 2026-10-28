@@ -8,10 +8,10 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'build'))  
 from hosttools import binutil                        # noqa: E402
 RE = binutil('readelf')
 syms = {}
-for l in open(ROOT + '/config/GW4E69/symbols.txt'):
+for l in open(ROOT + '/config/GW4E69-rev0/symbols.txt'):
     m = re.match(r'(\S+) = (\.\w+):0x([0-9A-F]+);.*?size:0x([0-9A-F]+)', l)
     if m: syms[m.group(1)] = (m.group(2), int(m.group(3), 16), int(m.group(4), 16))
-asm = {f: open(f).read() for f in glob.glob(ROOT + '/build/GW4E69/asm/*.s') if 'auto_' not in f}
+asm = {f: open(f).read() for f in glob.glob(ROOT + '/build/GW4E69-rev0/asm/*.s') if 'auto_' not in f}
 def relocs(o):
     out = subprocess.run([RE, '-r', '-W', o], capture_output=True, text=True).stdout
     sec = None; r = {}
@@ -33,7 +33,7 @@ def symsec(o):
     out = subprocess.run([RE, '-s', '-W', o], capture_output=True, text=True).stdout
     return out
 for u in sys.argv[1:]:
-    src = f'{ROOT}/build/GW4E69/src/{u}.o'; org = f'{ROOT}/build/GW4E69/obj/{u}.o'
+    src = f'{ROOT}/build/GW4E69-rev0/src/{u}.o'; org = f'{ROOT}/build/GW4E69-rev0/obj/{u}.o'
     print('==', u, sections(src))
     rs, ro = relocs(src), relocs(org)
     seen = {}

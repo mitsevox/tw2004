@@ -68,7 +68,7 @@ functions that name it, in link order. The prefixes group them:
 | the save library (GCC) | | `ChecksumCRC32.c` `SharedFileIO.c` `TagFile.c` `llSharedFileIO.c` (under `../../../Source/Common/` and `Source/NGC/`), plus an XOR cipher module with no asserts |
 
 `_Gc` marks EA's GameCube version of a file; the TW2003 Xbox build has the same files as `_Xbox`
-(see [`reference/README.md`](../../reference/README.md) for EA's folder layout).
+(see [`references/README.md`](../../references/README.md) for EA's folder layout).
 
 Culling and the widescreen fix
 ------------------------------

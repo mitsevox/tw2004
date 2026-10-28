@@ -1,5 +1,5 @@
 """Compare two DOLs section by section and print the first differing address ranges.
-    python tools/quality/doldiff.py orig/GW4E69/sys/main.dol build/GW4E69/main.dol [--all | --max N]
+    python tools/quality/doldiff.py orig/GW4E69-rev0/sys/main.dol build/GW4E69-rev0/main.dol [--all | --max N]
 Shows 20 differences per section by default; --max N changes the limit, --all shows every one."""
 import struct, sys
 args, limit, rest = [], 20, sys.argv[1:]

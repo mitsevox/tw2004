@@ -27,7 +27,7 @@ def parse_syms(p):
     return out
 # TW symbols: name -> (section, addr, size)
 tw={}; sec_of={}
-for line in open('C:/dev/tw2004/config/GW4E69/symbols.txt'):
+for line in open('C:/dev/tw2004/config/GW4E69-rev0/symbols.txt'):
     m=re.match(r'^(\S+) = \.(\w+):0x([0-9A-Fa-f]+); // type:(\w+) size:0x([0-9A-Fa-f]+)',line)
     if m: tw.setdefault(m.group(1),[]).append((m.group(2),int(m.group(3),16),int(m.group(5),16)))
 units=json.load(open('C:/dev/tw2004/build/sdk_import/sdk_units.json'))
@@ -35,7 +35,7 @@ anon=json.load(open('C:/dev/tw2004/build/sdk_import/anon_map.json'))   # tw lbl 
 anon_by_unit=collections.defaultdict(dict)
 for lbl,(rel,n) in anon.items(): anon_by_unit[rel][n]=lbl
 twaddr={}
-for line in open('C:/dev/tw2004/config/GW4E69/symbols.txt'):
+for line in open('C:/dev/tw2004/config/GW4E69-rev0/symbols.txt'):
     m=re.match(r'^(\S+) = \.(\w+):0x([0-9A-Fa-f]+); // type:(\w+) size:0x([0-9A-Fa-f]+)',line)
     if m: twaddr[m.group(1)]=(m.group(2),int(m.group(3),16),int(m.group(5),16))
 res=[]

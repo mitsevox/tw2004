@@ -16,7 +16,7 @@ Steps, in order; the first failure stops it and puts every touched file back:
      --dry-run (current name at that address, new name a C identifier unused anywhere);
   2. rename.py: symbols.txt, src/, include/ (code and comments);
   3. the old names in the Markdown docs (not the reference dumps:
-     reference/);
+     references/);
   4. the comments of column 4 above their definitions;
   5. wraplong.py: lines the longer names pushed past lint's 110 columns are rewrapped;
   6. configure + ninja, and the DOL check must print main.dol: OK;
@@ -34,7 +34,7 @@ import hotnames                                              # noqa: E402  (find
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 PY = sys.executable
 PATHS = ['src', 'include', 'config', 'docs']
-SKIP_MD = ('reference/',)
+SKIP_MD = ('references/',)
 
 
 def run(cmd, **kw):
@@ -229,7 +229,7 @@ def main():
     if run([PY, 'configure.py']).returncode:
         restore('configure.py failed')
     b = run(['ninja'])
-    check = run(run(['ninja', '-t', 'commands', 'build/GW4E69/ok']).stdout.strip().splitlines()[-1],
+    check = run(run(['ninja', '-t', 'commands', 'build/GW4E69-rev0/ok']).stdout.strip().splitlines()[-1],
                 shell=True)
     if b.returncode or 'OK' not in check.stdout + check.stderr:
         tail = '\n'.join((b.stdout + b.stderr).splitlines()[-15:])

@@ -9,7 +9,7 @@ units from sdk_data_ok.json. Data range ends are padded to the next symbol in th
 Overlapping data ranges are resolved by keeping the first owner in link order.
 """
 import json, re, collections, os
-ROOT = 'C:/dev/tw2004'; V = 'GW4E69'; IMP = ROOT + '/build/sdk_import'
+ROOT = 'C:/dev/tw2004'; V = 'GW4E69-rev0'; IMP = ROOT + '/build/sdk_import'
 units = json.load(open(IMP + '/sdk_units.json')); ok = json.load(open(IMP + '/sdk_data_ok.json'))
 cands = {}
 for u in units:

@@ -30,7 +30,7 @@ def parse(p):
         elif info&0xf==1 and sz: data[sn]+=sz
     return funcs,dict(data)
 tw={}
-for line in open('C:/dev/tw2004/config/GW4E69/symbols.txt'):
+for line in open('C:/dev/tw2004/config/GW4E69-rev0/symbols.txt'):
     m=re.match(r'^(\S+) = \.(text|init):0x([0-9A-Fa-f]+); // type:function size:0x([0-9A-Fa-f]+)',line)
     if m: tw.setdefault(m.group(1),[]).append((int(m.group(3),16),int(m.group(4),16)))
 allf=sorted((a,s) for v in tw.values() for a,s in v)

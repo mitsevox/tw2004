@@ -5,13 +5,13 @@ Pin leaked source file names (assert __FILE__ strings) to the functions that ref
     python tools/research/map_source_files.py            # prints the table
     python tools/research/map_source_files.py --json out.json
 
-Reads the dtk disassembly in build/GW4E69/asm. Data-section .string objects whose text ends in
+Reads the dtk disassembly in build/GW4E69-rev0/asm. Data-section .string objects whose text ends in
 .c or .h are collected, then every code reference (lbl_XXXXXXXX@ha/@l/@sda21) is attributed to
 the enclosing function.
 """
 import re, glob, os, sys, json, collections
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-ASM = os.path.join(ROOT, 'build', 'GW4E69', 'asm')
+ASM = os.path.join(ROOT, 'build', 'GW4E69-rev0', 'asm')
 strings = {}
 ASM_FILES = glob.glob(os.path.join(ASM, '**', '*.s'), recursive=True)
 for f in ASM_FILES:

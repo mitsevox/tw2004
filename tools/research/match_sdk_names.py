@@ -3,7 +3,7 @@
 Name SDK / runtime functions by matching them against another decomp project's split objects.
 
 Usage: python tools/research/match_sdk_names.py <other_project_obj_dir> <main.dol> <symbols.txt>
-  e.g. python tools/research/match_sdk_names.py C:/dev/prime/build/GM8E01_00/obj orig/main.dol config/GW4E69/symbols.txt
+  e.g. python tools/research/match_sdk_names.py C:/dev/prime/build/GM8E01_00/obj orig/main.dol config/GW4E69-rev0/symbols.txt
 
 The other project's split objects carry relocation records, so only the bytes the linker fills in
 are masked; everything else must be identical. A name is proposed only when the match is unique

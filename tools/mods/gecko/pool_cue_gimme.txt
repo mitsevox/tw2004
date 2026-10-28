@@ -5,7 +5,7 @@ $Pool Cue Gimme For Everyone [mits]
 *  Cedric "Ace" Andrews (03), Moa "Big Mo" Ta'a Vatu (25), Melvin "Yosh" Tanigawa (26),
 *  Dominic "The Don" Donatello (09) and Hamish "Mulligan" McGregor (16).
 *Source: pool_cue_gimme.c
-*(build: python mods/gecko/build_gecko.py mods/gecko/pool_cue_gimme.c 80025AD8).
+*(build: python tools/mods/gecko/build_gecko.py tools/mods/gecko/pool_cue_gimme.c 80025AD8).
 C2025AD8 00000017
 2C1B0009 408200A8
 28030000 418200A0

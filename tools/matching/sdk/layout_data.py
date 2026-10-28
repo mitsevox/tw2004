@@ -5,7 +5,7 @@ layout: a unit's data section keeps the same symbol order and sizes, so one know
 the whole section. Writes the results into build/sdk_import/sdk_data_ok.json (extending it).
 """
 import struct, re, json, collections, os
-ROOT = 'C:/dev/tw2004'; V = 'GW4E69'; IMP = ROOT + '/build/sdk_import'; OBJ = 'C:/dev/prime/build/GM8E01_00/obj'
+ROOT = 'C:/dev/tw2004'; V = 'GW4E69-rev0'; IMP = ROOT + '/build/sdk_import'; OBJ = 'C:/dev/prime/build/GM8E01_00/obj'
 exec(open(ROOT + '/tools/matching/sdk/sdk_data_units.py').read().split("units=json.load")[0])   # parse_syms, tw, etc.
 units = json.load(open(IMP + '/sdk_units.json')); ok = json.load(open(IMP + '/sdk_data_ok.json')); done = {u['unit'] for u in ok}
 anon = json.load(open(IMP + '/anon_map.json')); anon_by_unit = collections.defaultdict(dict)

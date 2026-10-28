@@ -15,8 +15,8 @@ rest = '\n'.join(lines[n:])
 
 
 def score():
-    subprocess.run('ninja build/GW4E69/report.json', shell=True, cwd=TW, capture_output=True)
-    r = json.load(open(TW + '/build/GW4E69/report.json'))
+    subprocess.run('ninja build/GW4E69-rev0/report.json', shell=True, cwd=TW, capture_output=True)
+    r = json.load(open(TW + '/build/GW4E69-rev0/report.json'))
     u = [u for u in r['units'] if u['name'] == 'main/' + unit][0]
     return [f.get('fuzzy_match_percent') or 0 for f in u['functions'] if f['name'] == fn][0]
 

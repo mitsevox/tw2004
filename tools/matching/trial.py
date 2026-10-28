@@ -27,11 +27,11 @@ class Trial:
         self.path.write_text(s, encoding='utf-8')
 
     def score(self, fn):
-        r = subprocess.run('ninja build/GW4E69/report.json', shell=True, cwd=ROOT,
+        r = subprocess.run('ninja build/GW4E69-rev0/report.json', shell=True, cwd=ROOT,
                            capture_output=True, text=True)
         if 'FAILED' in r.stdout:
             return 'ERR'
-        rep = json.load(open(ROOT / 'build/GW4E69/report.json'))
+        rep = json.load(open(ROOT / 'build/GW4E69-rev0/report.json'))
         for u in rep['units']:
             if u['name'] == self.unit:
                 for f in u['functions']:

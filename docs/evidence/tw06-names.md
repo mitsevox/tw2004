@@ -3,7 +3,7 @@ TW06 function names
 
 Names carried over from Tiger Woods PGA Tour 06 (2005): the Xbox beta PDB and the PS2 build's
 linker map (`MAPFILE.TXT`, SLUS-21264, 2005-07-12). Same studio (EA Redwood Shores) and the same
-engine lineage as this game; [`reference/README.md`](../../reference/README.md) describes both
+engine lineage as this game; [`references/README.md`](../../references/README.md) describes both
 builds. The PDB and executable are
 reference material and are not in this repository.
 

@@ -14,8 +14,8 @@ fragment, so those bytes never enter the repository either.
 Each symbol's section, address, size and alignment come from config/<version>/symbols.txt; the
 element type is the SDK header's (dolphin/ax.h, dolphin/ax/__ax.h).
 
-    python tools/build/gendata.py --dol orig/GW4E69/sys/main.dol \
-        --symbols config/GW4E69/symbols.txt -o build/GW4E69/gen
+    python tools/build/gendata.py --dol orig/GW4E69-rev0/sys/main.dol \
+        --symbols config/GW4E69-rev0/symbols.txt -o build/GW4E69-rev0/gen
 """
 
 import argparse

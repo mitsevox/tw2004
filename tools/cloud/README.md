@@ -15,7 +15,7 @@ container CI uses, with a read-only token the owner creates.
 ```
 bash tools/cloud/setup.sh      # main.dol, compilers (wibo), decomp-permuter beside the repo, build
 ```
-It must end with `build/GW4E69/main.dol: OK`. `ninja -t clean` ends with "Directory not empty" for
+It must end with `build/GW4E69-rev0/main.dol: OK`. `ninja -t clean` ends with "Directory not empty" for
 `build/compilers` and `build/binutils`: harmless, the game objects are gone and the downloaded tools
 stay.
 
