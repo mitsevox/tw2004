@@ -38,6 +38,9 @@ jobs:
       - name: Select affected target inputs
         id: plan
         run: python3 tools/ci_targets.py
+      - name: Check the declared tier
+        # Pull requests only: the PR body's Tier against what the diff touches (CONTRIBUTING.md).
+        run: python3 tools/tier.py
 
   tests:
     name: Tool tests
