@@ -24,7 +24,7 @@ new commits are read.
 """
 import json, os, re, subprocess
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-VERSION = 'GW4E69'
+VERSION = 'GW4E69-rev0'
 OUT = os.path.join(ROOT, 'build', 'dashboard_history.json')
 REPORTS = os.path.join(ROOT, 'build', 'dashboard_reports.json')
 REPORT = os.path.join(ROOT, 'build', VERSION, 'report.json')

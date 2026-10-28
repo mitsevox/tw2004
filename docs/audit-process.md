@@ -50,18 +50,17 @@ From the main checkout, on the branch that carries pull requests:
 ```
 git fetch origin
 git checkout -B <pr-branch> review/<name>
-git merge origin/main          # if main moved; message ends with build/GW4E69/main.dol: OK
-rm build/GW4E69/src/<OldName>.o   # for each unit the pass (or main) renamed or removed
-python configure.py && ninja   # build/GW4E69/main.dol: OK
+git merge origin/main          # if main moved; message ends with build/GW4E69-rev0/main.dol: OK
+rm build/GW4E69-rev0/src/<OldName>.o   # for each unit the pass (or main) renamed or removed
+python configure.py && ninja   # build/GW4E69-rev0/main.dol: OK
 python tools/quality/audit.py --check
 python tools/quality/lint.py --diff origin/main --compile
 git push -f origin <pr-branch>
 ```
 
-Then open the pull request (Before / After / How), and merge it with a merge commit once both
-`build (GW4E69)` checks are green. decomp.dev's bot reports renamed functions as new and broken
-matches; that is expected. Every commit on the branch, merges included, ends with
-`build/GW4E69/main.dol: OK`.
+Then open the pull request (Before / After / How), and merge it with a merge commit once the
+`Validate targets` check is green. Every commit on the branch, merges included, ends with
+`build/GW4E69-rev0/main.dol: OK`.
 
 Merge conflicts with `main` are resolved by keeping both sides' intent: the plan and `audit.tsv`
 keep every row that is done on either side; renamed types and functions take main's new name at

@@ -4,7 +4,7 @@ Ranges go under the unit's code lines (.init and/or .text) in the order given.
 Exits 0 only when the DOL is OK; any failure exits 1 with both files unchanged."""
 import pathlib, re, subprocess, sys
 ROOT = pathlib.Path(__file__).resolve().parents[2].as_posix()   # the checkout this script lives in
-SP, CF = ROOT + '/config/GW4E69/splits.txt', ROOT + '/configure.py'
+SP, CF = ROOT + '/config/GW4E69-rev0/splits.txt', ROOT + '/configure.py'
 if len(sys.argv) < 2: sys.exit(__doc__)
 unit, ranges = sys.argv[1], sys.argv[2:]
 sp0 = open(SP, encoding='utf-8', newline='').read(); cf0 = open(CF, encoding='utf-8', newline='').read()
@@ -29,7 +29,7 @@ if r.returncode == 0 and not ok:
     if not pathlib.Path(dtk).exists():
         dtk += '.exe'
     check = subprocess.run([dtk, 'shasum', '-c',
-                            'config/GW4E69/build.sha1'], cwd=ROOT, capture_output=True, text=True)
+                            'config/GW4E69-rev0/build.sha1'], cwd=ROOT, capture_output=True, text=True)
     ok = check.returncode == 0 and 'main.dol: OK' in check.stdout
 print(unit, 'OK' if ok else 'FAILED')
 if not ok:

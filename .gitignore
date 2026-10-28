@@ -53,6 +53,3 @@ compile_commands.json
 *.exe
 scratch/
 
-# CI: the Pages export and the pages-history worktree (.github/workflows/build.yml)
-/site/
-/pages-history/

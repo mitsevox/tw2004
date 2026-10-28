@@ -63,14 +63,20 @@ else:
         """Nothing to do: stop_tree() ends the whole process group."""
 
 
+# The compilers and binutils configure.py downloads, or the build image's copies (CI sets
+# TW_COMPILERS and TW_BINUTILS to them).
+COMPILERS = pathlib.Path(os.environ.get('TW_COMPILERS') or ROOT / 'build/compilers')
+BINUTILS = pathlib.Path(os.environ.get('TW_BINUTILS') or ROOT / 'build/binutils')
+
+
 def mwcc(version='GC/2.5'):
     """The command that runs the Metrowerks compiler (a list: add flags and files after it)."""
-    return WRAP + [(ROOT / 'build/compilers' / version / 'mwcceppc.exe').as_posix()]
+    return WRAP + [(COMPILERS / version / 'mwcceppc.exe').as_posix()]
 
 
 def binutil(name):
     """A powerpc-eabi binutils program by its short name: binutil('nm'), binutil('readelf')."""
-    return (ROOT / 'build/binutils' / f'powerpc-eabi-{name}{EXE}').as_posix()
+    return (BINUTILS / f'powerpc-eabi-{name}{EXE}').as_posix()
 
 
 # paths are handed out with forward slashes: Windows programs accept them, and a Windows path

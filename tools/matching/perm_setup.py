@@ -17,7 +17,7 @@ os.makedirs(out, exist_ok=True)
 def unit_flags(unit):
     """The compiler and cflags build.ninja uses for this unit's object (per-object extra_cflags included)."""
     nj = re.sub(r'\$\n\s*', '', open(ROOT + '/build.ninja', encoding='utf-8').read())
-    obj = NINJA_SEP.join(['build', 'GW4E69', 'src', '%s.o:' % unit.replace('/', NINJA_SEP)])
+    obj = NINJA_SEP.join(['build', 'GW4E69-rev0', 'src', '%s.o:' % unit.replace('/', NINJA_SEP)])
     i = nj.index('build ' + obj)
     block = nj[i:nj.find('\nbuild ', i + 1)]
     ver = re.search(r'^\s*mw_version = (\S+)', block, re.M).group(1).replace('\\', '/')
@@ -48,7 +48,7 @@ def bracket_end(s, i):
 
 
 # 1. preprocessed source, other functions reduced to prototypes (inline helpers kept whole)
-pp = subprocess.run(CC + CFLAGS + ['-i', 'include', '-i', 'build/GW4E69/include'] + DEFS
+pp = subprocess.run(CC + CFLAGS + ['-i', 'include', '-i', 'build/GW4E69-rev0/include'] + DEFS
                     + ['-EP', f'src/{unit}.c'], cwd=ROOT, capture_output=True, text=True, check=True).stdout
 pp = '\n'.join(l for l in pp.splitlines() if not l.startswith('#pragma'))
 res, pos = [], 0
@@ -73,11 +73,11 @@ while True:
 open(out + '/base.c', 'w', encoding='utf-8', newline='\n').write(''.join(res))
 
 # 2. target.o: the function's asm, assembled on its own
-asm = open(f'{ROOT}/build/GW4E69/asm/{unit}.s', encoding='utf-8').read()
+asm = open(f'{ROOT}/build/GW4E69-rev0/asm/{unit}.s', encoding='utf-8').read()
 m = re.search(r'^\.fn ' + re.escape(fn) + r',.*?^\.endfn ' + re.escape(fn) + r'$', asm, re.M | re.S)
 open(out + '/target.s', 'w', encoding='utf-8', newline='\n').write(
     '.include "macros.inc"\n.text\n.balign 4\n' + m.group(0) + '\n')
-subprocess.run([binutil('as'), '-mgekko', '-I', ROOT + '/build/GW4E69/include',
+subprocess.run([binutil('as'), '-mgekko', '-I', ROOT + '/build/GW4E69-rev0/include',
                 out + '/target.s', '-o', out + '/target.o'], check=True)
 
 # 3. compile.sh and settings.toml

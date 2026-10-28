@@ -88,8 +88,8 @@ The fixes that come up most often. Each points to its full entry below.
 
 - **Read EA's later source first, when there is one.** A debug build of a later game from the same
   studio and engine keeps EA's own declarations. For this game, TW07's PS3 debug info is split per
-  source file in `reference/tw07-ps3/cu/` (a machine
-  pairing of our functions with TW07's is `reference/tw07-ps3/pairs.tsv`). The compiler
+  source file in `references/tw07-ps3/cu/` (a machine
+  pairing of our functions with TW07's is `references/tw07-ps3/pairs.tsv`). The compiler
   differs, but the programmers' style carried over three years, and it decides register
   allocation. **[verified]** on 16 functions, in five patterns:
   - **EA's types:** a player index typed as EA's enum `PlayerNumber_t`, not `int`/`s32`, made four

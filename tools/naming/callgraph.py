@@ -1,4 +1,4 @@
-"""Evidence for naming a unit's functions, from the original's split objects (build/GW4E69/obj).
+"""Evidence for naming a unit's functions, from the original's split objects (build/GW4E69-rev0/obj).
     python tools/naming/callgraph.py <unit>           e.g. GoCamera, unsorted/sweep_8010FF5C
     python tools/naming/callgraph.py <unit> --unnamed only the functions still named fn_XXXXXXXX
 For every function of the unit, leaves first (a function comes after everything it calls inside the
@@ -9,7 +9,7 @@ Run after a build (`ninja` makes the split objects)."""
 import bisect, collections, json, pathlib, re, struct, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-OBJ = ROOT / 'build/GW4E69/obj'
+OBJ = ROOT / 'build/GW4E69-rev0/obj'
 R_PPC_REL24 = 10
 
 
@@ -76,7 +76,7 @@ def read_obj(path):
 
 
 def current_objects():
-    """The split objects of the current units (objdiff.json); build/GW4E69/obj also keeps objects
+    """The split objects of the current units (objdiff.json); build/GW4E69-rev0/obj also keeps objects
     of splits since replaced."""
     return [p for p in (ROOT / u['target_path'] for u in json.loads((ROOT / 'objdiff.json').read_text())['units']
                         if u.get('target_path')) if p.exists()]
@@ -84,7 +84,7 @@ def current_objects():
 
 def symbol_addresses():
     out = collections.defaultdict(list)
-    for l in (ROOT / 'config/GW4E69/symbols.txt').read_text(encoding='utf-8').splitlines():
+    for l in (ROOT / 'config/GW4E69-rev0/symbols.txt').read_text(encoding='utf-8').splitlines():
         m = re.match(r'^(\S+) = \.text:0x([0-9A-Fa-f]+);', l)
         if m:
             out[m.group(1)].append(int(m.group(2), 16))

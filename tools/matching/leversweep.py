@@ -5,7 +5,7 @@ written, every result is a candidate to apply by hand and check.
     python tools/matching/leversweep.py --from-report [--min 95] [--skip Unit,Unit] [--minutes 6] [-j N]
 
 --from-report takes every non-exact function of report.json at or above --min percent, closest first
-(rebuild the report first: `ninja build/GW4E69/report.json`). Each function gets its permuter
+(rebuild the report first: `ninja build/GW4E69-rev0/report.json`). Each function gets its permuter
 directory (perm_setup.py, from the current src/) and --minutes of sweeping on -j worker processes
 (default: all cores). An overnight run on 20 cores: `--from-report --min 95 -j 20` (80 functions,
 about 8 hours). The time per function is sized for 20 cores: on 4 cores, 6 minutes
@@ -574,7 +574,7 @@ def _write(unit, fn, base_score, results, nlev, secs, note, f=None, L=None, n1=0
             lines += ['  - ' + L[k][1] for k in combo]
             if any(L[k][0][0] in ('id', 'addr') for k in combo):
                 lines.append('  fake match: EA did not write this (an identity inline, or an address '
-                             'taken only to steer the compiler). Look in TW07 (reference/'
+                             'taken only to steer the compiler). Look in TW07 (references/'
                              'tw07-ps3/cu/) for EA\'s real helper or macro at this spot and use it; '
                              'otherwise keep it with a `// fake match:` comment, the inline named '
                              'for what it reads.')
@@ -599,7 +599,7 @@ def _write(unit, fn, base_score, results, nlev, secs, note, f=None, L=None, n1=0
 
 
 def from_report(min_pct, skip):
-    r = json.load(open(ROOT / 'build/GW4E69/report.json'))
+    r = json.load(open(ROOT / 'build/GW4E69-rev0/report.json'))
     todo = []
     for u in r['units']:
         unit = u['name'].split('/', 1)[1]

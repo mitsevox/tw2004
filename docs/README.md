@@ -33,7 +33,7 @@
 - [name-pairing.md](evidence/name-pairing.md): EA name proposals from TW07 and TW06, not yet applied.
 - [mad-names.md](evidence/mad-names.md): names for EA's MAD movie decoder, from two builds.
 - [filemap.md](evidence/filemap.md): EA's `__FILE__` names pinned to functions.
-- [../reference/](../reference/README.md): the other EA builds whose symbols the names come from.
+- [../references/](../references/README.md): the other EA builds whose symbols the names come from.
 
 ## Decomp-toolkit docs: [`dtk/`](dtk/)
 

@@ -9,7 +9,7 @@ or less are unreliable (tiny setters collide); apply only the larger ones, then 
 applied name is a new anchor. Does not edit symbols.txt.
 """
 import json, re, glob, os, collections, sys
-SYMS = 'C:/dev/tw2004/config/GW4E69/symbols.txt'
+SYMS = 'C:/dev/tw2004/config/GW4E69-rev0/symbols.txt'
 exec(open('C:/dev/tw2004/tools/matching/sdk/sdk_units.py').read().split("tw={}")[0])
 OBJ = sys.argv[1]; OUT = sys.argv[2] if len(sys.argv) > 2 else 'layout_props.json'
 by_addr = {}; by_name = collections.defaultdict(list)

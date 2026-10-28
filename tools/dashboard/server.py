@@ -4,8 +4,8 @@ Local progress dashboard for the tw2004 decompilation.
 
     python tools/dashboard/server.py [--port 8420] [--host 0.0.0.0]
 
-Serves one page and /api/progress. Reads build/GW4E69/report.json (written by every `ninja`
-run), config/GW4E69/symbols.txt, build/dashboard_history.json (written by the post-commit hook,
+Serves one page and /api/progress. Reads build/GW4E69-rev0/report.json (written by every `ninja`
+run), config/GW4E69-rev0/symbols.txt, build/dashboard_history.json (written by the post-commit hook,
 see refresh_history.py). Standard library only. Never launches another program: on Windows a
 console program started from a windowless process opens a terminal window.
 """
@@ -13,7 +13,7 @@ import argparse, json, os, re, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-VERSION = 'GW4E69'
+VERSION = 'GW4E69-rev0'
 REPORT = os.path.join(ROOT, 'build', VERSION, 'report.json')
 SYMBOLS = os.path.join(ROOT, 'config', VERSION, 'symbols.txt')
 HISTORY = os.path.join(ROOT, 'build', 'dashboard_history.json')
@@ -283,7 +283,7 @@ footer code{font-family:ui-monospace,Consolas,monospace}
 </style></head><body><div class="wrap">
 <header><h1>Tiger Woods PGA Tour 2004 <span>&middot; decompilation progress</span></h1><div class="meta" id="meta">loading&hellip;</div></header>
 <div id="main"></div>
-<footer>Reads <code>build/GW4E69/report.json</code> (written by every <code>ninja</code> run), <code>symbols.txt</code> and <code>build/dashboard_history.json</code> (written by the post-commit hook). Refreshes every 20&nbsp;s. Read-only.</footer>
+<footer>Reads <code>build/GW4E69-rev0/report.json</code> (written by every <code>ninja</code> run), <code>symbols.txt</code> and <code>build/dashboard_history.json</code> (written by the post-commit hook). Refreshes every 20&nbsp;s. Read-only.</footer>
 </div>
 <script>
 const API='/api/progress',REFRESH=20000;

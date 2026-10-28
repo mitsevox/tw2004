@@ -148,8 +148,8 @@ UB = [('ub-missing-return', 'return value expected'),
 CFLAGS = ['-nodefaults', '-proc', 'gekko', '-align', 'powerpc', '-enum', 'int', '-fp', 'hardware',
           '-Cpp_exceptions', 'off', '-O4,p', '-inline', 'smart', '-nosyspath', '-RTTI', 'off',
           '-fp_contract', 'on', '-str', 'reuse', '-common', 'on', '-multibyte', '-lang=c',
-          '-i', 'include', '-i', 'build/GW4E69/include', '-i', 'build/GW4E69/gen',
-          '-DBUILD_VERSION=0', '-DVERSION_GW4E69',
+          '-i', 'include', '-i', 'build/GW4E69-rev0/include', '-i', 'build/GW4E69-rev0/gen',
+          '-DBUILD_VERSION=0', '-DVERSION_GW4E69_REV0',
           '-DVERSION=0', '-DNDEBUG=1', '-w', 'all', '-msgstyle', 'gcc']
 
 
@@ -435,7 +435,7 @@ def compile_units(units):
     ninja = (ROOT / 'build.ninja').read_text(encoding='utf-8', errors='replace')
 
     def target(u):
-        return NINJA_SEP.join(['build', 'GW4E69', 'src', '%s.o' % u.replace('/', NINJA_SEP)])
+        return NINJA_SEP.join(['build', 'GW4E69-rev0', 'src', '%s.o' % u.replace('/', NINJA_SEP)])
     # A .c file #included into another unit (char_tex_manager.c into char.c) is checked by
     # compiling the unit that includes it.
     units = set(units)

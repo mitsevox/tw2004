@@ -7,7 +7,7 @@ Section bounds are hex strings (end exclusive). A lib that is not in configure.p
 SDK block (GC/1.2.5n + cflags_sdk, or GC/1.3 + cflags_runtime for MSL/Runtime libs).
 """
 import json, re, sys
-ROOT = 'C:/dev/tw2004'; V = 'GW4E69'
+ROOT = 'C:/dev/tw2004'; V = 'GW4E69-rev0'
 spec = json.load(open(sys.argv[1]))
 sp = ROOT + f'/config/{V}/splits.txt'; s = open(sp, newline='').read(); nl = '\r\n' if '\r\n' in s else '\n'
 have = set(re.findall(r'^(\S.*?):\s*$', s, re.M))

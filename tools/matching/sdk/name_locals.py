@@ -6,10 +6,10 @@ compared by bytes (relocation-masked) at the exact addresses implied by the unit
 Applies scope:local renames to symbols.txt.
 """
 import struct, re, json, glob, collections
-ROOT = 'C:/dev/tw2004'; V = 'GW4E69'; OBJ = 'C:/dev/prime/build/GM8E01_00/obj'; IMP = ROOT + '/build/sdk_import'
+ROOT = 'C:/dev/tw2004'; V = 'GW4E69-rev0'; OBJ = 'C:/dev/prime/build/GM8E01_00/obj'; IMP = ROOT + '/build/sdk_import'
 src = open(ROOT + '/tools/research/match_sdk_names.py').read()
 exec(src[src.index('def parse(p):'):src.index('# TW\n')])                   # parse(): (name, code, mask, calls, bind)
-td = open(ROOT + '/orig/GW4E69/sys/main.dol', 'rb').read() if False else open('C:/dev/scratch/tw/main.dol', 'rb').read()
+td = open(ROOT + '/orig/GW4E69-rev0/sys/main.dol', 'rb').read() if False else open('C:/dev/scratch/tw/main.dol', 'rb').read()
 toffs = struct.unpack('>7I', td[0:0x1C]); tad = struct.unpack('>7I', td[0x48:0x64]); tsz = struct.unpack('>7I', td[0x90:0xAC])
 def tw(addr, size):
     for o, a, s in zip(toffs, tad, tsz):

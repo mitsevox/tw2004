@@ -11,16 +11,16 @@ renames nothing.
     python tools/naming/pairnames.py --holdout 0.5 [--seed N]
         precision test: hides that share of the functions already named after a reference name,
         re-runs the pairing, and reports how often each confidence level gets the hidden name back
-Run after a build (it reads the split objects in build/GW4E69/obj, like callgraph.py). ~30 s.
+Run after a build (it reads the split objects in build/GW4E69-rev0/obj, like callgraph.py). ~30 s.
 
-References (reference/, derived inventories only):
+References (references/, derived inventories only):
   tw07   TW07 PS3 DWARF, cu/<file>.txt: every function per EA source file, in source order, with its
          PS3 size, parameters (C++ `this` included), locals and the functions it inlines.
   tw06p  TW06 PS2 EA_DASH.ELF stabs, functions.cpp: EA's shared packages (SharedFileIO, TagFile,
          ChecksumCRC32, TibExt, ...), per source file in address order, with sizes and parameters.
 Hints taken as extra evidence (never alone): docs/evidence/tw06-names.md suggestions not yet applied
-(TW06 Xbox PDB / PS2 map pairing, code E2), reference/tw07-ps3/pairs.tsv (the PC pairing
-that saw TW07's call graph and strings), reference/007eon-ps2/shared_functions.tsv.
+(TW06 Xbox PDB / PS2 map pairing, code E2), references/tw07-ps3/pairs.tsv (the PC pairing
+that saw TW07's call graph and strings), references/007eon-ps2/shared_functions.tsv.
 
 Method, per unit (our .o = one EA source file, functions in source order):
  1. Anchors: our functions that already carry a reference name (exact, `::` -> `_`). They give the
@@ -62,7 +62,7 @@ Method, per unit (our .o = one EA source file, functions in source order):
     (neighbour vote); their pairs are capped at C unless bracketed.
 Measured (--holdout 0.5, three seeds): A 99%, B 91-96%, C 64-70% get the hidden name
 back; a hand check of 30 A/B pairs on real fn_ functions: docs/evidence/name-pairing.md.
-Codes in the output follow config/GW4E69/name_sources.tsv: E2b = TW07 name, E2 = TW06 name, E1 =
+Codes in the output follow config/GW4E69-rev0/name_sources.tsv: E2b = TW07 name, E2 = TW06 name, E1 =
 EA's text, then the machine lines above. Every proposal is a candidate, checked against the code
 (docs/style.md "Names"), never a rename.
 Not scored: IStudio (UIS*, UIStudio), the MAD decoder (maddec*, madidct) and runtime/MSL units (named from
@@ -73,7 +73,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import callgraph as cg  # noqa: E402
 
 ROOT = cg.ROOT
-REF = ROOT / 'reference'
+REF = ROOT / 'references'
 SKIP = re.compile(r'^(UIS\w*|UIStudio|maddeca?|madidct|runtime/.*|src/MSL_C/.*)$')
 
 # ---------------------------------------------------------------------------------------- types
@@ -1022,7 +1022,7 @@ def globals_survey(P, props):
     inventories name (the TW06 PS2 per-file globals of EA's shared packages), and how many are used
     by a function that has a reference pair (their names would come with a TW07 globals export)."""
     syms = {}
-    for l in (ROOT / 'config/GW4E69/symbols.txt').read_text(encoding='utf-8').splitlines():
+    for l in (ROOT / 'config/GW4E69-rev0/symbols.txt').read_text(encoding='utf-8').splitlines():
         m = re.match(r'^(lbl_[0-9A-F]{8}) = (\.\w+):0x([0-9A-F]+); // (.*)$', l)
         if m and m.group(2) in ('.data', '.sdata', '.bss', '.sbss') and 'data:string' not in m.group(4):
             syms[m.group(1)] = m.group(2)
@@ -1053,7 +1053,7 @@ def globals_survey(P, props):
         m = re.match(r'^/\* (\w+) [0-9a-f]+ \*/ (?:static )?(.*?)\s*\**(\w+)(\[\d*\])*;', l)
         if m and cur:
             t6[cur].append(m.group(3))
-    ours = set(re.findall(r'^(\w+) = ', (ROOT / 'config/GW4E69/symbols.txt').read_text(encoding='utf-8'), re.M))
+    ours = set(re.findall(r'^(\w+) = ', (ROOT / 'config/GW4E69-rev0/symbols.txt').read_text(encoding='utf-8'), re.M))
     shared = {f: [(n, n in ours) for n in t6[f]] for f in ('SharedFileIO.c', 'TagFile.c', 'ChecksumCRC32.c',
                                                             'llSharedFileIO.c', 'TibExt.cpp')}
     return dict(total=len(syms), used=len(users), by_paired=by_paired, by_anchor=by_anchor,

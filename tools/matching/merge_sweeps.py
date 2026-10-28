@@ -42,7 +42,7 @@ def parse(files):
 
 def addresses():
     out = {}
-    for l in (ROOT / 'config/GW4E69/symbols.txt').read_text(encoding='utf-8').splitlines():
+    for l in (ROOT / 'config/GW4E69-rev0/symbols.txt').read_text(encoding='utf-8').splitlines():
         m = re.match(r'^(\w+) = \.text:0x([0-9A-Fa-f]+);', l)
         if m:
             out.setdefault(m.group(1), int(m.group(2), 16))

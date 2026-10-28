@@ -3,7 +3,7 @@ uses (ghcr.io/mitsevox/tw2004-build), without docker: registry API + the image's
     TW_BUILD_TOKEN=<token> python tools/cloud/fetch_orig.py
 The token is a GitHub token with read:packages that the OWNER creates and stores as a secret of the
 cloud environment; nothing here prints or stores it. Extracts orig/ into the repo root and checks the
-DOL against config/GW4E69/build.sha1."""
+DOL against config/GW4E69-rev0/build.sha1."""
 import base64, hashlib, io, json, os, pathlib, sys, tarfile, urllib.error, urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -56,10 +56,10 @@ for layer in reversed(man['layers']):     # the orig/ files are in one of the la
                 found += m.isfile()
     if found:
         break
-dol = ROOT / 'orig/GW4E69/sys/main.dol'
+dol = ROOT / 'orig/GW4E69-rev0/sys/main.dol'
 if not dol.exists():
-    sys.exit('no orig/GW4E69/sys/main.dol in the image layers')
-want = next(l.split(':', 1)[1].strip() for l in (ROOT / 'config/GW4E69/config.yml').read_text().splitlines()
+    sys.exit('no orig/GW4E69-rev0/sys/main.dol in the image layers')
+want = next(l.split(':', 1)[1].strip() for l in (ROOT / 'config/GW4E69-rev0/config.yml').read_text().splitlines()
             if l.startswith('hash:'))
 got = hashlib.sha1(dol.read_bytes()).hexdigest()
 print('orig/: %d files; main.dol sha1 %s: %s' % (found, got, 'OK' if got == want else 'MISMATCH (want %s)' % want))

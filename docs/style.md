@@ -6,7 +6,7 @@ produce; this page decides how the source reads. The goal is code as close to EA
 the match allows: a reader who knows the game can follow each file without knowing how it was
 decompiled. EA's 32-bit habits stay (pointers in `int`, literal sizes, type puns).
 
-Every change ends with `build/GW4E69/main.dol: OK`. `python tools/quality/lint.py <files>` checks
+Every change ends with `build/GW4E69-rev0/main.dol: OK`. `python tools/quality/lint.py <files>` checks
 the mechanical rules and compiles each file to catch undefined behaviour.
 
 The first half of this page is the conventions: what correct code looks like. The second half,
@@ -18,7 +18,7 @@ Files
 - **Header comment.** Every file opens with one to three lines saying what it does in the game:
   which system or game mode, and the main data it works on.
 - **File names**, strongest evidence first: EA's own (an assert string in the binary, or the file
-  in a related EA build, `reference/`), then a TW06 class name the code confirms, then our own.
+  in a related EA build, `references/`), then a TW06 class name the code confirms, then our own.
 - **Order inside a file:** includes, types local to the file, data, prototypes of static
   functions, then functions in address order (the binary fixes the order).
 
@@ -28,11 +28,11 @@ Names
 - **Everything is named:** functions, globals, struct fields, parameters and locals. No
   `fn_XXXXXXXX` or `lbl_XXXXXXXX` survives an audit.
 - **A name says what the code does.** Where EA's own name is known (its text in the binary, or a
-  related EA build in `reference/`), use it as EA spelled it; otherwise name it from a careful
+  related EA build in `references/`), use it as EA spelled it; otherwise name it from a careful
   reading of the code. Either way the name is ours to stand behind: it is not cited anywhere, and
-  it never claims more than the code shows. Before naming a function, look for it in `reference/`.
+  it never claims more than the code shows. Before naming a function, look for it in `references/`.
 - Renames go through `tools/naming/name.py` (functions) or `tools/naming/rename.py` (globals),
-  which change `config/GW4E69/symbols.txt`, the C and the headers together, so the C and the
+  which change `config/GW4E69-rev0/symbols.txt`, the C and the headers together, so the C and the
   assembly agree; never alias with `#define`. They also update the "Now" column of
   `docs/evidence/tw06-names.md`; nothing else in `docs/evidence/` changes with a rename.
 - **EA's naming style.** Functions `System_Verb` (`View_SetCamera`, `Session_SetNumPlayers`),
@@ -202,7 +202,7 @@ comment) goes in a commit of its own, or is left for that file's pass.
 **Every pass checks the file's two ends.** For the first and last functions, the commit message
 says what shows they belong to this file. Proof is one of these: the data they use (or a table
 that points at them) sits in this file's data, in the same order as the other files; or a related
-EA build (`reference/`) keeps them in the same file. When a function at an end
+EA build (`references/`) keeps them in the same file. When a function at an end
 uses no data and nothing else settles it, it stays where it is, and the commit message says so and
 what was checked. A boundary between two named files moves only with proof. An `unsorted/`
 scrap is the exception, as it cannot stay where it is: with no proof it goes to the neighbour the
@@ -263,7 +263,7 @@ Names
 | **C1.** A `fn_`/`lbl_` name, or a hybrid (`fn_800C8C70_Read`) | A real name |
 | **C2.** A name that claims more than the code shows, or reuses a name another struct or function already uses for something else | A name the code supports, used for one thing |
 | **C3.** A field named by its offset (`p->nC38`, `fF08`) that any code touches | A name for what it holds |
-| **C4.** Locals and parameters like `a`, `b`, `p`, `t0`, `temp_r3` | EA's names where `reference/` has them, else Hungarian names for what they hold; a parameter the function never reads takes the name of the matching parameter of the function its callers mirror |
+| **C4.** Locals and parameters like `a`, `b`, `p`, `t0`, `temp_r3` | EA's names where `references/` has them, else Hungarian names for what they hold; a parameter the function never reads takes the name of the matching parameter of the function its callers mirror |
 | **C5.** A value with a meaning left as a bare number: a flag bit, a group of bits, a count or table size | EA's enum or define, or ours, used everywhere the value is |
 
 Structure

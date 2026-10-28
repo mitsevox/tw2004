@@ -28,7 +28,7 @@ def first_sdk_text(units, splits):
     return lo
 
 
-def categorise_auto_units(objdiff='objdiff.json', splits='config/GW4E69/splits.txt', write=True):
+def categorise_auto_units(objdiff='objdiff.json', splits='config/GW4E69-rev0/splits.txt', write=True):
     """-> (boundary, units changed, their total size unknown here). Writes objdiff.json."""
     path = pathlib.Path(objdiff)
     if not path.is_file():         # a fresh checkout: no split yet, so no objdiff.json to amend
@@ -51,7 +51,7 @@ def categorise_auto_units(objdiff='objdiff.json', splits='config/GW4E69/splits.t
 
 
 if __name__ == '__main__':
-    b, c = categorise_auto_units(ROOT / 'objdiff.json', ROOT / 'config/GW4E69/splits.txt',
+    b, c = categorise_auto_units(ROOT / 'objdiff.json', ROOT / 'config/GW4E69-rev0/splits.txt',
                                  write=False)
     print('first SDK .text at 0x%08X: %d uncategorised gap units below it would count as game'
           % (b or 0, len(c)))

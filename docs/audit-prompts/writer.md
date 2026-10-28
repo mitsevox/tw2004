@@ -18,8 +18,8 @@ other files the pass covers. For a chunk, read the whole file first, then change
 functions in `{SCOPE}` and what they own. Check the file's boundaries and whether its name is
 EA's; rename only on proof. Files already marked done in `docs/audit.tsv` show the conventions.
 
-Look in `reference/` for EA's names before naming anything, and search every build there. Where
-`reference/` has EA's name for a function, global, type, field, enum, parameter or local, use it
+Look in `references/` for EA's names before naming anything, and search every build there. Where
+`references/` has EA's name for a function, global, type, field, enum, parameter or local, use it
 as EA spelled it (style.md, "EA's naming style"). Locals with no reference name get Hungarian
 names (not `d`, `s`, `p`, `t0`).
 
@@ -29,13 +29,13 @@ keep the edit to that one call and say so.
 SETUP (from the worktree root; if `git fetch` is refused, use the local `origin/main`):
 ```
 git fetch -q origin && git checkout -B audit/{BRANCH} origin/main
-ln -s {MAIN}/orig/GW4E69/sys orig/GW4E69/sys
+ln -s {MAIN}/orig/GW4E69-rev0/sys orig/GW4E69-rev0/sys
 mkdir -p build && for d in compilers binutils tools; do ln -s {MAIN}/build/$d build/$d; done
-python configure.py && ninja    # must end with build/GW4E69/main.dol: OK before you change anything
+python configure.py && ninja    # must end with build/GW4E69-rev0/main.dol: OK before you change anything
 ```
 
 Finished means all of these hold:
-- `ninja` ends with `build/GW4E69/main.dol: OK`.
+- `ninja` ends with `build/GW4E69-rev0/main.dol: OK`.
 - `python tools/quality/lint.py --diff origin/main --compile` reports 0 findings, and
   `python tools/quality/lint.py` on the file has none.
 - The `audit.tsv` and `audit-plan.tsv` rows stay `open`; the writer never marks them done.
@@ -43,13 +43,13 @@ Finished means all of these hold:
 - The pass is one commit on `audit/{BRANCH}`. Its message stands alone as the record of the
   pass: what changed by category, the proof of both ends of the file (or, where unproven, what
   was checked and why it stays), and the decisions you made. The last line before any trailers is
-  `build/GW4E69/main.dol: OK`.
+  `build/GW4E69-rev0/main.dol: OK`.
 - Out-of-scope changes go in a separate commit before the pass commit, with their own reason and
   the same last line.
 - If you rename, split or merge the file, update every place that records its name:
   `configure.py`, `splits.txt`, `audit.tsv` (via `audit.py --sync`), `docs/audit-plan.tsv`,
   `src/README.md`, other files' comments. Leave frozen evidence logs alone.
-- Every static function has `scope:local` in `config/GW4E69/symbols.txt`.
+- Every static function has `scope:local` in `config/GW4E69-rev0/symbols.txt`.
 - Comments say what the code does. Check every claim against the code and its callers before
   committing. Any claim about code outside the function (every, all, never, only, callers, other
   files) is traced repo-wide first; the reviewer will trace each one. A branch that can never run
