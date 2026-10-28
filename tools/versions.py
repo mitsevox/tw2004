@@ -28,6 +28,11 @@ IDENT=re.compile(r'\b[A-Za-z_][A-Za-z0-9_]*\b')
 GROUP=re.compile(r'^\s*#\s*define\s+([A-Za-z_][A-Za-z0-9_]*)\s+(.+?)\s*$')
 
 
+def read(path):
+    """A source file as text; bytes that are not UTF-8 (a Latin-1 copyright sign) never stop the check."""
+    return Path(path).read_text(encoding='utf-8',errors='replace')
+
+
 def strip_comments(text):
     """Blank C comments, keeping line numbers, so that prose never reads as a token."""
     text=re.sub(r'/\*.*?\*/',lambda m:re.sub(r'[^\n]',' ',m.group(0)),text,flags=re.S)
@@ -151,10 +156,10 @@ class Versions:
 
     def view(self,path,target_id):
         if target_id not in self.ids:raise SystemExit('versions: unknown target '+target_id)
-        return [line for line,_ in self.walk(Path(path).read_text().splitlines(),target_id) if line is not None]
+        return [line for line,_ in self.walk(read(path).splitlines(),target_id) if line is not None]
 
     def check_file(self,path):
-        text=strip_comments(Path(path).read_text());errors=[]
+        text=strip_comments(read(path));errors=[]
         for _,error in self.walk(text.splitlines()):
             if error:errors.append('%s:%s'%(path,error))
         for number,line in enumerate(text.splitlines(),1):
