@@ -87,6 +87,7 @@ class Targets(unittest.TestCase):
             root=scratch(tmp);(root/'include').mkdir();(root/'src').mkdir()
             (root/'include/version.h').write_text('#define GROUP_ALL (%s)\n'%' || '.join(define(i) for i in ids))
             (root/'src/a.c').write_text('int a;\n#if %s\nint first;\n#else\nint other;\n#endif\n#ifdef DEBUG\n#if GROUP_ALL\nint all;\n#endif\n#endif\n'%first)
+            (root/'src/latin1.c').write_bytes(b'/* \xa9 1999 */\nint c;\n')
             versions=Versions(root)
             self.assertEqual(versions.check(),[])
             self.assertEqual(versions.view(root/'src/a.c',ids[0]),['int a;','int first;','#ifdef DEBUG','int all;','#endif'])
